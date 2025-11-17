@@ -1,0 +1,100 @@
+<?php
+
+/**
+ * Shared Admin Hero Partial
+ * Usage:
+ *   require_once __DIR__ . '/admin_hero.php';
+ *   renderAdminHero('Title', 'Optional subtitle', 'fa-cog');
+ */
+
+if (!function_exists('renderAdminHero')) {
+    /**
+     * Render a standardized admin hero.
+     * @param string $title
+     * @param string $subtitle
+     * @param string $icon Font Awesome icon class (e.g., 'fa-cog')
+     * @param array $options Optional settings:
+     *   - 'description' => string (additional small text under subtitle)
+     *   - 'actions' => array of arrays [{label, href, class, icon}]
+     *   - 'show_logo' => bool (display club logo at left)
+     *   - 'logo_size' => string small|normal|large
+     */
+    function renderAdminHero($title, $subtitle = '', $icon = 'fa-tools', $options = [])
+    {
+        // Load site settings for hero variables
+        if (!function_exists('get_site_setting')) {
+            @require_once __DIR__ . '/site_settings.php';
+        }
+        $heroDefaults = function_exists('get_hero_defaults') ? get_hero_defaults() : [];
+
+        if (!defined('ADMIN_HERO_CSS_EMITTED')) {
+            define('ADMIN_HERO_CSS_EMITTED', true);
+            echo '<style>';
+            echo '.admin-hero-card{position:relative;background:linear-gradient(135deg,var(--theme-accent-primary, var(--primary-blue)) 0%, var(--theme-accent-secondary, var(--secondary-blue)) 100%);color:var(--theme-text-primary,#fff);border-radius:12px;padding:28px 30px;margin:18px 10px 24px;overflow:hidden;box-shadow:0 4px 14px rgba(0,0,0,0.15);}';
+            // Overlay handled by global theme gradient; no per-page overlay
+            echo '.admin-hero-card::after{content:"";position:absolute;top:-40%;right:-10%;width:60%;height:180%;background:rgba(255,255,255,.08);transform:rotate(18deg);z-index:1;pointer-events:none;}';
+            echo '.admin-hero-content{position:relative;z-index:2;}';
+            echo '.admin-hero-grid{display:flex;align-items:center;gap:16px;justify-content:center;flex-wrap:wrap;}';
+            echo '.admin-hero-logo{z-index:2;}';
+            echo '.admin-hero-actions{display:flex;justify-content:flex-end;gap:.5rem;margin:-10px 10px 18px;flex-wrap:wrap;}';
+            echo '</style>';
+        }
+
+        $safeTitle = htmlspecialchars($title, ENT_QUOTES, 'UTF-8');
+        $safeSubtitle = htmlspecialchars($subtitle ?? '', ENT_QUOTES, 'UTF-8');
+        $safeIcon = htmlspecialchars($icon ?? 'fa-tools', ENT_QUOTES, 'UTF-8');
+        $description = isset($options['description']) ? htmlspecialchars($options['description'], ENT_QUOTES, 'UTF-8') : '';
+        $actions = isset($options['actions']) && is_array($options['actions']) ? $options['actions'] : [];
+
+        // Optional logo include
+        $showLogo = !empty($options['show_logo']);
+        $logoSize = !empty($options['logo_size']) ? $options['logo_size'] : 'small';
+        if ($showLogo) {
+            @require_once __DIR__ . '/hero_logo.php';
+            if (function_exists('getHeroLogoCSSLink')) {
+                echo getHeroLogoCSSLink();
+            }
+        }
+
+        echo '<section class="admin-hero-card" aria-label="' . $safeTitle . '">';
+        echo '  <div class="admin-hero-content text-center">';
+        echo '      <div class="admin-hero-grid">';
+        if ($showLogo && function_exists('renderHeroLogo')) {
+            echo '<div class="admin-hero-logo">';
+            renderHeroLogo('', 'W5OBM Amateur Radio Club', $logoSize);
+            echo '</div>';
+        }
+        echo '      <div class="admin-hero-head">';
+        echo '      <h1 class="h3 fw-bold mb-2">';
+        if ($safeIcon) {
+            echo '          <i class="fas ' . $safeIcon . ' me-2"></i>';
+        }
+        echo            $safeTitle . '</h1>';
+        if (!empty($safeSubtitle)) {
+            echo '      <p class="lead mb-0">' . $safeSubtitle . '</p>';
+        }
+        if (!empty($description)) {
+            echo '      <p class="mb-0">' . $description . '</p>';
+        }
+        echo '      </div>';
+        echo '      </div>';
+        echo '  </div>';
+        echo '</section>';
+
+        if (!empty($actions)) {
+            echo '<div class="admin-hero-actions">';
+            foreach ($actions as $btn) {
+                $label = htmlspecialchars($btn['label'] ?? 'Action', ENT_QUOTES, 'UTF-8');
+                $href = htmlspecialchars($btn['href'] ?? '#', ENT_QUOTES, 'UTF-8');
+                $cls = htmlspecialchars($btn['class'] ?? 'btn btn-outline-secondary btn-sm', ENT_QUOTES, 'UTF-8');
+                $icn = htmlspecialchars($btn['icon'] ?? '', ENT_QUOTES, 'UTF-8');
+                echo '<a class="' . $cls . '" href="' . $href . '">';
+                if (!empty($icn)) {
+                    echo '<i class="fas ' . $icn . ' me-1"></i>';
+                }
+                echo $label . '</a>';
+            }
+            echo '</div>';
+        }
+    }
+}

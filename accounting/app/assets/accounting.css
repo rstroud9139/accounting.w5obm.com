@@ -1,0 +1,94 @@
+:root {
+    --acc-muted: #6b7280;
+    --acc-border: #e5e7eb
+}
+
+.no-print {
+    print-color-adjust: exact
+}
+
+.accounting-subnav {
+    position: sticky;
+    top: 0.5rem;
+    z-index: 10
+}
+
+.card .card-header {
+    background: #f9fafb;
+    border-bottom: 1px solid var(--acc-border)
+}
+
+.table th,
+.table td {
+    vertical-align: middle
+}
+
+.table thead th {
+    white-space: nowrap
+}
+
+.badge-type {
+    font-weight: 600
+}
+
+.badge-type.income {
+    background: #e8f5e9;
+    color: #1b5e20
+}
+
+.badge-type.expense {
+    background: #ffebee;
+    color: #b71c1c
+}
+
+.badge-type.asset {
+    background: #e3f2fd;
+    color: #0d47a1
+}
+
+.badge-type.liability {
+    background: #fff3e0;
+    color: #e65100
+}
+
+.badge-type.equity {
+    background: #ede7f6;
+    color: #4527a0
+}
+
+@media print {
+    .no-print {
+        display: none !important
+    }
+}
+
+/* Print header visible only when printing */
+.print-header {
+    display: none;
+}
+
+@media print {
+    .print-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding-bottom: 8px;
+        margin-bottom: 12px;
+        border-bottom: 1px solid var(--acc-border);
+    }
+
+    .print-header img {
+        max-height: 50px;
+        width: auto;
+    }
+
+    .print-header .title {
+        font-size: 1.1rem;
+        font-weight: 600;
+    }
+
+    .print-header .meta {
+        color: var(--acc-muted);
+        font-size: 0.9rem;
+    }
+}

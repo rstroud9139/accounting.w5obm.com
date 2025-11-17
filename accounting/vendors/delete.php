@@ -1,0 +1,35 @@
+<-- /accounting/vendors/delete.php
+    <?php
+    require_once __DIR__ . '/../utils/session_manager.php';
+    require_once '../../include/dbconn.php';
+    require_once __DIR__ . '/../controllers/vendor_controller.php';
+
+    // Validate session
+    validate_session();
+
+    // CSRF protect
+    if (session_status() === PHP_SESSION_NONE) { session_start(); }
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        header('Location: list.php?status=invalid_request');
+        exit();
+    }
+    if (!isset($_POST['csrf_token']) || !isset($_SESSION['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
+        header('Location: list.php?status=error');
+        exit();
+    }
+
+    // Handle vendor deletion
+    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id'])) {
+        $id = $_POST['id'];
+
+        if (delete_vendor($id)) {
+            header('Location: list.php?status=deleted');
+            exit();
+        } else {
+            header('Location: list.php?status=error');
+            exit();
+        }
+    } else {
+        header('Location: list.php?status=invalid_request');
+        exit();
+    }

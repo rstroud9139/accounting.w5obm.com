@@ -12,6 +12,9 @@ session_start();
 require_once __DIR__ . '/../../include/dbconn.php';
 require_once __DIR__ . '/../lib/helpers.php';
 // Use legacy controller to match current DB schema
+// Error handling
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 require_once __DIR__ . '/../controllers/category_controller.php';
 
 // Authentication check

@@ -36,10 +36,18 @@ require_once __DIR__ . '/lib/helpers.php';
 // This keeps accounting.w5obm.com pointing at dev.w5obm.com auth
 $mainSiteBase = 'https://dev.w5obm.com/';
 
+// Build return URL so that, after login, control returns here and
+// this script can continue with permission checks and routing.
+$scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+$host = $_SERVER['HTTP_HOST'] ?? 'accounting.w5obm.com';
+$selfPath = rtrim(dirname($_SERVER['REQUEST_URI'] ?? '/accounting/index.php'), '/');
+$currentScript = $selfPath . '/index.php';
+$returnUrl = urlencode($scheme . '://' . $host . $currentScript);
+
 // Check authentication using consolidated functions
 if (!isAuthenticated()) {
     setToastMessage('info', 'Login Required', "Please login to access {$APP_NAME}.", 'club-logo');
-    header('Location: ' . $mainSiteBase . 'authentication/login.php');
+    header('Location: ' . $mainSiteBase . 'authentication/login.php?redirect=' . $returnUrl);
     exit();
 }
 
@@ -64,7 +72,7 @@ foreach ($DASHBOARDS as $dashboard) {
 }
 
 // If no dashboard found, show placeholder page
-$page_title = "{$APP_NAME} - W5OBM";
+$page_title = "{$APP_NAME} - Club Accounting System";
 include __DIR__ . '/../include/header.php';
 ?>
 

@@ -37,7 +37,7 @@ if (!isSuperAdmin($user_id) && !isAdmin($user_id) && !hasPermission($user_id, 'a
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-$page_title = "Accounting Dashboard - W5OBM";
+$page_title = "Club Accounting System Dashboard";
 
 // Get dashboard statistics
 try {

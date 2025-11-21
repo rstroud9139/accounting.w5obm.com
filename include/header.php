@@ -343,10 +343,10 @@ if (isset($_GET['preview_nav'])) {
 </style>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
 
-<!-- CUSTOM W5OBM CSS - Load after Bootstrap -->
-<link rel="stylesheet" href="<?= BASE_URL ?>css/w5obm.css?v=<?= filemtime(__DIR__ . '/../css/w5obm.css') ?>">
+<!-- CUSTOM W5OBM CSS - Load after Bootstrap (point to main site assets) -->
+<link rel="stylesheet" href="https://w5obm.com/css/w5obm.css">
 <!-- Hero Logo Styles globally to standardize hero logos across pages -->
-<link rel="stylesheet" href="<?= BASE_URL ?>css/hero-logo-styles.css?v=<?= filemtime(__DIR__ . '/../css/hero-logo-styles.css') ?>">
+<link rel="stylesheet" href="https://w5obm.com/css/hero-logo-styles.css">
 
 <?php
 // Ensure a CSRF token exists for activity pings
@@ -503,15 +503,9 @@ if (!function_exists('adjustPreviewPercent')) {
         --hero-fade-start-effective: <?= htmlspecialchars($heroFadeStartEffective, ENT_QUOTES, 'UTF-8') ?>;
     }
 
-    /* CRITICAL: Body padding for fixed navbar */
+    /* Accounting dashboard: no global fixed-navbar padding */
     body {
-        padding-top: 80px !important;
-    }
-
-    @media (max-width: 768px) {
-        body {
-            padding-top: 90px !important;
-        }
+        padding-top: 0 !important;
     }
 
     .w5obm-text-primary {
@@ -549,6 +543,48 @@ if (!function_exists('adjustPreviewPercent')) {
     /* Table improvements */
     .table {
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+    }
+
+    /* Hero - shared base styles (full-height variants defined elsewhere) */
+    .hero {
+        position: relative;
+        border-radius: 1rem;
+        overflow: hidden;
+        background: linear-gradient(135deg, var(--hero-overlay-from), var(--hero-overlay-to));
+        color: #fff;
+        box-shadow: 0 10px 30px rgba(15, 23, 42, 0.35);
+    }
+
+    .hero .hero-body {
+        position: relative;
+        z-index: 1;
+    }
+
+    /* Compact hero for dashboards */
+    .hero-small {
+        min-height: 120px;
+        padding: 0.75rem 1.5rem;
+        display: flex;
+        align-items: center;
+    }
+
+    @media (min-width: 768px) {
+        .hero-small {
+            min-height: 130px;
+            padding: 1rem 2rem;
+        }
+    }
+
+    /* Summary tiles overlapping hero bottom edge */
+    .hero-summary-row {
+        margin-top: -28px;
+        position: relative;
+        z-index: 2;
+    }
+
+    .hero-summary-card {
+        border-radius: 0.75rem;
+        box-shadow: 0 10px 25px rgba(15, 23, 42, 0.25);
     }
 
     /* Card improvements per guidelines */

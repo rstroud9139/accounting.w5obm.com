@@ -33,30 +33,57 @@ loadEnvFile(__DIR__ . '/../config/.env');
 $is_local = (strpos($_SERVER['HTTP_HOST'] ?? '', 'localhost') !== false ||
     ($_SERVER['SERVER_ADDR'] ?? '') === '127.0.0.1');
 
-// Database configuration (accounting-specific)
+// =====================================================================================
+// Primary AUTH database connection ($conn) - points to shared w5obm DB
+// =====================================================================================
 if ($is_local) {
-    $servername = $_ENV['LOCAL_ACC_DB_HOST'] ?? 'localhost';
-    $username = $_ENV['LOCAL_ACC_DB_USER'] ?? 'root';
-    $password = $_ENV['LOCAL_ACC_DB_PASS'] ?? '';
-    $dbname = $_ENV['LOCAL_ACC_DB_NAME'] ?? 'accounting_w5obm';
+    $authServer = $_ENV['LOCAL_DB_HOST'] ?? 'localhost';
+    $authUser   = $_ENV['LOCAL_DB_USER'] ?? 'root';
+    $authPass   = $_ENV['LOCAL_DB_PASS'] ?? '';
+    $authDb     = $_ENV['LOCAL_DB_NAME'] ?? 'w5obm';
 } else {
-    $servername = $_ENV['ACC_DB_HOST'] ?? 'mysql.w5obm.com';
-    $username = $_ENV['ACC_DB_USER'] ?? 'w5obmcom_admin';
-    $password = $_ENV['ACC_DB_PASS'] ?? '';
-    $dbname = $_ENV['ACC_DB_NAME'] ?? 'accounting_w5obm';
+    $authServer = $_ENV['AUTH_DB_HOST'] ?? 'mysql.w5obm.com';
+    $authUser   = $_ENV['AUTH_DB_USER'] ?? 'w5obmcom_admin';
+    $authPass   = $_ENV['AUTH_DB_PASS'] ?? '';
+    $authDb     = $_ENV['AUTH_DB_NAME'] ?? 'w5obm';
 }
 
-// Create database connection only if not already created
 if (!isset($conn) || $conn === null) {
-    $conn = new mysqli($servername, $username, $password, $dbname);
+    $conn = new mysqli($authServer, $authUser, $authPass, $authDb);
 
-    // Check connection
     if ($conn->connect_error) {
-        die("Connection failed: " . $conn->connect_error);
+        die("Auth DB connection failed: " . $conn->connect_error);
     }
 
-    // Set charset
     $conn->set_charset("utf8");
+}
+
+// =====================================================================================
+// Secondary ACCOUNTING database connection ($accConn) - points to accounting_w5obm
+// =====================================================================================
+$accConn = null;
+if ($is_local) {
+    $accServer = $_ENV['LOCAL_ACC_DB_HOST'] ?? 'localhost';
+    $accUser   = $_ENV['LOCAL_ACC_DB_USER'] ?? 'root';
+    $accPass   = $_ENV['LOCAL_ACC_DB_PASS'] ?? '';
+    $accDb     = $_ENV['LOCAL_ACC_DB_NAME'] ?? 'accounting_w5obm';
+} else {
+    $accServer = $_ENV['ACC_DB_HOST'] ?? 'mysql.w5obm.com';
+    $accUser   = $_ENV['ACC_DB_USER'] ?? 'w5obmcom_admin';
+    $accPass   = $_ENV['ACC_DB_PASS'] ?? '';
+    $accDb     = $_ENV['ACC_DB_NAME'] ?? 'accounting_w5obm';
+}
+
+try {
+    $accConn = new mysqli($accServer, $accUser, $accPass, $accDb);
+    if ($accConn->connect_error) {
+        // Do not hard-fail the app if accounting DB is unreachable; auth still works
+        $accConn = null;
+    } else {
+        $accConn->set_charset("utf8");
+    }
+} catch (Exception $e) {
+    $accConn = null;
 }
 
 // URL constants - only define if not already defined by header.php
@@ -87,7 +114,4 @@ if (!defined('IMAGE_URL')) {
     define('IMAGE_URL', BASE_URL . 'images/');
 }
 
-global $conn;
-if (!$conn) {
-    require_once __DIR__ . '/dbconn.php';
-}
+global $conn, $accConn;

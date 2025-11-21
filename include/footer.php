@@ -285,7 +285,7 @@ $isAdmin = $isLoggedIn ? isAdmin(getCurrentUserId()) : false;
 <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
 
 <!-- W5OBM Toast Notifications -->
-<script src="<?= BASE_URL ?>js/toast-notifications.js"></script>
+<script src="https://w5obm.com/js/toast-notifications.js"></script>
 
 <script>
     // Initialize Bootstrap components when DOM is ready
@@ -312,5 +312,18 @@ $isAdmin = $isLoggedIn ? isAdmin(getCurrentUserId()) : false;
     });
 </script>
 
-
-
+<script>
+    // Global DataTables guideline initialization for standard tables
+    $(document).ready(function() {
+        if ($('#recentTransactionsTable').length) {
+            $('#recentTransactionsTable').DataTable({
+                order: [
+                    [0, 'desc']
+                ],
+                pageLength: 25,
+                lengthChange: false,
+                responsive: true
+            });
+        }
+    });
+</script>

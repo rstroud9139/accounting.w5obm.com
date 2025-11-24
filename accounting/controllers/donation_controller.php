@@ -75,45 +75,21 @@
      */
     function fetch_all_donations($start_date = null, $end_date = null, $contact_id = null)
     {
-        global $conn;
+        $filters = [];
 
-        $query = "SELECT d.*, c.name as contact_name, c.email as contact_email 
-              FROM acc_donations d
-              LEFT JOIN acc_contacts c ON d.contact_id = c.id
-              WHERE 1 = 1";
-        $types = '';
-        $params = [];
-
-        if ($start_date && $end_date) {
-            $query .= " AND d.donation_date BETWEEN ? AND ?";
-            $params[] = $start_date;
-            $params[] = $end_date;
-            $types .= 'ss';
+        if (!empty($start_date)) {
+            $filters['start_date'] = $start_date;
         }
 
-        if ($contact_id) {
-            $query .= " AND d.contact_id = ?";
-            $params[] = $contact_id;
-            $types .= 'i';
+        if (!empty($end_date)) {
+            $filters['end_date'] = $end_date;
         }
 
-        $query .= " ORDER BY d.donation_date DESC";
-
-        $stmt = $conn->prepare($query);
-
-        if (!empty($params)) {
-            $stmt->bind_param($types, ...$params);
+        if (!empty($contact_id)) {
+            $filters['contact_id'] = $contact_id;
         }
 
-        $stmt->execute();
-        $result = $stmt->get_result();
-
-        $donations = [];
-        while ($row = $result->fetch_assoc()) {
-            $donations[] = $row;
-        }
-
-        return $donations;
+        return get_donations($filters);
     }
 
     /**
@@ -165,6 +141,210 @@
         $row = $result->fetch_assoc();
 
         return $row['total'] ?? 0;
+    }
+
+    /**
+     * Generic donation retrieval with flexible filtering and ordering.
+     */
+    function get_donations(array $filters = [], array $options = [])
+    {
+        global $conn;
+
+        $query = "SELECT d.*, c.name AS contact_name, c.email AS contact_email, c.phone AS contact_phone, c.tax_id AS contact_tax_id
+              FROM acc_donations d
+              LEFT JOIN acc_contacts c ON d.contact_id = c.id
+              WHERE 1 = 1";
+
+        $params = [];
+        $types = '';
+
+        if (!empty($filters['start_date'])) {
+            $query .= " AND d.donation_date >= ?";
+            $params[] = $filters['start_date'];
+            $types .= 's';
+        }
+
+        if (!empty($filters['end_date'])) {
+            $query .= " AND d.donation_date <= ?";
+            $params[] = $filters['end_date'];
+            $types .= 's';
+        }
+
+        if (!empty($filters['contact_id'])) {
+            $query .= " AND d.contact_id = ?";
+            $params[] = (int)$filters['contact_id'];
+            $types .= 'i';
+        }
+
+        if (!empty($filters['search'])) {
+            $query .= " AND (d.description LIKE ? OR d.notes LIKE ? OR c.name LIKE ?)";
+            $search = '%' . $filters['search'] . '%';
+            $params[] = $search;
+            $params[] = $search;
+            $params[] = $search;
+            $types .= 'sss';
+        }
+
+        if (isset($filters['tax_deductible']) && $filters['tax_deductible'] !== '' && $filters['tax_deductible'] !== 'all') {
+            $value = $filters['tax_deductible'];
+            if ($value === 'yes') {
+                $value = 1;
+            } elseif ($value === 'no') {
+                $value = 0;
+            } else {
+                $value = (int)(bool)$value;
+            }
+            $query .= " AND d.tax_deductible = ?";
+            $params[] = $value;
+            $types .= 'i';
+        }
+
+        if (!empty($filters['receipt_status'])) {
+            if ($filters['receipt_status'] === 'sent') {
+                $query .= " AND d.receipt_sent = 1";
+            } elseif ($filters['receipt_status'] === 'pending') {
+                $query .= " AND (d.receipt_sent IS NULL OR d.receipt_sent = 0)";
+            }
+        }
+
+        if (!empty($filters['min_amount'])) {
+            $query .= " AND d.amount >= ?";
+            $params[] = (float)$filters['min_amount'];
+            $types .= 'd';
+        }
+
+        if (!empty($filters['max_amount'])) {
+            $query .= " AND d.amount <= ?";
+            $params[] = (float)$filters['max_amount'];
+            $types .= 'd';
+        }
+
+        $allowedOrder = ['d.donation_date DESC', 'd.donation_date ASC', 'd.amount DESC', 'd.amount ASC', 'd.created_at DESC'];
+        $orderBy = $options['order_by'] ?? 'd.donation_date DESC';
+        if (!in_array($orderBy, $allowedOrder, true)) {
+            $orderBy = 'd.donation_date DESC';
+        }
+        $query .= " ORDER BY $orderBy, d.id DESC";
+
+        if (!empty($options['limit'])) {
+            $query .= " LIMIT " . (int)$options['limit'];
+        }
+
+        $stmt = $conn->prepare($query);
+
+        if (!empty($params)) {
+            $stmt->bind_param($types, ...$params);
+        }
+
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        $donations = [];
+        while ($row = $result->fetch_assoc()) {
+            $donations[] = $row;
+        }
+
+        return $donations;
+    }
+
+    /**
+     * Build summary metrics for a donation collection.
+     */
+    function get_donation_summary(array $donations)
+    {
+        $summary = [
+            'total_count' => count($donations),
+            'total_amount' => 0.0,
+            'average_amount' => 0.0,
+            'largest_single' => 0.0,
+            'receipt_sent' => 0,
+            'receipt_pending' => 0,
+            'tax_deductible' => 0,
+            'non_deductible' => 0,
+            'unique_donors' => 0,
+            'latest_date' => null,
+        ];
+
+        $donorIds = [];
+
+        foreach ($donations as $donation) {
+            $amount = (float)($donation['amount'] ?? 0);
+            $summary['total_amount'] += $amount;
+            if ($amount > $summary['largest_single']) {
+                $summary['largest_single'] = $amount;
+            }
+
+            if (!empty($donation['receipt_sent'])) {
+                $summary['receipt_sent']++;
+            } else {
+                $summary['receipt_pending']++;
+            }
+
+            if (!empty($donation['tax_deductible'])) {
+                $summary['tax_deductible']++;
+            } else {
+                $summary['non_deductible']++;
+            }
+
+            if (!empty($donation['contact_id'])) {
+                $donorIds[$donation['contact_id']] = true;
+            }
+
+            if (!empty($donation['donation_date'])) {
+                $date = $donation['donation_date'];
+                if ($summary['latest_date'] === null || $date > $summary['latest_date']) {
+                    $summary['latest_date'] = $date;
+                }
+            }
+        }
+
+        if ($summary['total_count'] > 0) {
+            $summary['average_amount'] = $summary['total_amount'] / $summary['total_count'];
+        }
+
+        $summary['unique_donors'] = count($donorIds);
+
+        return $summary;
+    }
+
+    /**
+     * Retrieve donor options for select inputs.
+     */
+    function get_donation_contacts()
+    {
+        global $conn;
+
+        $query = "SELECT id, name, email FROM acc_contacts ORDER BY name ASC";
+        $result = $conn->query($query);
+
+        $contacts = [];
+        if ($result) {
+            while ($row = $result->fetch_assoc()) {
+                $contacts[] = $row;
+            }
+        }
+
+        return $contacts;
+    }
+
+    /**
+     * Update receipt sent flag manually.
+     */
+    function set_donation_receipt_status(int $id, bool $sent, ?string $date = null)
+    {
+        global $conn;
+
+        $query = "UPDATE acc_donations SET receipt_sent = ?, receipt_date = ? WHERE id = ?";
+        if ($date === null) {
+            $date = $sent ? date('Y-m-d') : null;
+        }
+
+        $stmt = $conn->prepare($query);
+        $receiptDate = $date;
+        $sentInt = $sent ? 1 : 0;
+        $stmt->bind_param('isi', $sentInt, $receiptDate, $id);
+
+        return $stmt->execute();
     }
 
     /**

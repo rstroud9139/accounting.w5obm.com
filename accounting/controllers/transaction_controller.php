@@ -47,18 +47,25 @@ function fetch_transaction_by_id($id)
     return getTransactionById($id);
 }
 
-function fetch_all_transactions($start_date = null, $end_date = null, $category_id = null, $type = null, $account_id = null)
+function fetch_all_transactions($start_date = null, $end_date = null, $category_id = null, $type = null, $account_id = null, $vendor_id = null, $search = null)
 {
     // Delegate to TransactionModel via controller convenience function if present
-    // Fallback: compose filters from args using camelCase getTransactions (if exists)
+    // Fallback: compose filters from args using camelCase controller helpers
+    $filterPayload = [
+        'start_date' => $start_date,
+        'end_date' => $end_date,
+        'category_id' => $category_id,
+        'type' => $type,
+        'account_id' => $account_id,
+        'vendor_id' => $vendor_id,
+        'search' => $search,
+    ];
+
     if (function_exists('getTransactions')) {
-        return getTransactions([
-            'start_date' => $start_date,
-            'end_date' => $end_date,
-            'category_id' => $category_id,
-            'type' => $type,
-            'account_id' => $account_id,
-        ]);
+        return getTransactions($filterPayload);
+    }
+    if (function_exists('getAllTransactions')) {
+        return getAllTransactions(array_filter($filterPayload));
     }
 
     // Use camelCase controller patterns
@@ -76,6 +83,12 @@ function fetch_all_transactions($start_date = null, $end_date = null, $category_
     }
     if ($account_id) {
         $filters['account_id'] = $account_id;
+    }
+    if ($vendor_id) {
+        $filters['vendor_id'] = $vendor_id;
+    }
+    if ($search) {
+        $filters['search'] = $search;
     }
 
     // Replicate previous behavior using prepared query
@@ -103,8 +116,22 @@ function fetch_all_transactions($start_date = null, $end_date = null, $category_
         $types .= 'i';
         $params[] = $filters['account_id'];
     }
+    if (!empty($filters['vendor_id'])) {
+        $where[] = 't.vendor_id = ?';
+        $types .= 'i';
+        $params[] = $filters['vendor_id'];
+    }
+    if (!empty($filters['search'])) {
+        $where[] = '(t.description LIKE ? OR c.name LIKE ? OR v.name LIKE ? OR t.reference_number LIKE ?)';
+        $types .= 'ssss';
+        $searchTerm = '%' . $filters['search'] . '%';
+        $params[] = $searchTerm;
+        $params[] = $searchTerm;
+        $params[] = $searchTerm;
+        $params[] = $searchTerm;
+    }
 
-    $sql = 'SELECT t.*, c.name AS category_name, a.name AS account_name FROM acc_transactions t LEFT JOIN acc_transaction_categories c ON t.category_id=c.id LEFT JOIN acc_ledger_accounts a ON t.account_id=a.id';
+    $sql = 'SELECT t.*, c.name AS category_name, a.name AS account_name, v.name AS vendor_name FROM acc_transactions t LEFT JOIN acc_transaction_categories c ON t.category_id=c.id LEFT JOIN acc_ledger_accounts a ON t.account_id=a.id LEFT JOIN acc_vendors v ON t.vendor_id=v.id';
     if ($where) {
         $sql .= ' WHERE ' . implode(' AND ', $where);
     }

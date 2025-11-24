@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Transaction Index - W5OBM Accounting System
  * File: /accounting/transactions/index.php
@@ -6,6 +7,8 @@
  * UPDATED: Uses proper relative path
  */
 
-// Redirect to transactions list
-header('Location: list.php');
+// Redirect to modern transactions workspace
+$query = $_SERVER['QUERY_STRING'] ?? '';
+$target = 'transactions.php' . ($query ? '?' . $query : '');
+header('Location: ' . $target);
 exit();

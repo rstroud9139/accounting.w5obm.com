@@ -48,3 +48,14 @@ function csrf_verify_post_or_throw(): void
         throw new Exception('Invalid security token. Please refresh the page and try again.');
     }
 }
+
+if (!function_exists('validateCSRFToken')) {
+    /**
+     * Backwards-compatible CSRF validator used by legacy forms.
+     */
+    function validateCSRFToken($token): bool
+    {
+        csrf_ensure_token();
+        return !empty($token) && hash_equals($_SESSION['csrf_token'], (string)$token);
+    }
+}

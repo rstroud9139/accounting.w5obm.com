@@ -409,22 +409,33 @@ function getAllLedgerAccounts($filters = [], $options = [])
 /**
  * Get chart of accounts in hierarchical structure
  * @param string $account_type Optional filter by account type
+ * @param string $status Optional status filter (active|inactive|all)
  * @return array Hierarchical array of accounts
  */
-function getChartOfAccounts($account_type = null)
+function getChartOfAccounts($account_type = null, $status = 'active')
 {
     global $conn;
 
     try {
-        $where_clause = "WHERE a.active = 1";
+        $conditions = [];
         $params = [];
         $types = '';
 
+        if ($status === 'inactive') {
+            $conditions[] = 'a.active = 0';
+        } elseif ($status === 'all') {
+            // no condition, include all
+        } else {
+            $conditions[] = 'a.active = 1';
+        }
+
         if ($account_type) {
-            $where_clause .= " AND a.account_type = ?";
+            $conditions[] = 'a.account_type = ?';
             $params[] = $account_type;
             $types .= 's';
         }
+
+        $where_clause = empty($conditions) ? '' : 'WHERE ' . implode(' AND ', $conditions);
 
         $query = "
             SELECT a.*, 
@@ -496,6 +507,19 @@ function getAccountBalance($account_id, $as_of_date = null)
             return 0.0;
         }
 
+        $account_type = 'Asset';
+        $acct_stmt = $conn->prepare("SELECT account_type FROM acc_ledger_accounts WHERE id = ?");
+        if ($acct_stmt) {
+            $acct_stmt->bind_param('i', $account_id);
+            if ($acct_stmt->execute()) {
+                $acct_result = $acct_stmt->get_result()->fetch_assoc();
+                if (!empty($acct_result['account_type'])) {
+                    $account_type = $acct_result['account_type'];
+                }
+            }
+            $acct_stmt->close();
+        }
+
         $where_clause = "WHERE account_id = ?";
         $params = [$account_id];
         $types = 'i';
@@ -519,7 +543,44 @@ function getAccountBalance($account_id, $as_of_date = null)
         $result = $stmt->get_result()->fetch_assoc();
         $stmt->close();
 
-        return floatval($result['balance'] ?? 0);
+        $balance = floatval($result['balance'] ?? 0);
+
+        $journal_where = "WHERE jl.account_id = ?";
+        $journal_params = [$account_id];
+        $journal_types = 'i';
+
+        if ($as_of_date) {
+            $journal_where .= " AND j.journal_date <= ?";
+            $journal_params[] = $as_of_date;
+            $journal_types .= 's';
+        }
+
+        $journal_stmt = $conn->prepare("
+            SELECT 
+                COALESCE(SUM(jl.debit), 0) AS total_debit,
+                COALESCE(SUM(jl.credit), 0) AS total_credit
+            FROM acc_journal_lines jl
+            JOIN acc_journals j ON j.id = jl.journal_id
+            $journal_where
+        ");
+
+        if ($journal_stmt) {
+            $journal_stmt->bind_param($journal_types, ...$journal_params);
+            $journal_stmt->execute();
+            $journal_result = $journal_stmt->get_result()->fetch_assoc();
+            $journal_stmt->close();
+
+            $total_debit = floatval($journal_result['total_debit'] ?? 0);
+            $total_credit = floatval($journal_result['total_credit'] ?? 0);
+
+            if (in_array($account_type, ['Asset', 'Expense'], true)) {
+                $balance += $total_debit - $total_credit;
+            } else {
+                $balance += $total_credit - $total_debit;
+            }
+        }
+
+        return $balance;
     } catch (Exception $e) {
         logError("Error getting account balance: " . $e->getMessage(), 'accounting');
         return 0.0;

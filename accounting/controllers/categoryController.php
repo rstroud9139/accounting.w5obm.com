@@ -336,10 +336,13 @@ function getAllCategories($filters = [], $options = [])
             $types .= 'i';
         }
 
-        if (isset($filters['active'])) {
-            $where_conditions[] = "c.active = ?";
-            $params[] = $filters['active'] ? 1 : 0;
-            $types .= 'i';
+        if (array_key_exists('active', $filters)) {
+            // Allow callers to bypass the active filter by passing 'all' or null
+            if ($filters['active'] !== 'all' && $filters['active'] !== null) {
+                $where_conditions[] = "c.active = ?";
+                $params[] = $filters['active'] ? 1 : 0;
+                $types .= 'i';
+            }
         } else {
             // Default to active categories only
             $where_conditions[] = "c.active = 1";

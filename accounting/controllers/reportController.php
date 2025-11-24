@@ -13,6 +13,183 @@ require_once __DIR__ . '/../../include/dbconn.php';
 require_once __DIR__ . '/../lib/helpers.php';
 
 /**
+ * Build normalized period metadata for financial statements.
+ */
+function buildStatementPeriod(string $periodType, ?int $year = null, ?int $value = null): array
+{
+    $periodType = strtolower($periodType);
+    $year = $year ?: (int)date('Y');
+    $today = new DateTimeImmutable('today');
+
+    $sanitizeMonth = static function ($month) {
+        $month = (int)$month;
+        if ($month < 1) {
+            return 1;
+        }
+        if ($month > 12) {
+            return 12;
+        }
+        return $month;
+    };
+
+    $start = sprintf('%04d-01-01', $year);
+    $end = sprintf('%04d-12-31', $year);
+    $label = 'Full Year ' . $year;
+    $displayValue = null;
+
+    switch ($periodType) {
+        case 'monthly':
+            $month = $sanitizeMonth($value ?? (int)date('n'));
+            $start = sprintf('%04d-%02d-01', $year, $month);
+            $end = date('Y-m-t', strtotime($start));
+            $label = date('F Y', strtotime($start));
+            $displayValue = $month;
+            break;
+        case 'quarterly':
+            $quarter = $value ?? (int)ceil(date('n') / 3);
+            if ($quarter < 1) {
+                $quarter = 1;
+            }
+            if ($quarter > 4) {
+                $quarter = 4;
+            }
+            $startMonth = (($quarter - 1) * 3) + 1;
+            $start = sprintf('%04d-%02d-01', $year, $startMonth);
+            $endMonth = $startMonth + 2;
+            $end = date('Y-m-t', strtotime(sprintf('%04d-%02d-01', $year, $endMonth)));
+            $label = sprintf('Q%d %d', $quarter, $year);
+            $displayValue = $quarter;
+            break;
+        case 'ytd':
+            $cutoffMonth = $sanitizeMonth($value ?? ((int)$today->format('Y') === $year ? (int)$today->format('n') : 12));
+            $start = sprintf('%04d-01-01', $year);
+            $end = date('Y-m-t', strtotime(sprintf('%04d-%02d-01', $year, $cutoffMonth)));
+            $label = sprintf('Year to Date %d (through %s)', $year, date('F', strtotime(sprintf('%04d-%02d-01', $year, $cutoffMonth))));
+            $displayValue = $cutoffMonth;
+            break;
+        case 'annual':
+        default:
+            $periodType = 'annual';
+            $label = 'Full Year ' . $year;
+            break;
+    }
+
+    if ($year === (int)$today->format('Y')) {
+        $end = min($end, $today->format('Y-m-d'));
+    }
+
+    if (strtotime($end) < strtotime($start)) {
+        $end = $start;
+    }
+
+    return [
+        'type' => $periodType,
+        'label' => $label,
+        'start_date' => $start,
+        'end_date' => $end,
+        'year' => $year,
+        'value' => $displayValue,
+        'slug' => $periodType . '_' . $year . '_' . ($displayValue ?? 'all'),
+    ];
+}
+
+/**
+ * Generate an income statement for arbitrary start/end dates.
+ */
+function generateIncomeStatementRange(string $startDate, string $endDate, ?string $displayLabel = null): array
+{
+    global $conn;
+
+    try {
+        $start = new DateTimeImmutable($startDate);
+        $end = new DateTimeImmutable($endDate);
+
+        if ($end < $start) {
+            throw new Exception('End date must be after start date');
+        }
+
+        $startStr = $start->format('Y-m-d');
+        $endStr = $end->format('Y-m-d');
+
+        $fetchTotals = static function (string $type) use ($conn, $startStr, $endStr) {
+            $stmt = $conn->prepare('
+                SELECT c.id, c.name, SUM(t.amount) AS total
+                FROM acc_transactions t
+                JOIN acc_transaction_categories c ON t.category_id = c.id
+                WHERE t.type = ? AND t.transaction_date BETWEEN ? AND ?
+                GROUP BY c.id, c.name
+                ORDER BY c.name
+            ');
+            if (!$stmt) {
+                throw new Exception('Failed preparing statement: ' . $conn->error);
+            }
+            $stmt->bind_param('sss', $type, $startStr, $endStr);
+            if (!$stmt->execute()) {
+                throw new Exception('Failed executing statement: ' . $stmt->error);
+            }
+            $result = $stmt->get_result();
+            $categories = [];
+            $total = 0.0;
+            while ($row = $result->fetch_assoc()) {
+                $amount = (float)$row['total'];
+                $categories[] = [
+                    'id' => $row['id'],
+                    'name' => $row['name'],
+                    'total' => $amount,
+                ];
+                $total += $amount;
+            }
+            $stmt->close();
+            return [$categories, $total];
+        };
+
+        [$incomeCategories, $totalIncome] = $fetchTotals('Income');
+        [$expenseCategories, $totalExpenses] = $fetchTotals('Expense');
+
+        $netIncome = $totalIncome - $totalExpenses;
+
+        logActivity(
+            getCurrentUserId(),
+            'income_statement_range_generated',
+            'acc_reports',
+            null,
+            sprintf('Generated statement %s through %s', $startStr, $endStr)
+        );
+
+        return [
+            'period' => [
+                'start_date' => $startStr,
+                'end_date' => $endStr,
+                'display' => $displayLabel ?: ($start->format('M d, Y') . ' - ' . $end->format('M d, Y')),
+                'days' => $start->diff($end)->days + 1,
+            ],
+            'income' => [
+                'categories' => $incomeCategories,
+                'total' => $totalIncome,
+            ],
+            'expenses' => [
+                'categories' => $expenseCategories,
+                'total' => $totalExpenses,
+            ],
+            'net_income' => $netIncome,
+        ];
+    } catch (Exception $e) {
+        logError('Error generating income statement range: ' . $e->getMessage(), 'accounting');
+        return [
+            'period' => [
+                'start_date' => $startDate,
+                'end_date' => $endDate,
+                'display' => $displayLabel ?: 'Invalid Period',
+            ],
+            'income' => ['categories' => [], 'total' => 0],
+            'expenses' => ['categories' => [], 'total' => 0],
+            'net_income' => 0,
+            'error' => $e->getMessage(),
+        ];
+    }
+}
+
+/**
  * Generate a balance sheet for a given date
  * @param string|null $date Date for balance sheet (defaults to today)
  * @return array Balance sheet data
@@ -111,111 +288,33 @@ function generateBalanceSheet($date = null)
  */
 function generateIncomeStatement($month, $year)
 {
-    global $conn;
-
-    try {
-        // Validate inputs
-        if (!is_numeric($month) || $month < 1 || $month > 12) {
-            throw new Exception("Invalid month: $month");
-        }
-        if (!is_numeric($year) || $year < 2000 || $year > date('Y') + 1) {
-            throw new Exception("Invalid year: $year");
-        }
-
-        $start_date = sprintf("%04d-%02d-01", $year, $month);
-        $end_date = date('Y-m-t', strtotime($start_date));
-
-        // Fetch income categories
-        $stmt = $conn->prepare("
-            SELECT c.id, c.name, SUM(t.amount) AS total
-            FROM acc_transactions t
-            JOIN acc_transaction_categories c ON t.category_id = c.id
-            WHERE t.type = 'Income' AND t.transaction_date BETWEEN ? AND ?
-            GROUP BY c.id, c.name
-            ORDER BY c.name
-        ");
-        $stmt->bind_param('ss', $start_date, $end_date);
-        $stmt->execute();
-        $income_result = $stmt->get_result();
-
-        $income_categories = [];
-        $total_income = 0;
-        while ($row = $income_result->fetch_assoc()) {
-            $amount = floatval($row['total']);
-            $income_categories[] = [
-                'id' => $row['id'],
-                'name' => $row['name'],
-                'total' => $amount
-            ];
-            $total_income += $amount;
-        }
-        $stmt->close();
-
-        // Fetch expense categories
-        $stmt = $conn->prepare("
-            SELECT c.id, c.name, SUM(t.amount) AS total
-            FROM acc_transactions t
-            JOIN acc_transaction_categories c ON t.category_id = c.id
-            WHERE t.type = 'Expense' AND t.transaction_date BETWEEN ? AND ?
-            GROUP BY c.id, c.name
-            ORDER BY c.name
-        ");
-        $stmt->bind_param('ss', $start_date, $end_date);
-        $stmt->execute();
-        $expense_result = $stmt->get_result();
-
-        $expense_categories = [];
-        $total_expenses = 0;
-        while ($row = $expense_result->fetch_assoc()) {
-            $amount = floatval($row['total']);
-            $expense_categories[] = [
-                'id' => $row['id'],
-                'name' => $row['name'],
-                'total' => $amount
-            ];
-            $total_expenses += $amount;
-        }
-        $stmt->close();
-
-        $net_income = $total_income - $total_expenses;
-
-        // Log activity
-        logActivity(
-            getCurrentUserId(),
-            'income_statement_generated',
-            'acc_reports',
-            null,
-            "Generated income statement for $month/$year"
-        );
-
-        return [
-            'period' => [
-                'month' => $month,
-                'year' => $year,
-                'start_date' => $start_date,
-                'end_date' => $end_date,
-                'display' => date('F Y', strtotime($start_date))
-            ],
-            'income' => [
-                'categories' => $income_categories,
-                'total' => $total_income
-            ],
-            'expenses' => [
-                'categories' => $expense_categories,
-                'total' => $total_expenses
-            ],
-            'net_income' => $net_income
-        ];
-    } catch (Exception $e) {
-        logError("Error generating income statement: " . $e->getMessage(), 'accounting');
+    if (!is_numeric($month) || $month < 1 || $month > 12) {
         return [
             'period' => ['month' => $month, 'year' => $year, 'display' => 'Invalid'],
             'income' => ['categories' => [], 'total' => 0],
             'expenses' => ['categories' => [], 'total' => 0],
             'net_income' => 0,
-            'error' => $e->getMessage()
+            'error' => 'Invalid month',
         ];
     }
+
+    if (!is_numeric($year) || $year < 2000 || $year > date('Y') + 1) {
+        return [
+            'period' => ['month' => $month, 'year' => $year, 'display' => 'Invalid'],
+            'income' => ['categories' => [], 'total' => 0],
+            'expenses' => ['categories' => [], 'total' => 0],
+            'net_income' => 0,
+            'error' => 'Invalid year',
+        ];
+    }
+
+    $period = buildStatementPeriod('monthly', (int)$year, (int)$month);
+    $statement = generateIncomeStatementRange($period['start_date'], $period['end_date'], $period['label']);
+
+    $statement['period']['month'] = (int)$month;
+    $statement['period']['year'] = (int)$year;
+
+    return $statement;
 }
 
 /**

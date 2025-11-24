@@ -204,6 +204,21 @@ if (function_exists('isAuthenticated') && isAuthenticated()) {
 if (!defined('BASE_URL')) {
     define('BASE_URL', '/'); // or your actual base path
 }
+
+// Determine accounting access levels once for menu rendering
+$accounting_user_id = $_SESSION['user_id'] ?? null;
+$can_view_accounting = false;
+$can_manage_accounting = false;
+
+if ($is_logged_in && $accounting_user_id) {
+    if ($is_admin_user) {
+        $can_view_accounting = true;
+        $can_manage_accounting = true;
+    } elseif (function_exists('hasPermission')) {
+        $can_manage_accounting = hasPermission($accounting_user_id, 'accounting_manage');
+        $can_view_accounting = $can_manage_accounting || hasPermission($accounting_user_id, 'accounting_view');
+    }
+}
 ?>
 
 <!-- Global print header (visible only when printing) -->
@@ -447,6 +462,89 @@ if (!defined('BASE_URL')) {
                                 <div>
                                     <span class="item-title">Documentation</span>
                                     <span class="item-desc">System & architecture docs</span>
+                                </div>
+                            </a>
+                        </div>
+                    </li>
+                <?php endif; ?>
+
+                <?php if ($can_view_accounting): ?>
+                    <!-- Accounting Suite -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="accountingDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-calculator nav-icon"></i>
+                            <span>Accounting</span>
+                        </a>
+                        <div class="dropdown-menu modern-dropdown shadow" aria-labelledby="accountingDropdown">
+                            <div class="dropdown-header">
+                                <i class="fas fa-coins"></i>
+                                <span>Financial Suite</span>
+                            </div>
+                            <a class="dropdown-item" href="<?php echo BASE_URL; ?>accounting/dashboard.php">
+                                <i class="fas fa-tachometer-alt"></i>
+                                <div>
+                                    <span class="item-title">Dashboard</span>
+                                    <span class="item-desc">Overview & quick stats</span>
+                                </div>
+                            </a>
+                            <a class="dropdown-item" href="<?php echo BASE_URL; ?>accounting/transactions/transactions.php">
+                                <i class="fas fa-exchange-alt"></i>
+                                <div>
+                                    <span class="item-title">Transactions</span>
+                                    <span class="item-desc">Review and manage entries</span>
+                                </div>
+                            </a>
+                            <a class="dropdown-item" href="<?php echo BASE_URL; ?>accounting/reports/reports_dashboard.php">
+                                <i class="fas fa-chart-bar"></i>
+                                <div>
+                                    <span class="item-title">Reports</span>
+                                    <span class="item-desc">Financial and activity reports</span>
+                                </div>
+                            </a>
+                            <a class="dropdown-item" href="<?php echo BASE_URL; ?>accounting/budgets/index.php">
+                                <i class="fas fa-piggy-bank"></i>
+                                <div>
+                                    <span class="item-title">Budgets</span>
+                                    <span class="item-desc">Plan and track allocations</span>
+                                </div>
+                            </a>
+                            <a class="dropdown-item" href="<?php echo BASE_URL; ?>accounting/reports/financial_statements.php">
+                                <i class="fas fa-file-invoice-dollar"></i>
+                                <div>
+                                    <span class="item-title">Financial Statements</span>
+                                    <span class="item-desc">Balance sheet & income</span>
+                                </div>
+                            </a>
+                            <a class="dropdown-item" href="<?php echo BASE_URL; ?>accounting/ledger/register.php">
+                                <i class="fas fa-book-open"></i>
+                                <div>
+                                    <span class="item-title">Ledger Register</span>
+                                    <span class="item-desc">Search and audit entries</span>
+                                </div>
+                            </a>
+                            <?php if ($can_manage_accounting): ?>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item" href="<?php echo BASE_URL; ?>accounting/ledger/">
+                                    <i class="fas fa-sitemap"></i>
+                                    <div>
+                                        <span class="item-title">Chart of Accounts</span>
+                                        <span class="item-desc">Manage account structure</span>
+                                    </div>
+                                </a>
+                                <a class="dropdown-item" href="<?php echo BASE_URL; ?>accounting/categories/">
+                                    <i class="fas fa-tags"></i>
+                                    <div>
+                                        <span class="item-title">Categories</span>
+                                        <span class="item-desc">Income & expense tags</span>
+                                    </div>
+                                </a>
+                            <?php endif; ?>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="<?php echo BASE_URL; ?>accounting/manual.php">
+                                <i class="fas fa-book"></i>
+                                <div>
+                                    <span class="item-title">User Manual</span>
+                                    <span class="item-desc">Guides & best practices</span>
                                 </div>
                             </a>
                         </div>

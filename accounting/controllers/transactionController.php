@@ -432,6 +432,23 @@ function calculateTransactionTotals($filters = [])
             $params[] = $filters['type'];
             $types .= 's';
         }
+        if (!empty($filters['account_id'])) {
+            $where_conditions[] = "account_id = ?";
+            $params[] = $filters['account_id'];
+            $types .= 'i';
+        }
+        if (!empty($filters['vendor_id'])) {
+            $where_conditions[] = "vendor_id = ?";
+            $params[] = $filters['vendor_id'];
+            $types .= 'i';
+        }
+        if (!empty($filters['search'])) {
+            $where_conditions[] = "(description LIKE ? OR reference_number LIKE ?)";
+            $search_term = '%' . $filters['search'] . '%';
+            $params[] = $search_term;
+            $params[] = $search_term;
+            $types .= 'ss';
+        }
         $where_clause = empty($where_conditions) ? '' : 'WHERE ' . implode(' AND ', $where_conditions);
         $query = "SELECT 
                 SUM(CASE WHEN type = 'Income' THEN amount ELSE 0 END) AS total_income,

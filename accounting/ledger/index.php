@@ -16,6 +16,7 @@ require_once __DIR__ . '/../../include/dbconn.php';
 require_once __DIR__ . '/../lib/helpers.php';
 require_once __DIR__ . '/../controllers/ledgerController.php';
 require_once __DIR__ . '/../views/ledger_list.php';
+require_once __DIR__ . '/../../include/premium_hero.php';
 
 // Authentication check
 if (!isAuthenticated()) {
@@ -32,6 +33,9 @@ if (!hasPermission($user_id, 'accounting_view') && !hasPermission($user_id, 'acc
     exit();
 }
 
+$canAddAccount = hasPermission($user_id, 'accounting_add') || hasPermission($user_id, 'accounting_manage');
+$canManageAccounts = hasPermission($user_id, 'accounting_manage');
+
 // CSRF token generation
 if (!isset($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
@@ -47,22 +51,32 @@ $page_title = "Chart of Accounts - W5OBM Accounting";
 $filters = [
     'account_type' => sanitizeInput($_GET['account_type'] ?? '', 'string'),
     'search' => sanitizeInput($_GET['search'] ?? '', 'string'),
-    'active' => true // Only show active accounts by default
+    'status' => sanitizeInput($_GET['status'] ?? 'active', 'string'),
 ];
 
-// Remove empty filters
-$filters = array_filter($filters, function ($value) {
-    return $value !== '' && $value !== null;
-});
-$filters['active'] = true; // Ensure this stays
+$validStatuses = ['active', 'all', 'inactive'];
+if (!in_array($filters['status'], $validStatuses, true)) {
+    $filters['status'] = 'active';
+}
+
+$queryFilters = [];
+if (!empty($filters['account_type'])) {
+    $queryFilters['account_type'] = $filters['account_type'];
+}
+if (!empty($filters['search'])) {
+    $queryFilters['search'] = $filters['search'];
+}
+if ($filters['status'] !== 'all') {
+    $queryFilters['active'] = $filters['status'] === 'inactive' ? false : true;
+}
 
 try {
     // Get chart of accounts in hierarchical structure
-    $chart_of_accounts = getChartOfAccounts($filters['account_type'] ?? null);
+    $chart_of_accounts = getChartOfAccounts($filters['account_type'] ?? null, $filters['status']);
 
-    // If we have search or other filters, get flat list instead
+    // If we have search, get flat list instead
     if (!empty($filters['search'])) {
-        $chart_of_accounts = getAllLedgerAccounts($filters);
+        $chart_of_accounts = getAllLedgerAccounts($queryFilters);
     }
 
     // Get account type totals for summary cards
@@ -84,6 +98,70 @@ try {
     setToastMessage('danger', 'Error', 'Failed to load chart of accounts: ' . $e->getMessage(), 'club-logo');
     logError("Error loading chart of accounts: " . $e->getMessage(), 'accounting');
 }
+
+$ledgerHeroHighlights = [];
+$highlightOrder = ['Asset', 'Income', 'Expense'];
+foreach ($highlightOrder as $typeKey) {
+    if (!empty($totals[$typeKey])) {
+        $ledgerHeroHighlights[] = [
+            'label' => $typeKey,
+            'value' => number_format($totals[$typeKey]['count']) . ' accts',
+            'meta' => '$' . number_format($totals[$typeKey]['balance'], 2) . ' balance'
+        ];
+    }
+}
+
+if (empty($ledgerHeroHighlights)) {
+    $totalAccounts = array_sum(array_map(static function ($summary) {
+        return $summary['count'] ?? 0;
+    }, $totals));
+    if ($totalAccounts > 0) {
+        $ledgerHeroHighlights[] = [
+            'label' => 'Accounts',
+            'value' => number_format($totalAccounts),
+            'meta' => 'Active ledger records'
+        ];
+    }
+}
+
+$statusLabel = 'Status: Active';
+if ($filters['status'] === 'inactive') {
+    $statusLabel = 'Status: Inactive';
+} elseif ($filters['status'] === 'all') {
+    $statusLabel = 'Status: All';
+}
+
+$ledgerHeroChips = array_values(array_filter([
+    !empty($filters['account_type']) ? 'Type: ' . $filters['account_type'] : null,
+    !empty($filters['search']) ? 'Search: ' . $filters['search'] : null,
+    $statusLabel,
+]));
+
+$ledgerHeroActions = array_values(array_filter([
+    $canAddAccount ? [
+        'label' => 'Add Account',
+        'url' => '/accounting/ledger/add.php',
+        'icon' => 'fa-plus'
+    ] : null,
+    $canManageAccounts ? [
+        'label' => 'Standard Setup',
+        'url' => '/accounting/ledger/setup_standard.php',
+        'variant' => 'outline',
+        'icon' => 'fa-magic'
+    ] : null,
+    [
+        'label' => 'Ledger Register',
+        'url' => '/accounting/ledger/register.php',
+        'variant' => 'outline',
+        'icon' => 'fa-book-open'
+    ],
+    [
+        'label' => 'Back to Dashboard',
+        'url' => '/accounting/dashboard.php',
+        'variant' => 'outline',
+        'icon' => 'fa-arrow-left'
+    ],
+]));
 
 ?>
 
@@ -107,34 +185,50 @@ try {
     }
     ?>
 
+    <?php if (function_exists('renderPremiumHero')): ?>
+        <?php renderPremiumHero([
+            'eyebrow' => 'Chart of Accounts',
+            'title' => 'Design your financial structure.',
+            'subtitle' => 'Manage ledger accounts, balances, and readiness before running reports.',
+            'chips' => $ledgerHeroChips,
+            'highlights' => $ledgerHeroHighlights,
+            'actions' => $ledgerHeroActions,
+            'theme' => 'emerald',
+            'size' => 'compact',
+            'media_mode' => 'none',
+        ]); ?>
+    <?php endif; ?>
+
     <!-- Page Container -->
     <div class="page-container">
-        <!-- Header Card -->
-        <div class="card shadow mb-4">
-            <div class="card-header bg-primary text-white">
-                <div class="row align-items-center">
-                    <div class="col-auto">
-                        <i class="fas fa-sitemap fa-2x"></i>
-                    </div>
-                    <div class="col">
-                        <h3 class="mb-0">Chart of Accounts</h3>
-                        <small>Manage your accounting ledger and account structure</small>
-                    </div>
-                    <div class="col-auto">
-                        <div class="btn-group" role="group">
-                            <?php if (hasPermission($user_id, 'accounting_add') || hasPermission($user_id, 'accounting_manage')): ?>
-                                <a href="/accounting/ledger/add/" class="btn btn-light btn-sm">
-                                    <i class="fas fa-plus me-1"></i>Add Account
+        <?php if (!function_exists('renderPremiumHero')): ?>
+            <!-- Header Card -->
+            <div class="card shadow mb-4">
+                <div class="card-header bg-primary text-white">
+                    <div class="row align-items-center">
+                        <div class="col-auto">
+                            <i class="fas fa-sitemap fa-2x"></i>
+                        </div>
+                        <div class="col">
+                            <h3 class="mb-0">Chart of Accounts</h3>
+                            <small>Manage your accounting ledger and account structure</small>
+                        </div>
+                        <div class="col-auto">
+                            <div class="btn-group" role="group">
+                                <?php if ($canAddAccount): ?>
+                                    <a href="/accounting/ledger/add/" class="btn btn-primary btn-sm">
+                                        <i class="fas fa-plus me-1"></i>Add Account
+                                    </a>
+                                <?php endif; ?>
+                                <a href="/accounting/dashboard.php" class="btn btn-outline-light btn-sm">
+                                    <i class="fas fa-arrow-left me-1"></i>Dashboard
                                 </a>
-                            <?php endif; ?>
-                            <a href="/accounting/dashboard.php" class="btn btn-outline-light btn-sm">
-                                <i class="fas fa-arrow-left me-1"></i>Dashboard
-                            </a>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
+        <?php endif; ?>
 
         <!-- Setup Helper Card (show if no accounts exist) -->
         <?php if (empty($chart_of_accounts) && empty($filters['search'])): ?>

@@ -7,6 +7,7 @@
  */
 
 require_once __DIR__ . '/../include/header.php';
+require_once __DIR__ . '/../include/premium_hero.php';
 
 $cash_balance = 0.00;
 $asset_value = 0.00;
@@ -104,31 +105,65 @@ if (isset($accConn) && $accConn instanceof mysqli) {
 ?>
 
 <div class="page-container" style="margin-top:0;padding-top:0;">
-    <section class="hero hero-small mb-4">
-        <div class="hero-body py-3">
-            <div class="container-fluid">
-                <div class="row align-items-center">
-                    <div class="col-md-2 d-none d-md-flex justify-content-center">
-                        <img src="https://w5obm.com/images/badges/club_logo.png" alt="W5OBM Logo" class="img-fluid no-shadow" style="max-height:64px;">
-                    </div>
-                    <div class="col-md-6 text-center text-md-start text-white">
-                        <h1 class="h4 mb-1">Accounting Dashboard</h1>
-                        <p class="mb-0 small">W5OBM Financial Management System</p>
-                    </div>
-                    <div class="col-md-4 text-center text-md-end mt-3 mt-md-0">
-                        <?php if (hasPermission($user_id, 'accounting_add') || hasPermission($user_id, 'accounting_manage')): ?>
-                            <a href="/accounting/transactions/add_transaction.php" class="btn btn-success btn-sm me-2">
-                                <i class="fas fa-plus-circle me-1"></i>New Transaction
-                            </a>
-                        <?php endif; ?>
-                        <a href="/accounting/manual.php" class="btn btn-outline-light btn-sm">
-                            <i class="fas fa-book me-1"></i>User Manual
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+    <?php
+    renderPremiumHero([
+        'eyebrow' => 'Accounting Command',
+        'title' => 'Accounting Dashboard',
+        'subtitle' => 'Real-time health indicators for the W5OBM Amateur Radio Club.',
+        'description' => 'Stay ahead of budget, cash, and compliance with a single mission control built for club leadership.',
+        'theme' => 'midnight',
+        'chips' => [
+            'Budget vs Actual insight',
+            'GAAP-ready exports',
+            'Role-based security'
+        ],
+        'actions' => array_filter([
+            (hasPermission($user_id, 'accounting_add') || hasPermission($user_id, 'accounting_manage')) ? [
+                'label' => 'New Transaction',
+                'url' => '/accounting/transactions/add_transaction.php',
+                'variant' => 'primary',
+                'icon' => 'fa-plus-circle'
+            ] : null,
+            [
+                'label' => 'View Reports',
+                'url' => '/accounting/reports_dashboard.php',
+                'variant' => 'outline',
+                'icon' => 'fa-chart-line'
+            ]
+        ]),
+        'highlights' => [
+            [
+                'value' => '$' . number_format($cash_balance, 2),
+                'label' => 'Cash on Hand',
+                'meta' => 'Available funds'
+            ],
+            [
+                'value' => '$' . number_format($month_totals['net_balance'], 2),
+                'label' => 'Monthly Net',
+                'meta' => date('F Y')
+            ],
+            [
+                'value' => '$' . number_format($ytd_totals['net_balance'], 2),
+                'label' => 'Year-to-Date',
+                'meta' => 'Operating position'
+            ],
+        ],
+        'slides' => [
+            [
+                'src' => 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=1100&q=80',
+                'alt' => 'Team reviewing financial statements'
+            ],
+            [
+                'src' => 'https://images.unsplash.com/photo-1556740749-887f6717d7e4?auto=format&fit=crop&w=1100&q=80',
+                'alt' => 'Budget planning session'
+            ],
+            [
+                'src' => 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=1100&q=80',
+                'alt' => 'Strategic financial discussion'
+            ],
+        ]
+    ]);
+    ?>
 
     <div class="row mb-3 hero-summary-row">
         <div class="col-md-3 col-sm-6 mb-3">

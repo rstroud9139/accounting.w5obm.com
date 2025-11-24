@@ -44,6 +44,24 @@ ini_set('display_errors', 1);
 
 $page_title = 'Transactions - W5OBM Accounting';
 
+// Handle legacy status query params forwarded from deprecated pages
+if (!empty($_GET['status'])) {
+    switch ($_GET['status']) {
+        case 'success':
+            setToastMessage('success', 'Transaction Added', 'Transaction added successfully!', 'fas fa-check-circle');
+            break;
+        case 'updated':
+            setToastMessage('success', 'Transaction Updated', 'Transaction updated successfully!', 'fas fa-edit');
+            break;
+        case 'deleted':
+            setToastMessage('success', 'Transaction Deleted', 'Transaction deleted successfully!', 'fas fa-trash');
+            break;
+        case 'error':
+            setToastMessage('danger', 'Error', 'An error occurred. Please try again.', 'fas fa-exclamation-triangle');
+            break;
+    }
+}
+
 // -----------------------------------------------------------------------------
 // Export handler
 // -----------------------------------------------------------------------------
@@ -55,6 +73,7 @@ if (isset($_GET['export']) && $_GET['export'] === 'csv') {
             'category_id' => sanitizeInput($_GET['category_id'] ?? '', 'int'),
             'type' => sanitizeInput($_GET['type'] ?? '', 'string'),
             'account_id' => sanitizeInput($_GET['account_id'] ?? '', 'int'),
+            'vendor_id' => sanitizeInput($_GET['vendor_id'] ?? '', 'int'),
             'search' => sanitizeInput($_GET['search'] ?? '', 'string')
         ];
 
@@ -65,7 +84,9 @@ if (isset($_GET['export']) && $_GET['export'] === 'csv') {
             $filters['end_date'] ?? null,
             $filters['category_id'] ?? null,
             $filters['type'] ?? null,
-            $filters['account_id'] ?? null
+            $filters['account_id'] ?? null,
+            $filters['vendor_id'] ?? null,
+            $filters['search'] ?? null
         );
 
         header('Content-Type: text/csv');
@@ -119,6 +140,7 @@ $filters = [
     'category_id' => sanitizeInput($_GET['category_id'] ?? '', 'int'),
     'type' => sanitizeInput($_GET['type'] ?? '', 'string'),
     'account_id' => sanitizeInput($_GET['account_id'] ?? '', 'int'),
+    'vendor_id' => sanitizeInput($_GET['vendor_id'] ?? '', 'int'),
     'search' => sanitizeInput($_GET['search'] ?? '', 'string')
 ];
 
@@ -134,7 +156,9 @@ try {
         $filters['end_date'] ?? null,
         $filters['category_id'] ?? null,
         $filters['type'] ?? null,
-        $filters['account_id'] ?? null
+        $filters['account_id'] ?? null,
+        $filters['vendor_id'] ?? null,
+        $filters['search'] ?? null
     );
 
     $all_transactions = $transactions;
@@ -215,7 +239,7 @@ require_once __DIR__ . '/../../include/header.php';
                     </div>
                     <div class="col-md-4 text-center text-md-end mt-3 mt-md-0">
                         <?php if ($can_add_transactions): ?>
-                            <button class="btn btn-success btn-sm me-2" data-bs-toggle="modal" data-bs-target="#addTransactionModal">
+                            <button class="btn btn-primary btn-sm me-2" data-bs-toggle="modal" data-bs-target="#addTransactionModal">
                                 <i class="fas fa-plus-circle me-1"></i>New Transaction
                             </button>
                         <?php endif; ?>
@@ -327,6 +351,7 @@ require_once __DIR__ . '/../../include/header.php';
                 $categories,
                 $accounts,
                 $vendors,
+                $totals,
                 $pagination,
                 $can_add_transactions,
                 $can_manage_transactions

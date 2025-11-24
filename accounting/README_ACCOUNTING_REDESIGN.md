@@ -73,3 +73,14 @@ Note: Existing `acc_transactions`/`acc_transaction_categories` remain supported 
 - Implement `repositories` and `services` for Accounts and Transactions
 - Design Transaction Entry (split lines, debits/credits) with validation and posting rules
 - Add CSV importers (bank statements), and CSV/QIF export
+
+## Modernization Rollout Plan (Nov 2025)
+
+1. **Categories & Donations** – adopt the transactions workspace pattern (hero header, summary tiles, collapsible filter cards with presets, inline modal CRUD, async toasts). These modules unblock most daily workflows, so they go first.
+2. **Assets** – reuse the same layout plus read-only detail drawer for depreciation and assignment history; convert add/edit/delete into modals that enforce CSRF and permission checks.
+3. **Ledger (Chart of Accounts)** – keep the hierarchical list but add inline modals for create/edit, quick filters, and background balance refresh. Prepare for future journal enforcement.
+4. **Reports Dashboard** – refactor actions into modals with async generation/email, standardize stats tiles, and expose reusable filter presets.
+5. **Utilities & Double-Entry Engine** – introduce `acc_journal` + `acc_journal_lines`, migrate posting logic to enforce balanced debits/credits, and expose journal viewer with the shared UI pattern. Tie transaction, donation, and asset flows into the journal service once ready.
+
+
+Each phase ships behind a feature flag if needed, but all share the same Bootstrap 5 + hero-treatment established in the modern transactions module.

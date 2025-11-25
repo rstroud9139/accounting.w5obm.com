@@ -1,5 +1,5 @@
- <!-- /accounting/utils/transaction_utils.php -->
- <?php
+<?php
+// /accounting/utils/transaction_utils.php
     /**
      * Transaction Utilities
      * Helper functions for transactions

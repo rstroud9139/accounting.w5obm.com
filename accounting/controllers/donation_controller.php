@@ -1,5 +1,6 @@
- <!-- /accounting/controllers/donation_controller.php -->
- <?php
+<?php
+// /accounting/controllers/donation_controller.php
+
     /**
      * Donation Controller
      * Handles all donation-related operations

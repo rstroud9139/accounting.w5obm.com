@@ -1,5 +1,5 @@
- <!-- /accounting/models/asset_model.php -->
- <?php
+<?php
+// /accounting/models/asset_model.php
     /**
      * Asset Model
      * Database operations for assets

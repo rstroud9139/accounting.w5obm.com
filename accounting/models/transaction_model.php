@@ -1,5 +1,5 @@
- <!-- /accounting/models/transaction_model.php -->
- <?php
+<?php
+// /accounting/models/transaction_model.php
     /**
      * Transaction Model
      * Database operations for transactions

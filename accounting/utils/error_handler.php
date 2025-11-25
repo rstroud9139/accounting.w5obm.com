@@ -1,5 +1,5 @@
- <!-- /accounting/utils/error_handler.php -->
- <?php
+<?php
+// /accounting/utils/error_handler.php
     /**
      * Error Handler
      * Functions for handling and logging errors

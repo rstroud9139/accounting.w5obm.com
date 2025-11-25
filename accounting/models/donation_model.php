@@ -1,5 +1,5 @@
- <!-- /accounting/models/donation_model.php -->
- <?php
+<?php
+// /accounting/models/donation_model.php
     /**
      * Donation Model
      * Database operations for donations

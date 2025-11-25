@@ -1,14 +1,14 @@
- <!-- /accounting/categories/edit.php -->
- <?php
-    require_once __DIR__ . '/../utils/session_manager.php';
-    require_once '../../include/dbconn.php';
-    require_once __DIR__ . '/../controllers/categoryController.php';
+<?php
+// /accounting/categories/edit.php
+require_once __DIR__ . '/../utils/session_manager.php';
+require_once __DIR__ . '/../../include/dbconn.php';
+require_once __DIR__ . '/../controllers/categoryController.php';
 
-    // Validate session
-    validate_session();
+// Validate session
+validate_session();
 
-    // Get category ID
-    $id = $_GET['id'] ?? null;
+// Get category ID
+$id = $_GET['id'] ?? null;
 
     if (!$id) {
         header('Location: list.php?status=invalid_request');

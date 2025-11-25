@@ -1,5 +1,5 @@
- <!-- /accounting/models/category_model.php -->
- <?php
+<?php
+// /accounting/models/category_model.php
     /**
      * Category Model
      * Database operations for transaction categories

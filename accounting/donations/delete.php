@@ -1,5 +1,5 @@
- <!-- /accounting/donations/delete.php -->
- <?php
+<?php
+// /accounting/donations/delete.php
     require_once __DIR__ . '/../utils/session_manager.php';
     require_once __DIR__ . '/../../include/dbconn.php';
     require_once __DIR__ . '/../controllers/donation_controller.php';

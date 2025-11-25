@@ -1,5 +1,5 @@
- <!-- /accounting/models/vendor_model.php -->
- <?php
+<?php
+// /accounting/models/vendor_model.php
     /**
      * Vendor Model
      * Database operations for vendors

@@ -1,5 +1,5 @@
- <!-- /accounting/models/ledger_model.php -->
- <?php
+<?php
+// /accounting/models/ledger_model.php
     /**
      * Ledger Model
      * Database operations for ledger accounts

@@ -1,13 +1,13 @@
- <!-- /accounting/assets/delete.php -->
- <?php
-    require_once __DIR__ . '/../utils/session_manager.php';
-    require_once '../../include/dbconn.php';
-    require_once __DIR__ . '/../controllers/assetController.php';
+<?php
+// /accounting/assets/delete.php
+require_once __DIR__ . '/../utils/session_manager.php';
+require_once __DIR__ . '/../../include/dbconn.php';
+require_once __DIR__ . '/../controllers/assetController.php';
 
-    // Validate session
-    validate_session();
+// Validate session
+validate_session();
 
-    if (session_status() === PHP_SESSION_NONE) { session_start(); }
+if (session_status() === PHP_SESSION_NONE) { session_start(); }
 
     // Handle asset deletion
     if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id'])) {

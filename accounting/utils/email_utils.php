@@ -1,5 +1,5 @@
- <!-- /accounting/utils/email_utils.php -->
- <?php
+<?php
+// /accounting/utils/email_utils.php
     /**
      * Email Utilities
      * Functions for sending emails

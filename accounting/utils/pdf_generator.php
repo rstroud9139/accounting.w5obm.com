@@ -1,5 +1,5 @@
- <!-- /accounting/utils/pdf_generator.php -->
- <?php
+<?php
+// /accounting/utils/pdf_generator.php
     /**
      * PDF Generator
      * Functions for generating PDF documents

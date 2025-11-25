@@ -1,5 +1,5 @@
- <!-- /accounting/models/report_model.php -->
- <?php
+<?php
+// /accounting/models/report_model.php
     /**
      * Report Model
      * Database operations for reports

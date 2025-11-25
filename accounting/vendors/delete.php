@@ -1,8 +1,8 @@
-<-- /accounting/vendors/delete.php
-    <?php
-    require_once __DIR__ . '/../utils/session_manager.php';
-    require_once '../../include/dbconn.php';
-    require_once __DIR__ . '/../controllers/vendorController.php';
+<?php
+// /accounting/vendors/delete.php
+require_once __DIR__ . '/../utils/session_manager.php';
+require_once __DIR__ . '/../../include/dbconn.php';
+require_once __DIR__ . '/../controllers/vendorController.php';
 
     // Validate session
     validate_session();

@@ -1,8 +1,8 @@
- <!-- /accounting/donations/add.php -->
- <?php
-    require_once __DIR__ . '/../utils/session_manager.php';
-    require_once '../../include/dbconn.php';
-    require_once __DIR__ . '/../controllers/donation_controller.php';
+<?php
+// /accounting/donations/add.php
+     require_once __DIR__ . '/../utils/session_manager.php';
+     require_once __DIR__ . '/../../include/dbconn.php';
+     require_once __DIR__ . '/../controllers/donation_controller.php';
     require_once __DIR__ . '/../utils/email_utils.php';
     require_once __DIR__ . '/../lib/email_bridge.php';
 

@@ -1,5 +1,4 @@
-<-- /accounting/vendors/index.php
-    <?php
-    // Redirect to vendors list
-    header('Location: list.php');
-    exit();
+<?php
+// /accounting/vendors/index.php
+header('Location: list.php');
+exit();

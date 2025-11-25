@@ -1,27 +1,28 @@
- <!-- /accounting/assets/edit.php -->
- <?php
-    require_once __DIR__ . '/../utils/session_manager.php';
-    require_once '../../include/dbconn.php';
-    require_once __DIR__ . '/../controllers/asset_controller.php';
+<?php
+// /accounting/assets/edit.php
+require_once __DIR__ . '/../utils/session_manager.php';
+require_once __DIR__ . '/../../include/dbconn.php';
+require_once __DIR__ . '/../controllers/assetController.php';
+require_once __DIR__ . '/../../include/premium_hero.php';
 
-    // Validate session
-    validate_session();
+// Validate session
+validate_session();
 
-    // Get asset ID
-    $id = $_GET['id'] ?? null;
+// Get asset ID
+$id = $_GET['id'] ?? null;
 
-    if (!$id) {
-        header('Location: list.php?status=invalid_request');
-        exit();
-    }
+if (!$id) {
+    header('Location: list.php?status=invalid_request');
+    exit();
+}
 
-    // Fetch asset data
-    $asset = fetch_asset_by_id($id);
+// Fetch asset data
+$asset = fetch_asset_by_id($id);
 
-    if (!$asset) {
-        header('Location: list.php?status=not_found');
-        exit();
-    }
+if (!$asset) {
+    header('Location: list.php?status=not_found');
+    exit();
+}
 
     // Handle form submission
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -50,14 +51,75 @@
  <body>
      <?php include '../../include/menu.php'; ?>
 
-     <div class="container mt-5">
-         <div class="d-flex align-items-center mb-4">
-             <?php $logoSrc = accounting_logo_src_for(__DIR__); ?>
-             <img src="<?php echo htmlspecialchars($logoSrc); ?>" alt="Club Logo" class="img-card-175">
-             <h2 class="ms-3">Edit Asset</h2>
-         </div>
+     <div class="page-container" style="margin-top:0;padding-top:0;">
+         <?php if (function_exists('renderPremiumHero')): ?>
+             <?php renderPremiumHero([
+                 'eyebrow' => 'Asset Operations',
+                 'title' => 'Edit Asset',
+                 'subtitle' => 'Refresh valuations, notes, and readiness for ' . htmlspecialchars($asset['name']),
+                 'theme' => 'emerald',
+                 'size' => 'compact',
+                 'media_mode' => 'none',
+                 'chips' => array_filter([
+                     'Asset ID: ' . (int)$asset['id'],
+                     !empty($asset['status']) ? 'Status: ' . ucwords($asset['status']) : null,
+                 ]),
+                 'actions' => [
+                     [
+                         'label' => 'View Assets',
+                         'url' => '/accounting/assets/list.php',
+                         'variant' => 'outline',
+                         'icon' => 'fa-boxes'
+                     ],
+                     [
+                         'label' => 'Back to Dashboard',
+                         'url' => '/accounting/dashboard.php',
+                         'variant' => 'outline',
+                         'icon' => 'fa-arrow-left'
+                     ]
+                 ],
+                 'highlights' => [
+                     [
+                         'label' => 'Acquired',
+                         'value' => $asset['acquisition_date'] ? date('M d, Y', strtotime($asset['acquisition_date'])) : 'Unknown',
+                         'meta' => 'Original date'
+                     ],
+                     [
+                         'label' => 'Value',
+                         'value' => '$' . number_format((float)($asset['value'] ?? 0), 2),
+                         'meta' => 'Current book'
+                     ]
+                 ],
+             ]); ?>
+         <?php else: ?>
+             <section class="hero hero-small mb-4">
+                 <div class="hero-body py-3">
+                     <div class="container-fluid">
+                         <div class="row align-items-center">
+                             <div class="col-md-2 d-none d-md-flex justify-content-center">
+                                 <?php $logoSrc = accounting_logo_src_for(__DIR__); ?>
+                                 <img src="<?= htmlspecialchars($logoSrc); ?>" alt="W5OBM Logo" class="img-fluid no-shadow" style="max-height:64px;">
+                             </div>
+                             <div class="col-md-6 text-center text-md-start text-white">
+                                 <h1 class="h4 mb-1">Edit Asset</h1>
+                                 <p class="mb-0 small">Update valuation details for existing equipment.</p>
+                             </div>
+                             <div class="col-md-4 text-center text-md-end mt-3 mt-md-0">
+                                 <a href="list.php" class="btn btn-outline-light btn-sm me-2">
+                                     <i class="fas fa-arrow-left me-1"></i>Back to Assets
+                                 </a>
+                                 <a href="/accounting/dashboard.php" class="btn btn-primary btn-sm">
+                                     <i class="fas fa-home me-1"></i>Dashboard
+                                 </a>
+                             </div>
+                         </div>
+                     </div>
+                 </div>
+             </section>
+         <?php endif; ?>
 
-         <div class="card shadow">
+         <div class="container mt-4">
+             <div class="card shadow">
              <div class="card-header">
                  <h3>Edit Asset</h3>
              </div>
@@ -89,6 +151,7 @@
                      <button type="submit" class="btn btn-primary">Update Asset</button>
                      <a href="list.php" class="btn btn-secondary">Cancel</a>
                  </form>
+             </div>
              </div>
          </div>
      </div>

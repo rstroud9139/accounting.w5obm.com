@@ -3,7 +3,7 @@
     require_once __DIR__ . '/../utils/session_manager.php';
     require_once '../../include/dbconn.php';
     require_once __DIR__ . '/../utils/pdf_generator.php';
-    require_once __DIR__ . '/../controllers/report_controller.php';
+    require_once __DIR__ . '/../controllers/reportController.php';
 
     // Validate session
     validate_session();
@@ -92,7 +92,7 @@
     function generate_balance_sheet_pdf($date)
     {
         // Load required controller functions
-        require_once __DIR__ . '/../controllers/report_controller.php';
+        require_once __DIR__ . '/../controllers/reportController.php';
 
         // Generate report data
         $balance_sheet = generate_balance_sheet($date);

@@ -7,7 +7,7 @@
 
 require_once __DIR__ . '/../../include/dbconn.php';
 require_once __DIR__ . '/../lib/helpers.php';
-require_once __DIR__ . '/../controllers/ledger_controller.php';
+require_once __DIR__ . '/../controllers/ledgerController.php';
 require_once __DIR__ . '/../utils/stats_service.php';
 
 if (!isAuthenticated()) {

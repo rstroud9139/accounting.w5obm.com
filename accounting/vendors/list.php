@@ -2,8 +2,9 @@
 
 require_once __DIR__ . '/../utils/session_manager.php';
 require_once __DIR__ . '/../../include/dbconn.php';
-require_once __DIR__ . '/../controllers/vendor_controller.php';
+require_once __DIR__ . '/../controllers/vendorController.php';
 require_once __DIR__ . '/../lib/helpers.php';
+require_once __DIR__ . '/../../include/premium_hero.php';
 
 validate_session();
 
@@ -92,6 +93,32 @@ $stats = [
     'withPhone' => count(array_filter($vendors, static fn($vendor) => !empty($vendor['phone']))),
 ];
 
+$vendorHeroChips = array_values(array_filter([
+    $filters['contact'] !== 'all' ? 'Contact: ' . str_replace('_', ' ', $filters['contact']) : 'All contact methods',
+    !empty($filters['search']) ? 'Search: ' . $filters['search'] : null,
+    'Sort: ' . ($filters['sort'] === 'name_desc' ? 'Name Z→A' : 'Name A→Z'),
+]));
+
+$vendorHeroActions = [
+    [
+        'label' => 'Add Vendor',
+        'url' => '/accounting/vendors/add.php',
+        'icon' => 'fa-plus'
+    ],
+    [
+        'label' => 'Export CSV',
+        'url' => '/accounting/vendors/list.php?' . http_build_query(array_merge($_GET, ['export' => 'csv'])),
+        'variant' => 'outline',
+        'icon' => 'fa-file-export'
+    ],
+    [
+        'label' => 'Back to Dashboard',
+        'url' => '/accounting/dashboard.php',
+        'variant' => 'outline',
+        'icon' => 'fa-arrow-left'
+    ],
+];
+
 $page_title = 'Vendors Workspace - W5OBM Accounting';
 include __DIR__ . '/../../include/header.php';
 ?>
@@ -104,30 +131,60 @@ include __DIR__ . '/../../include/header.php';
     } ?>
 
     <div class="page-container" style="margin-top:0;padding-top:0;">
-        <section class="hero hero-small mb-4">
-            <div class="hero-body py-3">
-                <div class="container-fluid">
-                    <div class="row align-items-center">
-                        <div class="col-md-2 d-none d-md-flex justify-content-center">
-                            <?php $logoSrc = accounting_logo_src_for(__DIR__); ?>
-                            <img src="<?= htmlspecialchars($logoSrc); ?>" alt="W5OBM Logo" class="img-fluid no-shadow" style="max-height:64px;">
-                        </div>
-                        <div class="col-md-6 text-center text-md-start text-white">
-                            <h1 class="h4 mb-1">Vendor Relationships</h1>
-                            <p class="mb-0 small">Centralize contacts, communications, and service partners.</p>
-                        </div>
-                        <div class="col-md-4 text-center text-md-end mt-3 mt-md-0">
-                            <a href="../dashboard.php" class="btn btn-outline-light btn-sm me-2">
-                                <i class="fas fa-arrow-left me-1"></i>Back to Accounting
-                            </a>
-                            <a href="add.php" class="btn btn-primary btn-sm">
-                                <i class="fas fa-plus-circle me-1"></i>Add Vendor
-                            </a>
+        <?php if (function_exists('renderPremiumHero')): ?>
+            <?php renderPremiumHero([
+                'eyebrow' => 'Vendor Operations',
+                'title' => 'Vendor Workspace',
+                'subtitle' => 'Centralize contacts, contracts, and readiness for events.',
+                'theme' => 'cobalt',
+                'size' => 'compact',
+                'media_mode' => 'none',
+                'chips' => $vendorHeroChips,
+                'highlights' => [
+                    [
+                        'label' => 'Active Vendors',
+                        'value' => number_format($stats['total']),
+                        'meta' => 'On file'
+                    ],
+                    [
+                        'label' => 'Filtered',
+                        'value' => number_format($stats['filtered']),
+                        'meta' => 'Matches now'
+                    ],
+                    [
+                        'label' => 'Reachable',
+                        'value' => number_format($stats['withEmail']),
+                        'meta' => 'Has email'
+                    ],
+                ],
+                'actions' => $vendorHeroActions,
+            ]); ?>
+        <?php else: ?>
+            <section class="hero hero-small mb-4">
+                <div class="hero-body py-3">
+                    <div class="container-fluid">
+                        <div class="row align-items-center">
+                            <div class="col-md-2 d-none d-md-flex justify-content-center">
+                                <?php $logoSrc = accounting_logo_src_for(__DIR__); ?>
+                                <img src="<?= htmlspecialchars($logoSrc); ?>" alt="W5OBM Logo" class="img-fluid no-shadow" style="max-height:64px;">
+                            </div>
+                            <div class="col-md-6 text-center text-md-start text-white">
+                                <h1 class="h4 mb-1">Vendor Relationships</h1>
+                                <p class="mb-0 small">Centralize contacts, communications, and service partners.</p>
+                            </div>
+                            <div class="col-md-4 text-center text-md-end mt-3 mt-md-0">
+                                <a href="../dashboard.php" class="btn btn-outline-light btn-sm me-2">
+                                    <i class="fas fa-arrow-left me-1"></i>Back to Accounting
+                                </a>
+                                <a href="add.php" class="btn btn-primary btn-sm">
+                                    <i class="fas fa-plus-circle me-1"></i>Add Vendor
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        </section>
+            </section>
+        <?php endif; ?>
 
         <div class="row mb-3 hero-summary-row">
             <div class="col-md-4 col-sm-6 mb-3">

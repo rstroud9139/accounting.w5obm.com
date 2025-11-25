@@ -13,7 +13,7 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 require_once __DIR__ . '/../../include/dbconn.php';
 require_once __DIR__ . '/../lib/helpers.php';
-require_once __DIR__ . '/../controllers/transaction_controller.php';
+require_once __DIR__ . '/../controllers/transactionController.php';
 require_once __DIR__ . '/../utils/csrf.php';
 
 // Only allow POST requests

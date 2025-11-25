@@ -2,7 +2,7 @@
 <?php
 require_once __DIR__ . '/../utils/session_manager.php';
 require_once '../../include/dbconn.php';
-require_once __DIR__ . '/../controllers/category_controller.php';
+require_once __DIR__ . '/../controllers/categoryController.php';
 
 // Validate session
 validate_session();

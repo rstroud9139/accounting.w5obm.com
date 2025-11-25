@@ -79,6 +79,13 @@ if ($monthly_report_result) {
     }
 }
 
+$hasReportTypeData = array_sum(array_map(static function ($typeRow) {
+    return (int)($typeRow['count'] ?? 0);
+}, $report_types)) > 0;
+$hasMonthlyReportData = array_sum(array_map(static function ($monthlyRow) {
+    return (int)($monthlyRow['count'] ?? 0);
+}, $monthly_reports)) > 0;
+
 // Calculate recent report statistics
 $recent_reports_count = 0;
 $total_reports_count = 0;
@@ -524,6 +531,22 @@ include __DIR__ . '/../include/header.php';
             text-align: center;
         }
     }
+
+    .analytics-placeholder {
+        min-height: 240px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        color: #6c757d;
+        padding: 1.5rem;
+    }
+
+    .analytics-placeholder i {
+        font-size: 2rem;
+        margin-bottom: .75rem;
+        color: #adb5bd;
+    }
 </style>
 
 <body>
@@ -800,7 +823,15 @@ include __DIR__ . '/../include/header.php';
                         <h5 class="mb-0"><i class="fas fa-chart-pie me-2 text-primary"></i>Report Type Distribution</h5>
                     </div>
                     <div class="card-body">
-                        <canvas id="reportTypeChart" height="280"></canvas>
+                        <?php if ($hasReportTypeData): ?>
+                            <canvas id="reportTypeChart" height="280"></canvas>
+                        <?php else: ?>
+                            <div class="analytics-placeholder text-center">
+                                <i class="fas fa-chart-pie"></i>
+                                <p class="mb-1 fw-semibold">Report mix insight coming soon</p>
+                                <small class="text-muted">Generate a few reports to unlock this visualization.</small>
+                            </div>
+                        <?php endif; ?>
                     </div>
                 </div>
             </div>
@@ -810,7 +841,15 @@ include __DIR__ . '/../include/header.php';
                         <h5 class="mb-0"><i class="fas fa-chart-line me-2 text-success"></i>Monthly Generation Trends</h5>
                     </div>
                     <div class="card-body">
-                        <canvas id="monthlyReportChart" height="280"></canvas>
+                        <?php if ($hasMonthlyReportData): ?>
+                            <canvas id="monthlyReportChart" height="280"></canvas>
+                        <?php else: ?>
+                            <div class="analytics-placeholder text-center">
+                                <i class="fas fa-wave-square"></i>
+                                <p class="mb-1 fw-semibold">Trend data not available yet</p>
+                                <small class="text-muted">Once monthly activity exists we will plot it here.</small>
+                            </div>
+                        <?php endif; ?>
                     </div>
                 </div>
             </div>
@@ -1060,12 +1099,10 @@ include __DIR__ . '/../include/header.php';
         }
 
         function initializeCharts() {
-            // FIXED: Check if data exists before initializing charts
-            const reportTypeData = <?php echo $report_types_json; ?>;
-            const monthlyReportData = <?php echo $monthly_reports_json; ?>;
+            const reportTypeData = <?php echo $report_types_json ?: '[]'; ?>;
+            const monthlyReportData = <?php echo $monthly_reports_json ?: '[]'; ?>;
 
-            // Initialize Report Types Chart
-            if (reportTypeData && reportTypeData.length > 0) {
+            if (Array.isArray(reportTypeData) && reportTypeData.length > 0) {
                 const reportTypeCtx = document.getElementById('reportTypeChart');
                 if (reportTypeCtx) {
                     new Chart(reportTypeCtx, {
@@ -1113,22 +1150,9 @@ include __DIR__ . '/../include/header.php';
                         }
                     });
                 }
-            } else {
-                // Show placeholder for empty chart
-                const reportTypeCtx = document.getElementById('reportTypeChart');
-                if (reportTypeCtx) {
-                    const ctx = reportTypeCtx.getContext('2d');
-                    ctx.fillStyle = '#f8f9fa';
-                    ctx.fillRect(0, 0, reportTypeCtx.width, reportTypeCtx.height);
-                    ctx.fillStyle = '#6c757d';
-                    ctx.font = '16px Arial';
-                    ctx.textAlign = 'center';
-                    ctx.fillText('No report data available', reportTypeCtx.width / 2, reportTypeCtx.height / 2);
-                }
             }
 
-            // Initialize Monthly Report Generation Chart
-            if (monthlyReportData && monthlyReportData.length > 0) {
+            if (Array.isArray(monthlyReportData) && monthlyReportData.length > 0) {
                 const monthlyReportCtx = document.getElementById('monthlyReportChart');
                 if (monthlyReportCtx) {
                     new Chart(monthlyReportCtx, {
@@ -1176,18 +1200,6 @@ include __DIR__ . '/../include/header.php';
                             }
                         }
                     });
-                }
-            } else {
-                // Show placeholder for empty chart
-                const monthlyReportCtx = document.getElementById('monthlyReportChart');
-                if (monthlyReportCtx) {
-                    const ctx = monthlyReportCtx.getContext('2d');
-                    ctx.fillStyle = '#f8f9fa';
-                    ctx.fillRect(0, 0, monthlyReportCtx.width, monthlyReportCtx.height);
-                    ctx.fillStyle = '#6c757d';
-                    ctx.font = '16px Arial';
-                    ctx.textAlign = 'center';
-                    ctx.fillText('No monthly data available', monthlyReportCtx.width / 2, monthlyReportCtx.height / 2);
                 }
             }
         }

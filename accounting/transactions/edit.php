@@ -16,8 +16,9 @@ if (session_status() === PHP_SESSION_NONE) {
 // Include required files per Website Guidelines
 require_once __DIR__ . '/../../include/dbconn.php';
 require_once __DIR__ . '/../lib/helpers.php';
-require_once __DIR__ . '/../controllers/transaction_controller.php';
+require_once __DIR__ . '/../controllers/transactionController.php';
 require_once __DIR__ . '/../utils/csrf.php';
+require_once __DIR__ . '/../../include/premium_hero.php';
 
 // Check authentication using consolidated functions
 if (!isAuthenticated()) {
@@ -157,6 +158,51 @@ try {
 }
 
 $page_title = "Edit Transaction - W5OBM Accounting";
+
+$transactionHeroHighlights = [
+    [
+        'label' => 'Amount',
+        'value' => '$' . number_format((float) $transaction['amount'], 2),
+        'meta' => ($transaction['type'] ?? 'Entry') . ' value'
+    ],
+    [
+        'label' => 'Category',
+        'value' => $transaction['category_name'] ?? 'Uncategorized',
+        'meta' => 'Current mapping'
+    ],
+    [
+        'label' => 'Transaction Date',
+        'value' => date('M j, Y', strtotime($transaction['transaction_date'])),
+        'meta' => 'Scheduled posting'
+    ]
+];
+
+$transactionHeroActions = [
+    [
+        'label' => 'Transactions Workspace',
+        'url' => '/accounting/transactions/transactions.php',
+        'variant' => 'outline',
+        'icon' => 'fa-list'
+    ],
+    [
+        'label' => 'Back to List',
+        'url' => '/accounting/transactions/list.php',
+        'variant' => 'outline',
+        'icon' => 'fa-arrow-left'
+    ],
+    [
+        'label' => 'Accounting Dashboard',
+        'url' => '/accounting/dashboard.php',
+        'variant' => 'primary',
+        'icon' => 'fa-chart-line'
+    ]
+];
+
+$transactionHeroChips = array_filter([
+    'Mode: Edit transaction',
+    'Security: CSRF protected',
+    $transaction['vendor_id'] ? 'Vendor linked' : 'Vendor optional'
+]);
 ?>
 
 <!DOCTYPE html>
@@ -177,34 +223,50 @@ $page_title = "Edit Transaction - W5OBM Accounting";
         displayToastMessage();
     } ?>
 
-    <div class="page-container">
-        <!-- Header Card -->
-        <div class="card shadow mb-4">
-            <div class="card-header bg-warning text-white">
-                <div class="row align-items-center">
-                    <div class="col-auto">
-                        <i class="fas fa-edit fa-2x"></i>
-                    </div>
-                    <div class="col">
-                        <h3 class="mb-0">Edit Transaction</h3>
-                        <small>Modify transaction details and information</small>
-                    </div>
-                    <div class="col-auto">
-                        <div class="btn-group shadow" role="group">
-                            <a href="list.php" class="btn btn-light btn-sm">
-                                <i class="fas fa-list me-1"></i>Back to List
-                            </a>
-                            <a href="../dashboard.php" class="btn btn-outline-light btn-sm">
-                                <i class="fas fa-arrow-left me-1"></i>Dashboard
-                            </a>
+    <div class="page-container" style="margin-top:0;padding-top:0;">
+        <?php if (function_exists('renderPremiumHero')): ?>
+            <?php renderPremiumHero([
+                'eyebrow' => 'Ledger Operations',
+                'title' => 'Edit Transaction',
+                'subtitle' => 'Adjust an existing ledger entry while preserving audit-friendly context.',
+                'description' => 'Review the current attributes below, apply updates, and keep leadership synchronized with the latest figures.',
+                'theme' => 'sunset',
+                'size' => 'compact',
+                'media_mode' => 'none',
+                'chips' => $transactionHeroChips,
+                'highlights' => $transactionHeroHighlights,
+                'actions' => $transactionHeroActions,
+            ]); ?>
+        <?php else: ?>
+            <section class="hero hero-small mb-4">
+                <div class="hero-body py-3">
+                    <div class="container-fluid">
+                        <div class="row align-items-center">
+                            <div class="col-md-2 d-none d-md-flex justify-content-center">
+                                <?php $logoSrc = accounting_logo_src_for(__DIR__); ?>
+                                <img src="<?= htmlspecialchars($logoSrc); ?>" alt="W5OBM Logo" class="img-fluid no-shadow" style="max-height:64px;">
+                            </div>
+                            <div class="col-md-6 text-center text-md-start text-white">
+                                <h1 class="h4 mb-1">Edit Transaction</h1>
+                                <p class="mb-0 small">Modify income or expense details with confidence.</p>
+                            </div>
+                            <div class="col-md-4 text-center text-md-end mt-3 mt-md-0">
+                                <a href="/accounting/transactions/list.php" class="btn btn-outline-light btn-sm">
+                                    <i class="fas fa-arrow-left me-1"></i>Back to Transactions
+                                </a>
+                                <a href="/accounting/dashboard.php" class="btn btn-primary btn-sm">
+                                    <i class="fas fa-home me-1"></i>Dashboard
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
+            </section>
+        <?php endif; ?>
 
-        <!-- Current Transaction Info -->
-        <div class="card shadow mb-4">
+        <div class="container mt-4">
+            <!-- Current Transaction Info -->
+            <div class="card shadow mb-4">
             <div class="card-header bg-info text-white">
                 <h6 class="mb-0">
                     <i class="fas fa-info-circle me-2"></i>Current Transaction Information
@@ -251,8 +313,8 @@ $page_title = "Edit Transaction - W5OBM Accounting";
             </div>
         </div>
 
-        <!-- Edit Form -->
-        <div class="card shadow">
+            <!-- Edit Form -->
+            <div class="card shadow">
             <div class="card-header bg-light">
                 <h5 class="mb-0">
                     <i class="fas fa-file-invoice-dollar me-2"></i>Edit Transaction Details
@@ -415,6 +477,7 @@ $page_title = "Edit Transaction - W5OBM Accounting";
             </div>
         </div>
     </div>
+</div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {

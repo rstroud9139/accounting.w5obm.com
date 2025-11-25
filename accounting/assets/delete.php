@@ -2,7 +2,7 @@
  <?php
     require_once __DIR__ . '/../utils/session_manager.php';
     require_once '../../include/dbconn.php';
-    require_once __DIR__ . '/../controllers/asset_controller.php';
+    require_once __DIR__ . '/../controllers/assetController.php';
 
     // Validate session
     validate_session();

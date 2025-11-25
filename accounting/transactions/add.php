@@ -1,10 +1,11 @@
 <?php
 require_once __DIR__ . '/../utils/session_manager.php';
 require_once '../../include/dbconn.php';
-require_once __DIR__ . '/../controllers/transaction_controller.php';
-require_once __DIR__ . '/../controllers/category_controller.php';
-require_once __DIR__ . '/../controllers/ledger_controller.php';
-require_once __DIR__ . '/../controllers/vendor_controller.php';
+require_once __DIR__ . '/../controllers/transactionController.php';
+require_once __DIR__ . '/../controllers/categoryController.php';
+require_once __DIR__ . '/../controllers/ledgerController.php';
+require_once __DIR__ . '/../controllers/vendorController.php';
+require_once __DIR__ . '/../../include/premium_hero.php';
 
 // Validate session
 validate_session();
@@ -35,6 +36,44 @@ $accounts = fetch_all_ledger_accounts();
 
 // Fetch vendors for dropdown
 $vendors = fetch_all_vendors();
+
+$legacyHeroHighlights = [
+    [
+        'label' => 'Categories',
+        'value' => number_format(count($categories)),
+        'meta' => 'Ready to use'
+    ],
+    [
+        'label' => 'Ledger Accounts',
+        'value' => number_format(count($accounts)),
+        'meta' => 'Optional mapping'
+    ],
+    [
+        'label' => 'Vendors',
+        'value' => number_format(count($vendors)),
+        'meta' => 'Lookup'
+    ],
+];
+
+$legacyHeroActions = [
+    [
+        'label' => 'Transactions Workspace',
+        'url' => '/accounting/transactions/transactions.php',
+        'variant' => 'outline',
+        'icon' => 'fa-list'
+    ],
+    [
+        'label' => 'Accounting Dashboard',
+        'url' => '/accounting/dashboard.php',
+        'variant' => 'outline',
+        'icon' => 'fa-arrow-left'
+    ],
+];
+
+$legacyHeroChips = [
+    'Legacy form version',
+    'Mode: Manual entry'
+];
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -47,12 +86,48 @@ $vendors = fetch_all_vendors();
 <body>
     <?php include '../../include/menu.php'; ?>
 
-    <div class="container mt-5">
-        <div class="d-flex align-items-center mb-4">
-            <?php $logoSrc = accounting_logo_src_for(__DIR__); ?>
-            <img src="<?php echo htmlspecialchars($logoSrc); ?>" alt="Club Logo" class="img-card-175">
-            <h2 class="ms-3">Add Transaction</h2>
-        </div>
+    <div class="page-container" style="margin-top:0;padding-top:0;">
+        <?php if (function_exists('renderPremiumHero')): ?>
+            <?php renderPremiumHero([
+                'eyebrow' => 'Ledger Operations',
+                'title' => 'Add Transaction (Legacy)',
+                'subtitle' => 'Use the classic form layout to log income or expense activity.',
+                'description' => 'Prefer the streamlined layout? The modern workspace remains available at any time.',
+                'theme' => 'emerald',
+                'size' => 'compact',
+                'media_mode' => 'none',
+                'chips' => $legacyHeroChips,
+                'highlights' => $legacyHeroHighlights,
+                'actions' => $legacyHeroActions,
+            ]); ?>
+        <?php else: ?>
+            <section class="hero hero-small mb-4">
+                <div class="hero-body py-3">
+                    <div class="container-fluid">
+                        <div class="row align-items-center">
+                            <div class="col-md-2 d-none d-md-flex justify-content-center">
+                                <?php $logoSrc = accounting_logo_src_for(__DIR__); ?>
+                                <img src="<?= htmlspecialchars($logoSrc); ?>" alt="W5OBM Logo" class="img-fluid no-shadow" style="max-height:64px;">
+                            </div>
+                            <div class="col-md-6 text-center text-md-start text-white">
+                                <h1 class="h4 mb-1">Add Transaction</h1>
+                                <p class="mb-0 small">Legacy entry experience for quick postings.</p>
+                            </div>
+                            <div class="col-md-4 text-center text-md-end mt-3 mt-md-0">
+                                <a href="transactions.php" class="btn btn-outline-light btn-sm me-2">
+                                    <i class="fas fa-arrow-left me-1"></i>Transactions Workspace
+                                </a>
+                                <a href="../dashboard.php" class="btn btn-primary btn-sm">
+                                    <i class="fas fa-home me-1"></i>Dashboard
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        <?php endif; ?>
+
+        <div class="container mt-4">
 
         <div class="card shadow">
             <div class="card-header">
@@ -219,6 +294,7 @@ $vendors = fetch_all_vendors();
                     </div>
                 </div>
             </div>
+        </div>
         </div>
     </div>
 

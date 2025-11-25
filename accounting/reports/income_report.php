@@ -11,7 +11,7 @@
 session_start();
 require_once __DIR__ . '/../../include/dbconn.php';
 require_once __DIR__ . '/../lib/helpers.php';
-require_once __DIR__ . '/../controllers/report_controller.php';
+require_once __DIR__ . '/../controllers/reportController.php';
 require_once __DIR__ . '/../../include/report_header.php';
 
 // Authentication check
@@ -127,7 +127,7 @@ if ($generate_report) {
             $filters['category_id'] = $category_id;
         }
 
-        require_once __DIR__ . '/../controllers/transaction_controller.php';
+        require_once __DIR__ . '/../controllers/transactionController.php';
         $income_transactions = getAllTransactions($filters);
 
         $report_data = [

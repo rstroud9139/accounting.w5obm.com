@@ -544,3 +544,171 @@ function validateTransactionData($data)
         'errors' => $errors
     ];
 }
+
+// -----------------------------------------------------------------------------
+// Legacy snake_case wrappers (compatibility layer)
+// -----------------------------------------------------------------------------
+
+if (!function_exists('add_transaction')) {
+    function add_transaction($category_id, $amount, $transaction_date, $description, $type, $account_id = null, $vendor_id = null)
+    {
+        return addTransaction([
+            'category_id' => $category_id,
+            'amount' => $amount,
+            'transaction_date' => $transaction_date,
+            'description' => $description,
+            'type' => $type,
+            'account_id' => $account_id,
+            'vendor_id' => $vendor_id,
+        ]);
+    }
+}
+
+if (!function_exists('update_transaction')) {
+    function update_transaction($id, $category_id, $amount, $transaction_date, $description, $type, $account_id = null, $vendor_id = null)
+    {
+        return updateTransaction($id, [
+            'category_id' => $category_id,
+            'amount' => $amount,
+            'transaction_date' => $transaction_date,
+            'description' => $description,
+            'type' => $type,
+            'account_id' => $account_id,
+            'vendor_id' => $vendor_id,
+        ]);
+    }
+}
+
+if (!function_exists('delete_transaction')) {
+    function delete_transaction($id)
+    {
+        return deleteTransaction($id);
+    }
+}
+
+if (!function_exists('fetch_transaction_by_id')) {
+    function fetch_transaction_by_id($id)
+    {
+        return getTransactionById($id);
+    }
+}
+
+if (!function_exists('fetch_all_transactions')) {
+    function fetch_all_transactions($start_date = null, $end_date = null, $category_id = null, $type = null, $account_id = null, $vendor_id = null, $search = null)
+    {
+        $filters = array_filter([
+            'start_date' => $start_date,
+            'end_date' => $end_date,
+            'category_id' => $category_id,
+            'type' => $type,
+            'account_id' => $account_id,
+            'vendor_id' => $vendor_id,
+            'search' => $search,
+        ], static function ($value) {
+            return $value !== null && $value !== '';
+        });
+
+        return getAllTransactions($filters);
+    }
+}
+
+if (!function_exists('get_recent_transactions')) {
+    function get_recent_transactions($limit = 5)
+    {
+        return getRecentTransactions($limit);
+    }
+}
+
+if (!function_exists('calculate_total_income')) {
+    function calculate_total_income($connRef = null)
+    {
+        $filters = ['type' => 'Income'];
+        $totals = calculateTransactionTotals($filters);
+        if (!empty($totals['income'])) {
+            return (float)$totals['income'];
+        }
+
+        $c = $connRef ?: (function_exists('getDbConnection') ? getDbConnection() : null);
+        if (!$c) {
+            global $conn;
+            $c = $conn;
+        }
+        $res = $c->query("SELECT COALESCE(SUM(amount),0) AS total FROM acc_transactions WHERE type='Income'");
+        $row = $res->fetch_assoc();
+        return (float)($row['total'] ?? 0);
+    }
+}
+
+if (!function_exists('calculate_total_expenses')) {
+    function calculate_total_expenses($connRef = null)
+    {
+        $filters = ['type' => 'Expense'];
+        $totals = calculateTransactionTotals($filters);
+        if (!empty($totals['expenses'])) {
+            return (float)$totals['expenses'];
+        }
+
+        $c = $connRef ?: (function_exists('getDbConnection') ? getDbConnection() : null);
+        if (!$c) {
+            global $conn;
+            $c = $conn;
+        }
+        $res = $c->query("SELECT COALESCE(SUM(amount),0) AS total FROM acc_transactions WHERE type='Expense'");
+        $row = $res->fetch_assoc();
+        return (float)($row['total'] ?? 0);
+    }
+}
+
+if (!function_exists('calculate_income_by_category')) {
+    function calculate_income_by_category($start_date, $end_date, $limit = null)
+    {
+        if (function_exists('get_income_by_category')) {
+            return get_income_by_category($start_date, $end_date, $limit);
+        }
+
+        global $conn;
+        $limit = ($limit !== null) ? (int)$limit : null;
+        $sql = "SELECT c.name, SUM(t.amount) AS total FROM acc_transactions t JOIN acc_transaction_categories c ON t.category_id=c.id WHERE t.type='Income' AND t.transaction_date BETWEEN ? AND ? GROUP BY c.name ORDER BY total DESC";
+        if ($limit && $limit > 0) {
+            $sql .= " LIMIT " . $limit;
+        }
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param('ss', $start_date, $end_date);
+        $stmt->execute();
+        $res = $stmt->get_result();
+        $rows = [];
+        while ($r = $res->fetch_assoc()) {
+            $r['total'] = (float)$r['total'];
+            $rows[] = $r;
+        }
+        $stmt->close();
+        return $rows;
+    }
+}
+
+if (!function_exists('calculate_expenses_by_category')) {
+    function calculate_expenses_by_category($start_date, $end_date, $limit = null)
+    {
+        if (function_exists('get_expenses_by_category')) {
+            return get_expenses_by_category($start_date, $end_date, $limit);
+        }
+
+        global $conn;
+        $limit = ($limit !== null) ? (int)$limit : null;
+        $sql = "SELECT c.name, SUM(t.amount) AS total FROM acc_transactions t JOIN acc_transaction_categories c ON t.category_id=c.id WHERE t.type='Expense' AND t.transaction_date BETWEEN ? AND ? GROUP BY c.name ORDER BY total DESC";
+        if ($limit && $limit > 0) {
+            $sql .= " LIMIT " . $limit;
+        }
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param('ss', $start_date, $end_date);
+        $stmt->execute();
+        $res = $stmt->get_result();
+        $rows = [];
+        while ($r = $res->fetch_assoc()) {
+            $r['total'] = (float)$r['total'];
+            $rows[] = $r;
+        }
+        $stmt->close();
+        return $rows;
+    }
+}

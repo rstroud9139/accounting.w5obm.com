@@ -13,8 +13,9 @@ if (session_status() === PHP_SESSION_NONE) {
 
 require_once __DIR__ . '/../../include/dbconn.php';
 require_once __DIR__ . '/../lib/helpers.php';
-require_once __DIR__ . '/../controllers/transaction_controller.php';
+require_once __DIR__ . '/../controllers/transactionController.php';
 require_once __DIR__ . '/../views/transactionList.php';
+require_once __DIR__ . '/../../include/premium_hero.php';
 
 // Authentication gate
 if (!isAuthenticated()) {
@@ -221,36 +222,146 @@ $heroTotals = [
     'count' => $totals['transaction_count'] ?? count($transactions)
 ];
 
-require_once __DIR__ . '/../../include/header.php';
+$formatDateChip = static function ($value) {
+    $timestamp = strtotime((string)$value);
+    return $timestamp ? date('M j, Y', $timestamp) : $value;
+};
+
+$transactionHeroHighlights = [
+    [
+        'label' => 'Income',
+        'value' => '$' . number_format($heroTotals['income'], 2),
+        'meta' => 'Filtered total'
+    ],
+    [
+        'label' => 'Expenses',
+        'value' => '$' . number_format($heroTotals['expenses'], 2),
+        'meta' => 'Filtered total'
+    ],
+    [
+        'label' => 'Net',
+        'value' => '$' . number_format($heroTotals['net'], 2),
+        'meta' => 'Income - expenses'
+    ],
+    [
+        'label' => 'Entries',
+        'value' => number_format($heroTotals['count']),
+        'meta' => 'Matching filters'
+    ],
+];
+
+$transactionHeroChips = array_values(array_filter([
+    !empty($filters['start_date']) ? 'From ' . $formatDateChip($filters['start_date']) : null,
+    !empty($filters['end_date']) ? 'Thru ' . $formatDateChip($filters['end_date']) : null,
+    !empty($filters['type']) ? 'Type: ' . ucfirst(strtolower($filters['type'])) : null,
+    !empty($filters['category_id']) ? 'Category #' . $filters['category_id'] : null,
+    !empty($filters['account_id']) ? 'Account #' . $filters['account_id'] : null,
+    !empty($filters['vendor_id']) ? 'Vendor #' . $filters['vendor_id'] : null,
+    !empty($filters['search']) ? 'Search: ' . $filters['search'] : null,
+]));
+
+if (empty($transactionHeroChips)) {
+    $transactionHeroChips[] = 'Scope: All transactions';
+}
+
+$exportQuery = array_filter([
+    'start_date' => $filters['start_date'] ?? '',
+    'end_date' => $filters['end_date'] ?? '',
+    'category_id' => $filters['category_id'] ?? '',
+    'type' => $filters['type'] ?? '',
+    'account_id' => $filters['account_id'] ?? '',
+    'vendor_id' => $filters['vendor_id'] ?? '',
+    'search' => $filters['search'] ?? '',
+], static function ($value) {
+    return $value !== null && $value !== '';
+});
+
+$exportQuery['export'] = 'csv';
+$exportUrl = '/accounting/transactions/transactions.php?' . http_build_query($exportQuery);
+
+$transactionHeroActions = array_values(array_filter([
+    $can_add_transactions ? [
+        'label' => 'Add Transaction',
+        'url' => '/accounting/transactions/add_transaction.php',
+        'icon' => 'fa-plus-circle'
+    ] : null,
+    [
+        'label' => 'Export CSV',
+        'url' => $exportUrl,
+        'variant' => 'outline',
+        'icon' => 'fa-file-export'
+    ],
+    [
+        'label' => 'Accounting Manual',
+        'url' => '/accounting/manual.php#transactions',
+        'variant' => 'outline',
+        'icon' => 'fa-book'
+    ],
+]));
 
 ?>
+<!DOCTYPE html>
+<html lang="en">
 
-<div class="page-container" style="margin-top:0;padding-top:0;">
-    <section class="hero hero-small mb-4">
-        <div class="hero-body py-3">
-            <div class="container-fluid">
-                <div class="row align-items-center">
-                    <div class="col-md-2 d-none d-md-flex justify-content-center">
-                        <img src="https://w5obm.com/images/badges/club_logo.png" alt="W5OBM Logo" class="img-fluid no-shadow" style="max-height:64px;">
-                    </div>
-                    <div class="col-md-6 text-center text-md-start text-white">
-                        <h1 class="h4 mb-1">Transaction Management</h1>
-                        <p class="mb-0 small">Review, post, and reconcile every ledger movement</p>
-                    </div>
-                    <div class="col-md-4 text-center text-md-end mt-3 mt-md-0">
-                        <?php if ($can_add_transactions): ?>
-                            <button class="btn btn-primary btn-sm me-2" data-bs-toggle="modal" data-bs-target="#addTransactionModal">
-                                <i class="fas fa-plus-circle me-1"></i>New Transaction
-                            </button>
-                        <?php endif; ?>
-                        <a href="/accounting/manual.php#transactions" class="btn btn-outline-light btn-sm">
-                            <i class="fas fa-book me-1"></i>Documentation
-                        </a>
+<head>
+    <title><?= htmlspecialchars($page_title); ?></title>
+    <?php include __DIR__ . '/../../include/header.php'; ?>
+</head>
+
+<body>
+    <?php include __DIR__ . '/../../include/menu.php'; ?>
+
+    <div class="page-container" style="margin-top:0;padding-top:0;">
+        <?php if (function_exists('renderPremiumHero')): ?>
+            <?php renderPremiumHero([
+                'eyebrow' => 'Ledger Operations',
+                'title' => 'Transactions Workspace',
+                'subtitle' => 'Review, post, and reconcile every ledger movement in one unified stream.',
+                'description' => 'Use the filters on the right to narrow the ledger, export polished CSVs, or jump into a detailed entry.',
+                'theme' => 'midnight',
+                'size' => 'compact',
+                'media_mode' => 'none',
+                'chips' => $transactionHeroChips,
+                'highlights' => $transactionHeroHighlights,
+                'actions' => $transactionHeroActions,
+            ]); ?>
+            <div class="d-flex flex-wrap justify-content-end gap-2 mb-4">
+                <?php if ($can_add_transactions): ?>
+                    <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addTransactionModal">
+                        <i class="fas fa-plus-circle me-1"></i>New Transaction
+                    </button>
+                <?php endif; ?>
+                <a href="/accounting/manual.php#transactions" class="btn btn-outline-secondary btn-sm">
+                    <i class="fas fa-book me-1"></i>Documentation
+                </a>
+            </div>
+        <?php else: ?>
+            <section class="hero hero-small mb-4">
+                <div class="hero-body py-3">
+                    <div class="container-fluid">
+                        <div class="row align-items-center">
+                            <div class="col-md-2 d-none d-md-flex justify-content-center">
+                                <img src="https://w5obm.com/images/badges/club_logo.png" alt="W5OBM Logo" class="img-fluid no-shadow" style="max-height:64px;">
+                            </div>
+                            <div class="col-md-6 text-center text-md-start text-white">
+                                <h1 class="h4 mb-1">Transaction Management</h1>
+                                <p class="mb-0 small">Review, post, and reconcile every ledger movement</p>
+                            </div>
+                            <div class="col-md-4 text-center text-md-end mt-3 mt-md-0">
+                                <?php if ($can_add_transactions): ?>
+                                    <button class="btn btn-primary btn-sm me-2" data-bs-toggle="modal" data-bs-target="#addTransactionModal">
+                                        <i class="fas fa-plus-circle me-1"></i>New Transaction
+                                    </button>
+                                <?php endif; ?>
+                                <a href="/accounting/manual.php#transactions" class="btn btn-outline-light btn-sm">
+                                    <i class="fas fa-book me-1"></i>Documentation
+                                </a>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </div>
-    </section>
+            </section>
+        <?php endif; ?>
 
     <div class="row mb-3 hero-summary-row">
         <div class="col-md-3 col-sm-6 mb-3">
@@ -361,4 +472,7 @@ require_once __DIR__ . '/../../include/header.php';
     </div>
 </div>
 
-<?php include __DIR__ . '/../../include/footer.php'; ?>
+    <?php include __DIR__ . '/../../include/footer.php'; ?>
+</body>
+
+</html>

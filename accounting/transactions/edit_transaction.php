@@ -13,7 +13,7 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 require_once __DIR__ . '/../../include/dbconn.php';
 require_once __DIR__ . '/../lib/helpers.php';
-require_once __DIR__ . '/../controllers/transaction_controller.php';
+require_once __DIR__ . '/../controllers/transactionController.php';
 require_once __DIR__ . '/../views/transactionForm.php';
 require_once __DIR__ . '/../utils/csrf.php';
 
@@ -129,7 +129,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 // Get categories for dropdown
 try {
-    require_once __DIR__ . '/../controllers/category_controller.php';
+    require_once __DIR__ . '/../controllers/categoryController.php';
     $categories = fetch_all_categories();
 } catch (Exception $e) {
     $categories = [];
@@ -138,7 +138,7 @@ try {
 
 // Get accounts for dropdown
 try {
-    require_once __DIR__ . '/../controllers/ledger_controller.php';
+    require_once __DIR__ . '/../controllers/ledgerController.php';
     $accounts = fetch_all_ledger_accounts();
 } catch (Exception $e) {
     $accounts = [];

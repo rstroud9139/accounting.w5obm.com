@@ -13,10 +13,10 @@ require_once __DIR__ . '/../lib/helpers.php';
 @require_once __DIR__ . '/../../include/load_env.php';
 
 // Controllers (use legacy controllers to match current DB schema)
-require_once __DIR__ . '/../controllers/transaction_controller.php';
-require_once __DIR__ . '/../controllers/category_controller.php';
-require_once __DIR__ . '/../controllers/ledger_controller.php';
-require_once __DIR__ . '/../controllers/vendor_controller.php';
+require_once __DIR__ . '/../controllers/transactionController.php';
+require_once __DIR__ . '/../controllers/categoryController.php';
+require_once __DIR__ . '/../controllers/ledgerController.php';
+require_once __DIR__ . '/../controllers/vendorController.php';
 require_once __DIR__ . '/../controllers/donation_controller.php';
 
 function api_response($code, $payload)

@@ -111,7 +111,7 @@
     function generate_income_statement_pdf($month, $year)
     {
         // Load required controller
-        require_once __DIR__ . '/../controllers/report_controller.php';
+        require_once __DIR__ . '/../controllers/reportController.php';
 
         // Generate report data
         $report_data = generate_income_statement($month, $year);

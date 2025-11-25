@@ -16,7 +16,7 @@ if (session_status() === PHP_SESSION_NONE) {
 // Include required files per Website Guidelines
 require_once __DIR__ . '/../../include/dbconn.php';
 require_once __DIR__ . '/../lib/helpers.php';
-require_once __DIR__ . '/../controllers/transaction_controller.php';
+require_once __DIR__ . '/../controllers/transactionController.php';
 require_once __DIR__ . '/../utils/csrf.php';
 
 // Check authentication using consolidated functions

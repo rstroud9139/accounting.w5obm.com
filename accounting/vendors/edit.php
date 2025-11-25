@@ -1,46 +1,47 @@
-<-- /accounting/vendors/edit.php
-    <?php
-    require_once __DIR__ . '/../utils/session_manager.php';
-    require_once '../../include/dbconn.php';
-    require_once __DIR__ . '/../controllers/vendor_controller.php';
+<?php
+// /accounting/vendors/edit.php
+require_once __DIR__ . '/../utils/session_manager.php';
+require_once __DIR__ . '/../../include/dbconn.php';
+require_once __DIR__ . '/../controllers/vendorController.php';
+require_once __DIR__ . '/../../include/premium_hero.php';
 
-    // Validate session
-    validate_session();
+// Validate session
+validate_session();
 
-    // Get vendor ID
-    $id = $_GET['id'] ?? null;
+// Get vendor ID
+$id = $_GET['id'] ?? null;
 
-    if (!$id) {
-        header('Location: list.php?status=invalid_request');
+if (!$id) {
+    header('Location: list.php?status=invalid_request');
+    exit();
+}
+
+// Fetch vendor data
+$vendor = fetch_vendor_by_id($id);
+
+if (!$vendor) {
+    header('Location: list.php?status=not_found');
+    exit();
+}
+
+// Handle form submission
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $name = $_POST['name'];
+    $contact_name = $_POST['contact_name'] ?? '';
+    $email = $_POST['email'] ?? '';
+    $phone = $_POST['phone'] ?? '';
+    $address = $_POST['address'] ?? '';
+    $notes = $_POST['notes'] ?? '';
+
+    if (update_vendor($id, $name, $contact_name, $email, $phone, $address, $notes)) {
+        header('Location: list.php?status=updated');
         exit();
+    } else {
+        $error_message = "Failed to update vendor. Please try again.";
     }
-
-    // Fetch vendor data
-    $vendor = fetch_vendor_by_id($id);
-
-    if (!$vendor) {
-        header('Location: list.php?status=not_found');
-        exit();
-    }
-
-    // Handle form submission
-    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-        $name = $_POST['name'];
-        $contact_name = $_POST['contact_name'] ?? '';
-        $email = $_POST['email'] ?? '';
-        $phone = $_POST['phone'] ?? '';
-        $address = $_POST['address'] ?? '';
-        $notes = $_POST['notes'] ?? '';
-
-        if (update_vendor($id, $name, $contact_name, $email, $phone, $address, $notes)) {
-            header('Location: list.php?status=updated');
-            exit();
-        } else {
-            $error_message = "Failed to update vendor. Please try again.";
-        }
-    }
-    ?>
-    <!DOCTYPE html>
+}
+?>
+<!DOCTYPE html>
     <html lang="en">
 
     <head>
@@ -51,14 +52,75 @@
     <body>
         <?php include '../../include/menu.php'; ?>
 
-        <div class="container mt-5">
-            <div class="d-flex align-items-center mb-4">
-                <?php $logoSrc = accounting_logo_src_for(__DIR__); ?>
-                <img src="<?php echo htmlspecialchars($logoSrc); ?>" alt="Club Logo" class="img-card-175">
-                <h2 class="ms-3">Edit Vendor</h2>
-            </div>
+        <div class="page-container" style="margin-top:0;padding-top:0;">
+            <?php if (function_exists('renderPremiumHero')): ?>
+                <?php renderPremiumHero([
+                    'eyebrow' => 'Vendor Operations',
+                    'title' => 'Edit Vendor',
+                    'subtitle' => 'Refresh contact intelligence for ' . htmlspecialchars($vendor['name']),
+                    'theme' => 'cobalt',
+                    'size' => 'compact',
+                    'media_mode' => 'none',
+                    'chips' => array_values(array_filter([
+                        'Vendor ID: ' . (int)$vendor['id'],
+                        !empty($vendor['category']) ? 'Category: ' . $vendor['category'] : null,
+                    ])),
+                    'actions' => [
+                        [
+                            'label' => 'Back to Vendors',
+                            'url' => '/accounting/vendors/list.php',
+                            'variant' => 'outline',
+                            'icon' => 'fa-table-list'
+                        ],
+                        [
+                            'label' => 'Accounting Dashboard',
+                            'url' => '/accounting/dashboard.php',
+                            'variant' => 'outline',
+                            'icon' => 'fa-arrow-left'
+                        ]
+                    ],
+                    'highlights' => [
+                        [
+                            'label' => 'Reachability',
+                            'value' => !empty($vendor['email']) ? 'Email ready' : 'Phone only',
+                            'meta' => $vendor['email'] ?: ($vendor['phone'] ?? 'No contact info')
+                        ],
+                        [
+                            'label' => 'Notes',
+                            'value' => $vendor['notes'] ? 'Has detail' : 'Add context',
+                            'meta' => 'Keeps history tidy'
+                        ]
+                    ],
+                ]); ?>
+            <?php else: ?>
+                <section class="hero hero-small mb-4">
+                    <div class="hero-body py-3">
+                        <div class="container-fluid">
+                            <div class="row align-items-center">
+                                <div class="col-md-2 d-none d-md-flex justify-content-center">
+                                    <?php $logoSrc = accounting_logo_src_for(__DIR__); ?>
+                                    <img src="<?= htmlspecialchars($logoSrc); ?>" alt="W5OBM Logo" class="img-fluid no-shadow" style="max-height:64px;">
+                                </div>
+                                <div class="col-md-6 text-center text-md-start text-white">
+                                    <h1 class="h4 mb-1">Edit Vendor</h1>
+                                    <p class="mb-0 small">Refresh the partnership record.</p>
+                                </div>
+                                <div class="col-md-4 text-center text-md-end mt-3 mt-md-0">
+                                    <a href="list.php" class="btn btn-outline-light btn-sm me-2">
+                                        <i class="fas fa-arrow-left me-1"></i>Back to Vendors
+                                    </a>
+                                    <a href="/accounting/dashboard.php" class="btn btn-primary btn-sm">
+                                        <i class="fas fa-home me-1"></i>Dashboard
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            <?php endif; ?>
 
-            <div class="card shadow">
+            <div class="container mt-4">
+                <div class="card shadow">
                 <div class="card-header">
                     <h3>Edit Vendor</h3>
                 </div>
@@ -98,6 +160,7 @@
                         <button type="submit" class="btn btn-primary">Update Vendor</button>
                         <a href="list.php" class="btn btn-secondary">Cancel</a>
                     </form>
+                </div>
                 </div>
             </div>
         </div>

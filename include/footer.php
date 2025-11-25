@@ -224,8 +224,8 @@ $isAdmin = $isLoggedIn ? isAdmin(getCurrentUserId()) : false;
             <div class="row align-items-center">
                 <div class="col-lg-6 text-center text-lg-start">
                     <p class="footer-copyright">
-                        &copy; <?= $current_year ?> W5OBM - Olive Branch Amateur Radio Club. All rights reserved.<br>
-                        <small>Licensed under FCC Part 97 | ARRL Affiliated | 501(c)(3) Organization</small>
+                        &copy; <?= $current_year ?> KD5BS Robert Stroud.  All rights reserved.<br>
+                        
                     </p>
                 </div>
 

@@ -13,9 +13,10 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 require_once __DIR__ . '/../../include/dbconn.php';
 require_once __DIR__ . '/../lib/helpers.php';
-require_once __DIR__ . '/../controllers/transaction_controller.php';
+require_once __DIR__ . '/../controllers/transactionController.php';
 require_once __DIR__ . '/../views/transactionForm.php';
 require_once __DIR__ . '/../utils/csrf.php';
+require_once __DIR__ . '/../../include/premium_hero.php';
 
 // Authentication check
 if (!isAuthenticated()) {
@@ -83,7 +84,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 // Get categories for dropdown
 try {
-    require_once __DIR__ . '/../controllers/category_controller.php';
+    require_once __DIR__ . '/../controllers/categoryController.php';
     $categories = fetch_all_categories();
 } catch (Exception $e) {
     $categories = [];
@@ -92,7 +93,7 @@ try {
 
 // Get accounts for dropdown
 try {
-    require_once __DIR__ . '/../controllers/ledger_controller.php';
+    require_once __DIR__ . '/../controllers/ledgerController.php';
     $accounts = fetch_all_ledger_accounts();
 } catch (Exception $e) {
     $accounts = [];
@@ -109,6 +110,44 @@ try {
     $vendors = [];
     logError("Error fetching vendors: " . $e->getMessage(), 'accounting');
 }
+
+$formHeroHighlights = [
+    [
+        'label' => 'Categories',
+        'value' => number_format(count($categories)),
+        'meta' => 'Available'
+    ],
+    [
+        'label' => 'Ledger Accounts',
+        'value' => number_format(count($accounts)),
+        'meta' => 'Selectable'
+    ],
+    [
+        'label' => 'Vendors',
+        'value' => number_format(count($vendors)),
+        'meta' => 'Optional links'
+    ],
+];
+
+$formHeroActions = [
+    [
+        'label' => 'Transactions Workspace',
+        'url' => '/accounting/transactions/transactions.php',
+        'variant' => 'outline',
+        'icon' => 'fa-list'
+    ],
+    [
+        'label' => 'Accounting Dashboard',
+        'url' => '/accounting/dashboard.php',
+        'variant' => 'outline',
+        'icon' => 'fa-arrow-left'
+    ],
+];
+
+$formHeroChips = [
+    'Mode: Add transaction',
+    'Security: CSRF ready'
+];
 
 ?>
 
@@ -132,55 +171,96 @@ try {
     }
     ?>
 
-    <!-- Page Container -->
-    <div class="page-container">
-        <!-- Header Card -->
-        <div class="card shadow mb-4">
-            <div class="card-header bg-primary text-white">
-                <div class="row align-items-center">
-                    <div class="col-auto">
-                        <i class="fas fa-plus fa-2x"></i>
-                    </div>
-                    <div class="col">
-                        <h3 class="mb-0">Add New Transaction</h3>
-                        <small>Enter transaction details to add to the accounting system</small>
-                    </div>
-                    <div class="col-auto">
-                        <a href="/accounting/transactions/" class="btn btn-light btn-sm">
-                            <i class="fas fa-arrow-left me-1"></i>Back to Transactions
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Validation Check -->
-        <?php if (empty($categories)): ?>
-            <div class="alert alert-warning border-0 shadow">
-                <div class="d-flex">
-                    <i class="fas fa-exclamation-triangle me-3 mt-1 text-warning"></i>
-                    <div>
-                        <h6 class="alert-heading mb-2">Setup Required</h6>
-                        <p class="mb-2">You need to set up transaction categories before adding transactions.</p>
-                        <a href="/accounting/categories/" class="btn btn-warning btn-sm">
-                            <i class="fas fa-tags me-1"></i>Manage Categories
-                        </a>
-                    </div>
-                </div>
-            </div>
+    <div class="page-container" style="margin-top:0;padding-top:0;">
+        <?php if (function_exists('renderPremiumHero')): ?>
+            <?php renderPremiumHero([
+                'eyebrow' => 'Ledger Operations',
+                'title' => 'Add Transaction',
+                'subtitle' => 'Post a new income or expense with full vendor and account attribution.',
+                'description' => 'Complete the guided form below to keep leadership synchronized with every movement.',
+                'theme' => 'cobalt',
+                'size' => 'compact',
+                'media_mode' => 'none',
+                'chips' => $formHeroChips,
+                'highlights' => $formHeroHighlights,
+                'actions' => $formHeroActions,
+            ]); ?>
         <?php else: ?>
-            <!-- Transaction Form -->
-            <?php
-            renderTransactionForm(
-                [], // Empty for new transaction
-                $categories,
-                $accounts,
-                $vendors,
-                '/accounting/transactions/add_transaction.php',
-                'add'
-            );
-            ?>
+            <section class="hero hero-small mb-4">
+                <div class="hero-body py-3">
+                    <div class="container-fluid">
+                        <div class="row align-items-center">
+                            <div class="col-md-2 d-none d-md-flex justify-content-center">
+                                <?php $logoSrc = accounting_logo_src_for(__DIR__); ?>
+                                <img src="<?= htmlspecialchars($logoSrc); ?>" alt="W5OBM Logo" class="img-fluid no-shadow" style="max-height:64px;">
+                            </div>
+                            <div class="col-md-6 text-center text-md-start text-white">
+                                <h1 class="h4 mb-1">Add Transaction</h1>
+                                <p class="mb-0 small">Register income or expense activity with helpful guidance.</p>
+                            </div>
+                            <div class="col-md-4 text-center text-md-end mt-3 mt-md-0">
+                                <a href="/accounting/transactions/" class="btn btn-outline-light btn-sm">
+                                    <i class="fas fa-arrow-left me-1"></i>Back to Transactions
+                                </a>
+                                <a href="/accounting/dashboard.php" class="btn btn-primary btn-sm">
+                                    <i class="fas fa-home me-1"></i>Dashboard
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
         <?php endif; ?>
+
+        <div class="container mt-4">
+            <!-- Header Card -->
+            <div class="card shadow mb-4">
+                <div class="card-header bg-primary text-white">
+                    <div class="row align-items-center">
+                        <div class="col-auto">
+                            <i class="fas fa-plus fa-2x"></i>
+                        </div>
+                        <div class="col">
+                            <h3 class="mb-0">Add New Transaction</h3>
+                            <small>Enter transaction details to add to the accounting system</small>
+                        </div>
+                        <div class="col-auto">
+                            <a href="/accounting/transactions/" class="btn btn-light btn-sm">
+                                <i class="fas fa-arrow-left me-1"></i>Back to Transactions
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Validation Check -->
+            <?php if (empty($categories)): ?>
+                <div class="alert alert-warning border-0 shadow">
+                    <div class="d-flex">
+                        <i class="fas fa-exclamation-triangle me-3 mt-1 text-warning"></i>
+                        <div>
+                            <h6 class="alert-heading mb-2">Setup Required</h6>
+                            <p class="mb-2">You need to set up transaction categories before adding transactions.</p>
+                            <a href="/accounting/categories/" class="btn btn-warning btn-sm">
+                                <i class="fas fa-tags me-1"></i>Manage Categories
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            <?php else: ?>
+                <!-- Transaction Form -->
+                <?php
+                renderTransactionForm(
+                    [], // Empty for new transaction
+                    $categories,
+                    $accounts,
+                    $vendors,
+                    '/accounting/transactions/add_transaction.php',
+                    'add'
+                );
+                ?>
+            <?php endif; ?>
+        </div>
     </div>
 
     <?php include __DIR__ . '/../../include/footer.php'; ?>

@@ -2,7 +2,7 @@
 // /accounting/assets/list.php
 require_once __DIR__ . '/../utils/session_manager.php';
 require_once __DIR__ . '/../../include/dbconn.php';
-require_once __DIR__ . '/../controllers/asset_controller.php';
+require_once __DIR__ . '/../controllers/assetController.php';
 require_once __DIR__ . '/../lib/helpers.php';
 require_once __DIR__ . '/../../include/premium_hero.php';
 

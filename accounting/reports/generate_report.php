@@ -134,7 +134,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($report_type)) {
                         'category_id' => $params['category_id'],
                         'type' => 'Expense'
                     ];
-                    require_once __DIR__ . '/../controllers/transaction_controller.php';
+                    require_once __DIR__ . '/../controllers/transactionController.php';
                     $report_data['transactions'] = getAllTransactions($filters);
                 }
                 break;
@@ -149,7 +149,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($report_type)) {
                 if (!empty($params['category_id'])) {
                     $filters['category_id'] = $params['category_id'];
                 }
-                require_once __DIR__ . '/../controllers/transaction_controller.php';
+                require_once __DIR__ . '/../controllers/transactionController.php';
                 $report_data = [
                     'transactions' => getAllTransactions($filters),
                     'totals' => calculateTransactionTotals($filters),
@@ -166,7 +166,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($report_type)) {
                 $start_date = sprintf("%04d-%02d-01", $params['year'], $params['month']);
                 $end_date = date('Y-m-t', strtotime($start_date));
                 $filters = ['start_date' => $start_date, 'end_date' => $end_date];
-                require_once __DIR__ . '/../controllers/transaction_controller.php';
+                require_once __DIR__ . '/../controllers/transactionController.php';
                 $report_data['summary'] = calculateTransactionTotals($filters);
                 break;
 
@@ -176,7 +176,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($report_type)) {
                     'start_date' => $params['start_date'],
                     'end_date' => $params['end_date']
                 ];
-                require_once __DIR__ . '/../controllers/transaction_controller.php';
+                require_once __DIR__ . '/../controllers/transactionController.php';
                 $report_data = [
                     'cash_inflows' => getAllTransactions(array_merge($filters, ['type' => 'Income'])),
                     'cash_outflows' => getAllTransactions(array_merge($filters, ['type' => 'Expense'])),

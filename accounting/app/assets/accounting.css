@@ -19,10 +19,12 @@
     position: sticky;
     top: 0;
     z-index: 1020;
+    background: linear-gradient(135deg, #04123b, #0c447a);
 }
 
 .accounting-nav .navbar-brand {
     color: #fff;
+    font-weight: 600;
 }
 
 .accounting-nav .navbar-brand img {
@@ -33,12 +35,16 @@
 
 .accounting-nav .nav-link {
     font-weight: 500;
+    color: rgba(255, 255, 255, 0.85);
+    transition: color 0.2s ease, transform 0.2s ease, font-weight 0.2s ease;
 }
 
 .accounting-nav .nav-link.active,
 .accounting-nav .nav-link:focus,
 .accounting-nav .nav-link:hover {
     color: #fff;
+    font-weight: 600;
+    transform: scale(1.05);
 }
 
 .accounting-nav .dropdown-menu {

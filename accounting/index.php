@@ -35,6 +35,21 @@ require_once __DIR__ . '/../include/dbconn.php';
 require_once __DIR__ . '/../include/helper_functions.php';
 require_once __DIR__ . '/lib/helpers.php';
 
+$accountingNavHelper = __DIR__ . '/include/accounting_nav_helpers.php';
+if (!file_exists($accountingNavHelper)) {
+    $accountingNavHelper = __DIR__ . '/../include/accounting_nav_helpers.php';
+}
+require_once $accountingNavHelper;
+require_once __DIR__ . '/../include/premium_hero.php';
+
+if (!function_exists('route')) {
+    function route(string $name, array $params = []): string
+    {
+        $query = http_build_query(array_merge(['route' => $name], $params));
+        return '/accounting/app/index.php?' . $query;
+    }
+}
+
 // For current phase: always use DEV main site for authentication
 // This keeps accounting.w5obm.com pointing at dev.w5obm.com auth
 $mainSiteBase = 'https://dev.w5obm.com/';
@@ -117,12 +132,14 @@ foreach ($DASHBOARDS as $dashboard) {
 // If no dashboard found, show placeholder page
 $page_title = "{$APP_NAME} - Club Accounting System";
 include __DIR__ . '/../include/header.php';
+accounting_head_assets();
 ?>
 
-<body>
-    <?php include __DIR__ . '/../include/menu.php'; ?>
+<body class="accounting-app bg-light">
+    <?php accounting_render_nav(__DIR__); ?>
 
-    <div class="container mt-4">
+    <div class="page-container accounting-dashboard-shell">
+        <div class="container mt-4">
         <!-- Compact hero / top bar -->
         <div class="d-flex justify-content-between align-items-center mb-3">
             <div>

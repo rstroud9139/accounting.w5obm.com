@@ -1,4 +1,12 @@
 <?php
+if (!function_exists('route')) {
+	function route(string $name, array $params = []): string
+	{
+		$query = http_build_query(array_merge(['route' => $name], $params));
+		return '/accounting/app/index.php?' . $query;
+	}
+}
+
 $currentRoute = $currentRoute ?? ($_GET['route'] ?? 'dashboard');
 $requestUri = $_SERVER['REQUEST_URI'] ?? '';
 $reportsActive = strpos($requestUri, '/accounting/reports/') !== false;
@@ -16,11 +24,11 @@ $dataMenuActive = $navIsActive($dataRoutes);
 $toolsMenuActive = $navIsActive(array_merge($toolsRoutes, $batchRoutes, $migrationRoutes));
 $dbLabel = $_ENV['LOCAL_ACC_DB_NAME'] ?? $_ENV['ACC_DB_NAME'] ?? 'accounting_w5obm';
 ?>
-<nav class="accounting-nav navbar navbar-expand-lg navbar-dark bg-primary no-print" role="navigation" aria-label="Accounting navigation">
+<nav class="accounting-nav navbar navbar-expand-lg navbar-dark no-print" role="navigation" aria-label="Accounting navigation">
 	<div class="container-fluid">
 		<a class="navbar-brand d-flex align-items-center" href="<?= route('dashboard'); ?>">
-			<img src="/images/badges/club_logo.png" alt="W5OBM logo" width="36" height="36" class="me-2 rounded shadow-sm">
-			<span class="fw-semibold">W5OBM Test</span>
+			<img src="/accounting/images/badges/club_logo.png" alt="W5OBM logo" width="40" height="40" class="me-2 rounded shadow-sm">
+			<span class="fw-semibold">W5OBM Accounting</span>
 		</a>
 		<button class="navbar-toggler accounting-nav-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#accountingNav" aria-controls="accountingNav" aria-expanded="false" aria-label="Toggle navigation">
 			<span class="navbar-toggler-icon"></span>

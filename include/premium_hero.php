@@ -123,6 +123,8 @@ if (!function_exists('renderPremiumHero')) {
 
                 .premium-hero__actions .btn {
                     min-width: 160px;
+                    color: var(--bs-btn-color, #fff);
+                    font-weight: 600;
                 }
 
                 .premium-hero__media {

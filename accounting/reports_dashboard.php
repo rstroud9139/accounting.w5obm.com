@@ -449,10 +449,17 @@ if (isset($_GET['export']) && $_GET['export'] === '1') {
 }
 
 $page_title = "Reports Dashboard - W5OBM";
-include __DIR__ . '/../include/header.php';
 ?>
 
-<style>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title><?= htmlspecialchars($page_title, ENT_QUOTES, 'UTF-8'); ?></title>
+    <?php include __DIR__ . '/../include/header.php'; ?>
+
+    <style>
     .report-collections-card .card-header {
         background: linear-gradient(92deg, rgba(13, 110, 253, 0.12), rgba(25, 135, 84, 0.12));
     }
@@ -548,8 +555,9 @@ include __DIR__ . '/../include/header.php';
         color: #adb5bd;
     }
 </style>
+</head>
 
-<body>
+<body class="accounting-app bg-light">
     <?php include __DIR__ . '/../include/menu.php'; ?>
 
     <div class="page-container" style="margin-top:0;padding-top:0;">

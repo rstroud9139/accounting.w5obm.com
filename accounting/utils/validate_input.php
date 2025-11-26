@@ -1,5 +1,5 @@
- <!-- /accounting/utils/validate_input.php -->
- <?php
+<?php
+// /accounting/utils/validate_input.php
     /**
      * Input Validation
      * Functions for validating and sanitizing user input

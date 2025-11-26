@@ -1,8 +1,8 @@
-<!--  /accounting/reports/donation_summary.php -->
 <?php
-require_once __DIR__ . '/../utils/session_manager.php';
-require_once '../../include/dbconn.php';
-require_once __DIR__ . '/../controllers/donation_controller.php';
+// /accounting/reports/donation_summary.php
+     require_once __DIR__ . '/../utils/session_manager.php';
+     require_once __DIR__ . '/../../include/dbconn.php';
+     require_once __DIR__ . '/../controllers/donation_controller.php';
 
 // Validate session
 validate_session();

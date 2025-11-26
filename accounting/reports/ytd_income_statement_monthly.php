@@ -1,8 +1,8 @@
- <!-- /accounting/reports/ytd_income_statement_monthly.php -->
- <?php
-    require_once __DIR__ . '/../utils/session_manager.php';
-    require_once '../../include/dbconn.php';
-    require_once __DIR__ . '/../controllers/reportController.php';
+<?php
+// /accounting/reports/ytd_income_statement_monthly.php
+     require_once __DIR__ . '/../utils/session_manager.php';
+     require_once __DIR__ . '/../../include/dbconn.php';
+     require_once __DIR__ . '/../controllers/reportController.php';
 
     // Validate session
     validate_session();

@@ -12,6 +12,15 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 require_once __DIR__ . '/../include/dbconn.php';
 require_once __DIR__ . '/lib/helpers.php';
+require_once __DIR__ . '/../include/premium_hero.php';
+
+if (!function_exists('route')) {
+    function route(string $name, array $params = []): string
+    {
+        $query = http_build_query(array_merge(['route' => $name], $params));
+        return '/accounting/app/index.php?' . $query;
+    }
+}
 
 // Auth check
 if (!isAuthenticated()) {
@@ -27,8 +36,9 @@ $page_title = 'Accounting Manual - W5OBM';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= $page_title ?></title>
+    <title><?= htmlspecialchars($page_title, ENT_QUOTES, 'UTF-8'); ?></title>
     <?php include __DIR__ . '/../include/header.php'; ?>
+    <link rel="stylesheet" href="/accounting/app/assets/accounting.css">
     <style>
         .manual-section {
             margin-bottom: 1.5rem;
@@ -36,10 +46,58 @@ $page_title = 'Accounting Manual - W5OBM';
     </style>
 </head>
 
-<body>
-    <?php include __DIR__ . '/../include/menu.php'; ?>
+<body class="accounting-app bg-light">
+    <?php include __DIR__ . '/app/views/partials/accounting_nav.php'; ?>
 
-    <div class="page-container">
+    <div class="page-container accounting-dashboard-shell">
+        <?php if (function_exists('renderPremiumHero')): ?>
+            <?php renderPremiumHero([
+                'eyebrow' => 'Accounting Guide',
+                'title' => 'Operations Manual',
+                'subtitle' => 'Reference the workflows, permissions, and safety rails that keep the finance stack aligned.',
+                'description' => 'Use the quick links and sections below to refresh process knowledge before training new treasurers or assistants.',
+                'theme' => 'emerald',
+                'size' => 'compact',
+                'chips' => [
+                    'Transactions lifecycle',
+                    'Categories & ledger',
+                    'Assets & compliance'
+                ],
+                'highlights' => [
+                    [
+                        'label' => 'Core Sections',
+                        'value' => '5',
+                        'meta' => 'Process overviews'
+                    ],
+                    [
+                        'label' => 'Guides Linked',
+                        'value' => '12+',
+                        'meta' => 'Docs & SOPs'
+                    ],
+                    [
+                        'label' => 'Updated',
+                        'value' => date('M Y'),
+                        'meta' => 'Latest pass'
+                    ],
+                ],
+                'actions' => [
+                    [
+                        'label' => 'Design Guidelines',
+                        'url' => '/accounting/MODERN_WEBSITE_DESIGN_GUIDELINES.md',
+                        'variant' => 'outline',
+                        'icon' => 'fa-drafting-compass'
+                    ],
+                    [
+                        'label' => 'Dashboard',
+                        'url' => '/accounting/dashboard.php',
+                        'variant' => 'outline',
+                        'icon' => 'fa-arrow-left'
+                    ],
+                ],
+                'media_mode' => 'none',
+            ]); ?>
+        <?php endif; ?>
+
         <div class="card shadow mb-4">
             <div class="card-header bg-secondary text-white">
                 <div class="row align-items-center">

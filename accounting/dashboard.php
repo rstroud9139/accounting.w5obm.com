@@ -6,14 +6,26 @@
  * Design: Following W5OBM Modern Website Design Guidelines
  */
 
-require_once __DIR__ . '/../include/header.php';
+require_once __DIR__ . '/../include/session_init.php';
+require_once __DIR__ . '/../include/dbconn.php';
+require_once __DIR__ . '/../include/helper_functions.php';
 require_once __DIR__ . '/../include/premium_hero.php';
+
+if (!function_exists('route')) {
+    function route(string $name, array $params = []): string
+    {
+        $query = http_build_query(array_merge(['route' => $name], $params));
+        return '/accounting/app/index.php?' . $query;
+    }
+}
 
 $cash_balance = 0.00;
 $asset_value = 0.00;
 $month_totals = ['income' => 0.00, 'expenses' => 0.00, 'net_balance' => 0.00];
 $ytd_totals = ['income' => 0.00, 'expenses' => 0.00, 'net_balance' => 0.00];
 $recent_transactions = [];
+$page_title = 'Accounting Dashboard - W5OBM';
+$user_id = function_exists('getCurrentUserId') ? getCurrentUserId() : ($_SESSION['user_id'] ?? null);
 
 if (!function_exists('accTableExists')) {
     function accTableExists(mysqli $connection, string $table): bool
@@ -104,7 +116,20 @@ if (isset($accConn) && $accConn instanceof mysqli) {
 }
 ?>
 
-<div class="page-container" style="margin-top:0;padding-top:0;">
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title><?= htmlspecialchars($page_title, ENT_QUOTES, 'UTF-8'); ?></title>
+    <?php require __DIR__ . '/../include/header.php'; ?>
+    <link rel="stylesheet" href="/accounting/app/assets/accounting.css">
+</head>
+
+<body class="accounting-app bg-light">
+    <?php include __DIR__ . '/app/views/partials/accounting_nav.php'; ?>
+
+    <div class="page-container accounting-dashboard-shell">
     <?php
     renderPremiumHero([
         'eyebrow' => 'Accounting Command',
@@ -372,4 +397,7 @@ if (isset($accConn) && $accConn instanceof mysqli) {
     });
 </script>
 
-<?php include __DIR__ . '/../include/footer.php'; ?>
+    <?php include __DIR__ . '/../include/footer.php'; ?>
+</body>
+
+</html>

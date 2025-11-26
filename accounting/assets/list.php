@@ -177,10 +177,18 @@ $assetHeroActions = [
 
 <?php
 $page_title = 'Assets - W5OBM Accounting';
-include __DIR__ . '/../../include/header.php';
 ?>
 
-<body>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title><?= htmlspecialchars($page_title, ENT_QUOTES, 'UTF-8'); ?></title>
+    <?php include __DIR__ . '/../../include/header.php'; ?>
+</head>
+
+<body class="accounting-app bg-light">
     <?php include __DIR__ . '/../../include/menu.php'; ?>
 
     <?php if (function_exists('renderPremiumHero')): ?>

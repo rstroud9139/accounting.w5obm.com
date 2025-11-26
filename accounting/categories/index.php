@@ -8,6 +8,8 @@ require_once __DIR__ . '/../../include/dbconn.php';
 require_once __DIR__ . '/../lib/helpers.php';
 require_once __DIR__ . '/../controllers/categoryController.php';
 require_once __DIR__ . '/../views/categoryManager.php';
+require_once __DIR__ . '/../../include/premium_hero.php';
+require_once __DIR__ . '/../include/accounting_nav_helpers.php';
 
 if (!isAuthenticated()) {
     header('Location: /authentication/login.php');
@@ -111,8 +113,9 @@ foreach ($categories as $category) {
 }
 
 if (isset($_GET['export']) && $_GET['export'] === 'csv') {
+    $exportFilename = 'categories_' . date('Y-m-d') . '.csv';
     header('Content-Type: text/csv');
-    header('Content-Disposition: attachment; filename="categories_' . date('Y-m-d') . '.csv"');
+    header('Content-Disposition: attachment; filename="' . $exportFilename . '"');
 
     $output = fopen('php://output', 'w');
     fputcsv($output, ['ID', 'Name', 'Type', 'Description', 'Parent', 'Transactions', 'Status']);
@@ -131,137 +134,194 @@ if (isset($_GET['export']) && $_GET['export'] === 'csv') {
     exit();
 }
 
-require_once __DIR__ . '/../../include/header.php';
+$categoryHeroChips = array_values(array_filter([
+    !empty($filters['type']) ? 'Type: ' . $filters['type'] : null,
+    'Status: ' . ucwords($filters['status']),
+    !empty($filters['search']) ? 'Search: ' . $filters['search'] : null,
+], static fn($chip) => $chip !== null));
+
+$categoryHeroHighlights = [
+    [
+        'label' => 'Categories',
+        'value' => number_format($summary['total']),
+        'meta' => 'Records after filters'
+    ],
+    [
+        'label' => 'Active vs Archived',
+        'value' => number_format($summary['active']) . ' / ' . number_format($summary['inactive']),
+        'meta' => 'Active / Archived'
+    ],
+    [
+        'label' => 'In Use',
+        'value' => number_format($summary['withTransactions']),
+        'meta' => 'Needs desc: ' . number_format($summary['needsDescription'])
+    ],
+];
+
+$exportQuery = array_filter([
+    'type' => $filters['type'] ?? null,
+    'search' => $filters['search'] ?? null,
+    'status' => $filters['status'] ?? null,
+    'export' => 'csv',
+], static fn($value) => $value !== null && $value !== '');
+
+$categoryHeroActions = array_values(array_filter([
+    $canAdd ? [
+        'label' => 'New Category',
+        'url' => '#categoryManagerCard',
+        'icon' => 'fa-plus'
+    ] : null,
+    [
+        'label' => 'Export CSV',
+        'url' => '/accounting/categories/?' . http_build_query($exportQuery),
+        'variant' => 'outline',
+        'icon' => 'fa-file-export'
+    ],
+    [
+        'label' => 'Back to Dashboard',
+        'url' => '/accounting/dashboard.php',
+        'variant' => 'outline',
+        'icon' => 'fa-arrow-left'
+    ],
+]));
+
 ?>
 
-<div class="page-container" style="margin-top:0;padding-top:0;">
-    <section class="hero hero-small mb-4">
-        <div class="hero-body py-3">
-            <div class="container-fluid">
-                <div class="row align-items-center">
-                    <div class="col-md-2 d-none d-md-flex justify-content-center">
-                        <img src="https://w5obm.com/images/badges/club_logo.png" alt="W5OBM Logo" class="img-fluid no-shadow" style="max-height:64px;">
-                    </div>
-                    <div class="col-md-6 text-center text-md-start text-white">
-                        <h1 class="h4 mb-1">Category Management</h1>
-                        <p class="mb-0 small">Organize every transaction under a consistent taxonomy</p>
-                    </div>
-                    <div class="col-md-4 text-center text-md-end mt-3 mt-md-0">
-                        <?php if ($canAdd): ?>
-                            <button class="btn btn-primary btn-sm me-2" data-bs-toggle="modal" data-bs-target="#addCategoryModal">
-                                <i class="fas fa-plus-circle me-1"></i>New Category
-                            </button>
-                        <?php endif; ?>
-                        <a href="/accounting/manual.php#categories" class="btn btn-outline-light btn-sm">
-                            <i class="fas fa-book me-1"></i>Documentation
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+<!DOCTYPE html>
+<html lang="en">
 
-    <div class="row mb-3 hero-summary-row">
-        <div class="col-md-3 col-sm-6 mb-3">
-            <div class="border rounded p-3 h-100 bg-light hero-summary-card">
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                    <span class="text-muted small">Total Categories</span>
-                    <i class="fas fa-tags text-warning"></i>
+<head>
+    <meta charset="UTF-8">
+    <title><?= htmlspecialchars($page_title, ENT_QUOTES, 'UTF-8'); ?></title>
+    <?php include __DIR__ . '/../../include/header.php'; ?>
+</head>
+
+<body class="accounting-app bg-light">
+    <?php include __DIR__ . '/../../include/menu.php'; ?>
+
+    <div class="page-container accounting-categories-shell">
+        <?php if (function_exists('displayToastMessage')): ?>
+            <?php displayToastMessage(); ?>
+        <?php endif; ?>
+
+        <?php if (function_exists('renderPremiumHero')): ?>
+            <?php renderPremiumHero([
+                'eyebrow' => 'Ledger Taxonomy',
+                'title' => 'Transaction Categories',
+                'subtitle' => 'Organize every transaction under a consistent taxonomy.',
+                'chips' => $categoryHeroChips,
+                'highlights' => $categoryHeroHighlights,
+                'actions' => $categoryHeroActions,
+                'theme' => 'emerald',
+                'size' => 'compact',
+                'media_mode' => 'none',
+            ]); ?>
+        <?php endif; ?>
+
+        <div class="row mb-3 hero-summary-row">
+            <div class="col-md-3 col-sm-6 mb-3">
+                <div class="border rounded p-3 h-100 bg-light hero-summary-card">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="text-muted small">Total Categories</span>
+                        <i class="fas fa-tags text-warning"></i>
+                    </div>
+                    <h4 class="mb-0"><?= number_format($summary['total']) ?></h4>
+                    <small class="text-muted">After filters</small>
                 </div>
-                <h4 class="mb-0"><?= number_format($summary['total']) ?></h4>
-                <small class="text-muted">After filters</small>
+            </div>
+            <div class="col-md-3 col-sm-6 mb-3">
+                <div class="border rounded p-3 h-100 bg-light hero-summary-card">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="text-muted small">Active vs Archived</span>
+                        <i class="fas fa-archive text-secondary"></i>
+                    </div>
+                    <h4 class="mb-0"><?= number_format($summary['active']) ?> / <?= number_format($summary['inactive']) ?></h4>
+                    <small class="text-muted">Active / Archived</small>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6 mb-3">
+                <div class="border rounded p-3 h-100 bg-light hero-summary-card">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="text-muted small">Linked Transactions</span>
+                        <i class="fas fa-link text-info"></i>
+                    </div>
+                    <h4 class="mb-0"><?= number_format($summary['withTransactions']) ?></h4>
+                    <small class="text-muted">Categories in use</small>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6 mb-3">
+                <div class="border rounded p-3 h-100 bg-light hero-summary-card">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="text-muted small">Needs Description</span>
+                        <i class="fas fa-highlighter text-danger"></i>
+                    </div>
+                    <h4 class="mb-0"><?= number_format($summary['needsDescription']) ?></h4>
+                    <small class="text-muted">Add guidance text</small>
+                </div>
             </div>
         </div>
-        <div class="col-md-3 col-sm-6 mb-3">
-            <div class="border rounded p-3 h-100 bg-light hero-summary-card">
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                    <span class="text-muted small">Active vs Archived</span>
-                    <i class="fas fa-archive text-secondary"></i>
-                </div>
-                <h4 class="mb-0"><?= number_format($summary['active']) ?> / <?= number_format($summary['inactive']) ?></h4>
-                <small class="text-muted">Active / Archived</small>
+
+        <div class="row g-4">
+            <div class="col-lg-3">
+                <?php if (function_exists('accounting_render_workspace_nav')): ?>
+                    <?php accounting_render_workspace_nav('categories'); ?>
+                <?php else: ?>
+                    <nav class="bg-light border rounded h-100 p-0 shadow-sm">
+                        <div class="px-3 py-2 border-bottom">
+                            <span class="text-muted text-uppercase small">Workspace</span>
+                        </div>
+                        <div class="list-group list-group-flush">
+                            <a href="/accounting/dashboard.php" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                                <span><i class="fas fa-chart-pie me-2 text-primary"></i>Dashboard</span>
+                                <i class="fas fa-chevron-right small text-muted"></i>
+                            </a>
+                            <a href="/accounting/transactions/transactions.php" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                                <span><i class="fas fa-exchange-alt me-2 text-success"></i>Transactions</span>
+                                <i class="fas fa-chevron-right small text-muted"></i>
+                            </a>
+                            <a href="/accounting/reports_dashboard.php" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                                <span><i class="fas fa-chart-bar me-2 text-info"></i>Reports</span>
+                                <i class="fas fa-chevron-right small text-muted"></i>
+                            </a>
+                            <a href="/accounting/ledger/" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                                <span><i class="fas fa-book me-2 text-warning"></i>Chart of Accounts</span>
+                                <i class="fas fa-chevron-right small text-muted"></i>
+                            </a>
+                            <a href="/accounting/categories/" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center active">
+                                <span><i class="fas fa-tags me-2 text-secondary"></i>Categories</span>
+                                <i class="fas fa-chevron-right small text-muted"></i>
+                            </a>
+                            <a href="/accounting/vendors/" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                                <span><i class="fas fa-store me-2 text-danger"></i>Vendors</span>
+                                <i class="fas fa-chevron-right small text-muted"></i>
+                            </a>
+                            <div class="list-group-item small text-muted text-uppercase">Other</div>
+                            <a href="/accounting/assets/" class="list-group-item list-group-item-action">
+                                <i class="fas fa-boxes me-2"></i>Assets
+                            </a>
+                            <a href="/accounting/donations/" class="list-group-item list-group-item-action">
+                                <i class="fas fa-heart me-2"></i>Donations
+                            </a>
+                        </div>
+                    </nav>
+                <?php endif; ?>
             </div>
-        </div>
-        <div class="col-md-3 col-sm-6 mb-3">
-            <div class="border rounded p-3 h-100 bg-light hero-summary-card">
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                    <span class="text-muted small">Linked Transactions</span>
-                    <i class="fas fa-link text-info"></i>
-                </div>
-                <h4 class="mb-0"><?= number_format($summary['withTransactions']) ?></h4>
-                <small class="text-muted">Categories in use</small>
-            </div>
-        </div>
-        <div class="col-md-3 col-sm-6 mb-3">
-            <div class="border rounded p-3 h-100 bg-light hero-summary-card">
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                    <span class="text-muted small">Needs Description</span>
-                    <i class="fas fa-highlighter text-danger"></i>
-                </div>
-                <h4 class="mb-0"><?= number_format($summary['needsDescription']) ?></h4>
-                <small class="text-muted">Add guidance text</small>
+            <div class="col-lg-9" id="categoryManagerCard">
+                <?php
+                renderCategoryWorkspace(
+                    $categories,
+                    $filters,
+                    $summary,
+                    $parentOptions,
+                    $canAdd,
+                    $canManage
+                );
+                ?>
             </div>
         </div>
     </div>
 
-    <?php if (function_exists('displayToastMessage')): ?>
-        <?php displayToastMessage(); ?>
-    <?php endif; ?>
+    <?php include __DIR__ . '/../../include/footer.php'; ?>
+</body>
 
-    <div class="row">
-        <div class="col-lg-3 mb-4">
-            <nav class="bg-light border rounded h-100 p-0 shadow-sm">
-                <div class="px-3 py-2 border-bottom">
-                    <span class="text-muted text-uppercase small">Workspace</span>
-                </div>
-                <div class="list-group list-group-flush">
-                    <a href="/accounting/dashboard.php" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
-                        <span><i class="fas fa-chart-pie me-2 text-primary"></i>Dashboard</span>
-                        <i class="fas fa-chevron-right small text-muted"></i>
-                    </a>
-                    <a href="/accounting/transactions/transactions.php" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
-                        <span><i class="fas fa-exchange-alt me-2 text-success"></i>Transactions</span>
-                        <i class="fas fa-chevron-right small text-muted"></i>
-                    </a>
-                    <a href="/accounting/reports_dashboard.php" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
-                        <span><i class="fas fa-chart-bar me-2 text-info"></i>Reports</span>
-                        <i class="fas fa-chevron-right small text-muted"></i>
-                    </a>
-                    <a href="/accounting/ledger/" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
-                        <span><i class="fas fa-book me-2 text-warning"></i>Chart of Accounts</span>
-                        <i class="fas fa-chevron-right small text-muted"></i>
-                    </a>
-                    <a href="/accounting/categories/" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center active">
-                        <span><i class="fas fa-tags me-2 text-secondary"></i>Categories</span>
-                        <i class="fas fa-chevron-right small text-muted"></i>
-                    </a>
-                    <a href="/accounting/vendors/" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
-                        <span><i class="fas fa-store me-2 text-danger"></i>Vendors</span>
-                        <i class="fas fa-chevron-right small text-muted"></i>
-                    </a>
-                    <div class="list-group-item small text-muted text-uppercase">Other</div>
-                    <a href="/accounting/assets/" class="list-group-item list-group-item-action">
-                        <i class="fas fa-boxes me-2"></i>Assets
-                    </a>
-                    <a href="/accounting/donations/" class="list-group-item list-group-item-action">
-                        <i class="fas fa-heart me-2"></i>Donations
-                    </a>
-                </div>
-            </nav>
-        </div>
-        <div class="col-lg-9 mb-4">
-            <?php
-            renderCategoryWorkspace(
-                $categories,
-                $filters,
-                $summary,
-                $parentOptions,
-                $canAdd,
-                $canManage
-            );
-            ?>
-        </div>
-    </div>
-</div>
-
-<?php include __DIR__ . '/../../include/footer.php'; ?>
+</html>

@@ -67,6 +67,28 @@ if (!defined('BASE_URL')) {
     }
 }
 
+// Detect accounting context early so downstream includes can react
+$__w5obmAccountingContext = defined('W5OBM_ACCOUNTING_CONTEXT');
+if (!$__w5obmAccountingContext) {
+    $requestUri = $_SERVER['REQUEST_URI'] ?? '';
+    $scriptName = $_SERVER['SCRIPT_NAME'] ?? '';
+    if (($requestUri && strpos($requestUri, '/accounting/') === 0) || ($scriptName && strpos($scriptName, '/accounting/') === 0)) {
+        $__w5obmAccountingContext = true;
+    }
+}
+if (!empty($GLOBALS['FORCE_ACCOUNTING_NAV'])) {
+    $__w5obmAccountingContext = true;
+}
+if ($__w5obmAccountingContext && !defined('W5OBM_ACCOUNTING_CONTEXT')) {
+    define('W5OBM_ACCOUNTING_CONTEXT', true);
+}
+if ($__w5obmAccountingContext) {
+    $accountingHelperPath = __DIR__ . '/../accounting/include/accounting_nav_helpers.php';
+    if (file_exists($accountingHelperPath)) {
+        require_once $accountingHelperPath;
+    }
+}
+
 // Set page title if not already set
 if (!isset($page_title)) {
     $page_title = "W5OBM Amateur Radio Club";
@@ -347,6 +369,13 @@ if (isset($_GET['preview_nav'])) {
 <link rel="stylesheet" href="https://w5obm.com/css/w5obm.css">
 <!-- Hero Logo Styles globally to standardize hero logos across pages -->
 <link rel="stylesheet" href="https://w5obm.com/css/hero-logo-styles.css">
+
+<?php
+if (defined('W5OBM_ACCOUNTING_CONTEXT') && function_exists('accounting_head_assets') && !defined('W5OBM_ACCOUNTING_STYLES_EMITTED')) {
+    accounting_head_assets();
+    define('W5OBM_ACCOUNTING_STYLES_EMITTED', true);
+}
+?>
 
 <?php
 // Ensure a CSRF token exists for activity pings

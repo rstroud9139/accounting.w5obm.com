@@ -113,8 +113,8 @@
         // Load required controller
         require_once __DIR__ . '/../controllers/reportController.php';
 
-        // Generate report data
-        $report_data = generate_income_statement($month, $year);
+        // Generate report data using the canonical controller function
+        $report_data = generateIncomeStatement((int)$month, (int)$year);
 
         // Format dates for the title
         $start_date = date('F j, Y', strtotime($report_data['start_date']));
@@ -190,7 +190,7 @@
         $pdf->Output('F', $file_path);
 
         // Save report metadata to database
-        save_report('income_statement', json_encode(['month' => $month, 'year' => $year]), $file_path);
+        saveReport('income_statement', ['month' => (int)$month, 'year' => (int)$year], $file_path);
 
         return $file_path;
     }

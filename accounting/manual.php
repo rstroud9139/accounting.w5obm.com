@@ -14,14 +14,6 @@ require_once __DIR__ . '/../include/dbconn.php';
 require_once __DIR__ . '/lib/helpers.php';
 require_once __DIR__ . '/../include/premium_hero.php';
 
-if (!function_exists('route')) {
-    function route(string $name, array $params = []): string
-    {
-        $query = http_build_query(array_merge(['route' => $name], $params));
-        return '/accounting/app/index.php?' . $query;
-    }
-}
-
 // Auth check
 if (!isAuthenticated()) {
     header('Location: /authentication/login.php');
@@ -38,7 +30,6 @@ $page_title = 'Accounting Manual - W5OBM';
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= htmlspecialchars($page_title, ENT_QUOTES, 'UTF-8'); ?></title>
     <?php include __DIR__ . '/../include/header.php'; ?>
-    <link rel="stylesheet" href="/accounting/app/assets/accounting.css">
     <style>
         .manual-section {
             margin-bottom: 1.5rem;
@@ -47,7 +38,7 @@ $page_title = 'Accounting Manual - W5OBM';
 </head>
 
 <body class="accounting-app bg-light">
-    <?php include __DIR__ . '/app/views/partials/accounting_nav.php'; ?>
+    <?php include __DIR__ . '/../include/menu.php'; ?>
 
     <div class="page-container accounting-dashboard-shell">
         <?php if (function_exists('renderPremiumHero')): ?>

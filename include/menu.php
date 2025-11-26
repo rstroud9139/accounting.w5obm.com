@@ -205,6 +205,28 @@ if (!defined('BASE_URL')) {
     define('BASE_URL', '/'); // or your actual base path
 }
 
+// Determine whether this request is for the accounting experience
+$__w5obmAccountingContext = defined('W5OBM_ACCOUNTING_CONTEXT');
+if (!$__w5obmAccountingContext) {
+    $requestUri = $_SERVER['REQUEST_URI'] ?? '';
+    $scriptName = $_SERVER['SCRIPT_NAME'] ?? '';
+    if (($requestUri && strpos($requestUri, '/accounting/') === 0) || ($scriptName && strpos($scriptName, '/accounting/') === 0)) {
+        $__w5obmAccountingContext = true;
+    }
+}
+if (!empty($GLOBALS['FORCE_ACCOUNTING_NAV'])) {
+    $__w5obmAccountingContext = true;
+}
+if ($__w5obmAccountingContext && !defined('W5OBM_ACCOUNTING_CONTEXT')) {
+    define('W5OBM_ACCOUNTING_CONTEXT', true);
+}
+if ($__w5obmAccountingContext) {
+    $accountingHelperPath = __DIR__ . '/../accounting/include/accounting_nav_helpers.php';
+    if (file_exists($accountingHelperPath)) {
+        require_once $accountingHelperPath;
+    }
+}
+
 // Determine accounting access levels once for menu rendering
 $accounting_user_id = $_SESSION['user_id'] ?? null;
 $can_view_accounting = false;
@@ -229,6 +251,14 @@ if ($is_logged_in && $accounting_user_id) {
     } ?>
 
 </div>
+
+<?php
+if (!empty($__w5obmAccountingContext) && function_exists('accounting_render_nav')) {
+    $accountingRootGuess = realpath(__DIR__ . '/../accounting') ?: (__DIR__ . '/../accounting');
+    accounting_render_nav($accountingRootGuess);
+    return;
+}
+?>
 
 <!-- Modern Navigation with Glass Morphism Effect -->
 <nav class="navbar navbar-expand-lg fixed-top modern-nav" data-nav-theme="<?= htmlspecialchars($nav_tone, ENT_QUOTES, 'UTF-8'); ?>" data-theme-key="<?= htmlspecialchars($current_theme_key ?? 'default', ENT_QUOTES, 'UTF-8'); ?>">

@@ -65,11 +65,13 @@ $dbLabel = $_ENV['LOCAL_ACC_DB_NAME'] ?? $_ENV['ACC_DB_NAME'] ?? 'accounting_w5o
 						<li><a class="dropdown-item" href="<?= route('transactions'); ?>">Journal Entries</a></li>
 						<li><a class="dropdown-item" href="<?= route('account_register'); ?>">Account Registers</a></li>
 						<li><a class="dropdown-item" href="<?= route('reconciliation'); ?>">Reconciliations</a></li>
+						<li><a class="dropdown-item" href="/accounting/assets/list.php">Assets Workspace</a></li>
 						<li>
 							<hr class="dropdown-divider">
 						</li>
 						<li class="dropdown-header">Reference Tables</li>
 						<li><a class="dropdown-item" href="<?= route('category_map'); ?>">Category Mapping</a></li>
+						<li><a class="dropdown-item" href="/accounting/donations/index.php">Donations Workspace</a></li>
 						<li><a class="dropdown-item" href="<?= route('batch_reports'); ?>">Batch Reports</a></li>
 					</ul>
 				</li>

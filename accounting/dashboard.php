@@ -11,14 +11,6 @@ require_once __DIR__ . '/../include/dbconn.php';
 require_once __DIR__ . '/../include/helper_functions.php';
 require_once __DIR__ . '/../include/premium_hero.php';
 
-if (!function_exists('route')) {
-    function route(string $name, array $params = []): string
-    {
-        $query = http_build_query(array_merge(['route' => $name], $params));
-        return '/accounting/app/index.php?' . $query;
-    }
-}
-
 $cash_balance = 0.00;
 $asset_value = 0.00;
 $month_totals = ['income' => 0.00, 'expenses' => 0.00, 'net_balance' => 0.00];
@@ -123,11 +115,10 @@ if (isset($accConn) && $accConn instanceof mysqli) {
     <meta charset="UTF-8">
     <title><?= htmlspecialchars($page_title, ENT_QUOTES, 'UTF-8'); ?></title>
     <?php require __DIR__ . '/../include/header.php'; ?>
-    <link rel="stylesheet" href="/accounting/app/assets/accounting.css">
 </head>
 
 <body class="accounting-app bg-light">
-    <?php include __DIR__ . '/app/views/partials/accounting_nav.php'; ?>
+    <?php include __DIR__ . '/../include/menu.php'; ?>
 
     <div class="page-container accounting-dashboard-shell">
     <?php
@@ -142,20 +133,19 @@ if (isset($accConn) && $accConn instanceof mysqli) {
             'GAAP-ready exports',
             'Role-based security'
         ],
-        'actions' => array_filter([
-            (hasPermission($user_id, 'accounting_add') || hasPermission($user_id, 'accounting_manage')) ? [
-                'label' => 'New Transaction',
-                'url' => '/accounting/transactions/add_transaction.php',
-                'variant' => 'primary',
-                'icon' => 'fa-plus-circle'
-            ] : null,
+        'actions' => [
+            [
+                'label' => 'Transactions Workspace',
+                'url' => '/accounting/transactions/transactions.php',
+                'icon' => 'fa-table'
+            ],
             [
                 'label' => 'View Reports',
                 'url' => '/accounting/reports_dashboard.php',
                 'variant' => 'outline',
                 'icon' => 'fa-chart-line'
             ]
-        ]),
+        ],
         'highlights' => [
             [
                 'value' => '$' . number_format($cash_balance, 2),
@@ -235,149 +225,107 @@ if (isset($accConn) && $accConn instanceof mysqli) {
         </div>
     </div>
 
-    <div class="row mb-3">
-        <div class="col-lg-6 mb-3">
-            <div class="card shadow-sm h-100">
-                <div class="card-header bg-white d-flex justify-content-between align-items-center">
-                    <div>
-                        <h5 class="mb-0">Current Month Summary</h5>
-                        <small class="text-muted"><?= date('F Y') ?></small>
-                    </div>
-                    <span class="badge bg-secondary"><i class="fas fa-calendar-day"></i></span>
-                </div>
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <span class="text-muted">Income</span>
-                        <strong>$<?= number_format($month_totals['income'], 2) ?></strong>
-                    </div>
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <span class="text-muted">Expenses</span>
-                        <strong>$<?= number_format($month_totals['expenses'], 2) ?></strong>
-                    </div>
-                    <div class="d-flex justify-content-between align-items-center">
-                        <span class="text-muted">Net Balance</span>
-                        <span class="h5 mb-0 text-<?= $month_totals['net_balance'] >= 0 ? 'success' : 'danger' ?>">
-                            $<?= number_format($month_totals['net_balance'], 2) ?>
-                        </span>
-                    </div>
-                </div>
-            </div>
+    <div class="row g-4">
+        <div class="col-lg-3">
+            <?php accounting_render_workspace_nav('dashboard'); ?>
         </div>
-        <div class="col-lg-6 mb-3">
-            <div class="card shadow-sm h-100">
-                <div class="card-header bg-white d-flex justify-content-between align-items-center">
-                    <div>
-                        <h5 class="mb-0">YTD Summary</h5>
-                        <small class="text-muted">Fiscal Year <?= date('Y') ?></small>
-                    </div>
-                    <span class="badge bg-primary"><i class="fas fa-chart-area"></i></span>
-                </div>
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <span class="text-muted">Income</span>
-                        <strong>$<?= number_format($ytd_totals['income'], 2) ?></strong>
-                    </div>
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <span class="text-muted">Expenses</span>
-                        <strong>$<?= number_format($ytd_totals['expenses'], 2) ?></strong>
-                    </div>
-                    <div class="d-flex justify-content-between align-items-center">
-                        <span class="text-muted">Net Balance</span>
-                        <span class="h5 mb-0 text-<?= $ytd_totals['net_balance'] >= 0 ? 'success' : 'danger' ?>">
-                            $<?= number_format($ytd_totals['net_balance'], 2) ?>
-                        </span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="row">
-        <div class="col-lg-3 mb-4">
-            <nav class="bg-light border rounded h-100 p-0 shadow-sm">
-                <div class="px-3 py-2 border-bottom">
-                    <span class="text-muted text-uppercase small">Workspace</span>
-                </div>
-                <div class="list-group list-group-flush">
-                    <?php if (hasPermission($user_id, 'accounting_add') || hasPermission($user_id, 'accounting_manage')): ?>
-                        <a href="/accounting/transactions/add_transaction.php" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
-                            <span><i class="fas fa-plus me-2 text-success"></i>Add Transaction</span>
-                            <i class="fas fa-chevron-right small text-muted"></i>
-                        </a>
-                    <?php endif; ?>
-                    <a href="/accounting/transactions/transactions.php" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
-                        <span><i class="fas fa-exchange-alt me-2 text-primary"></i>Transactions</span>
-                        <i class="fas fa-chevron-right small text-muted"></i>
-                    </a>
-                    <a href="/accounting/reports/reports_dashboard.php" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
-                        <span><i class="fas fa-chart-bar me-2 text-success"></i>Reports</span>
-                        <i class="fas fa-chevron-right small text-muted"></i>
-                    </a>
-                    <a href="/accounting/ledger/" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
-                        <span><i class="fas fa-book me-2 text-info"></i>Chart of Accounts</span>
-                        <i class="fas fa-chevron-right small text-muted"></i>
-                    </a>
-                    <a href="/accounting/categories/" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
-                        <span><i class="fas fa-tags me-2 text-warning"></i>Categories</span>
-                        <i class="fas fa-chevron-right small text-muted"></i>
-                    </a>
-                    <div class="list-group-item small text-muted text-uppercase">
-                        Other
-                    </div>
-                    <a href="/accounting/assets/" class="list-group-item list-group-item-action">
-                        <i class="fas fa-boxes me-2"></i>Assets
-                    </a>
-                    <a href="/accounting/donations/" class="list-group-item list-group-item-action">
-                        <i class="fas fa-heart me-2"></i>Donations
-                    </a>
-                </div>
-            </nav>
-        </div>
-
-        <div class="col-lg-9 mb-4">
-            <div class="row mb-4">
-                <div class="col-12 mb-3">
+        <div class="col-lg-9">
+            <div class="row mb-3">
+                <div class="col-lg-6 mb-3">
                     <div class="card shadow-sm h-100">
-                        <div class="card-header bg-white">
-                            <h5 class="mb-0">
-                                <i class="fas fa-history me-2 text-secondary"></i>Recent Transactions
-                            </h5>
+                        <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                            <div>
+                                <h5 class="mb-0">Current Month Summary</h5>
+                                <small class="text-muted"><?= date('F Y') ?></small>
+                            </div>
+                            <span class="badge bg-secondary"><i class="fas fa-calendar-day"></i></span>
                         </div>
                         <div class="card-body">
-                            <?php if (!empty($recent_transactions)): ?>
-                                <div class="table-responsive">
-                                    <table id="recentTransactionsTable" class="table table-striped table-hover mb-0 w-100">
-                                        <thead>
-                                            <tr>
-                                                <th>Date</th>
-                                                <th>Description</th>
-                                                <th class="text-end">Amount</th>
-                                                <th>Category</th>
-                                                <th>Type</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <?php foreach ($recent_transactions as $txn): ?>
-                                                <tr class="cursor-pointer" role="button" data-href="/accounting/transactions/transactions.php?focus=<?= (int)$txn['id'] ?>">
-                                                    <td><?= htmlspecialchars($txn['transaction_date']) ?></td>
-                                                    <td><?= htmlspecialchars($txn['description']) ?></td>
-                                                    <td class="text-end">$<?= number_format($txn['amount'], 2) ?></td>
-                                                    <td><?= htmlspecialchars($txn['category_name'] ?? 'N/A') ?></td>
-                                                    <td>
-                                                        <span class="badge bg-<?= $txn['type'] === 'income' ? 'success' : 'danger' ?>">
-                                                            <?= ucfirst($txn['type']) ?>
-                                                        </span>
-                                                    </td>
-                                                </tr>
-                                            <?php endforeach; ?>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            <?php else: ?>
-                                <p class="text-muted mb-0">No recent transactions found.</p>
-                            <?php endif; ?>
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <span class="text-muted">Income</span>
+                                <strong>$<?= number_format($month_totals['income'], 2) ?></strong>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <span class="text-muted">Expenses</span>
+                                <strong>$<?= number_format($month_totals['expenses'], 2) ?></strong>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="text-muted">Net Balance</span>
+                                <span class="h5 mb-0 text-<?= $month_totals['net_balance'] >= 0 ? 'success' : 'danger' ?>">
+                                    $<?= number_format($month_totals['net_balance'], 2) ?>
+                                </span>
+                            </div>
                         </div>
                     </div>
+                </div>
+                <div class="col-lg-6 mb-3">
+                    <div class="card shadow-sm h-100">
+                        <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                            <div>
+                                <h5 class="mb-0">YTD Summary</h5>
+                                <small class="text-muted">Fiscal Year <?= date('Y') ?></small>
+                            </div>
+                            <span class="badge bg-primary"><i class="fas fa-chart-area"></i></span>
+                        </div>
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <span class="text-muted">Income</span>
+                                <strong>$<?= number_format($ytd_totals['income'], 2) ?></strong>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <span class="text-muted">Expenses</span>
+                                <strong>$<?= number_format($ytd_totals['expenses'], 2) ?></strong>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="text-muted">Net Balance</span>
+                                <span class="h5 mb-0 text-<?= $ytd_totals['net_balance'] >= 0 ? 'success' : 'danger' ?>">
+                                    $<?= number_format($ytd_totals['net_balance'], 2) ?>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-history me-2 text-secondary"></i>Recent Transactions
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <?php if (!empty($recent_transactions)): ?>
+                        <div class="table-responsive">
+                            <table id="recentTransactionsTable" class="table table-striped table-hover mb-0 w-100">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Description</th>
+                                        <th class="text-end">Amount</th>
+                                        <th>Category</th>
+                                        <th>Type</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php foreach ($recent_transactions as $txn): ?>
+                                        <tr class="cursor-pointer" role="button" data-href="/accounting/transactions/transactions.php?focus=<?= (int)$txn['id'] ?>">
+                                            <td><?= htmlspecialchars($txn['transaction_date']) ?></td>
+                                            <td><?= htmlspecialchars($txn['description']) ?></td>
+                                            <td class="text-end">$<?= number_format($txn['amount'], 2) ?></td>
+                                            <td><?= htmlspecialchars($txn['category_name'] ?? 'N/A') ?></td>
+                                            <td>
+                                                <span class="badge bg-<?= $txn['type'] === 'income' ? 'success' : 'danger' ?>">
+                                                    <?= ucfirst($txn['type']) ?>
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                </tbody>
+                            </table>
+                        </div>
+                    <?php else: ?>
+                        <p class="text-muted mb-0">No recent transactions found.</p>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>

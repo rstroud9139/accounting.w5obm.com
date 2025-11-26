@@ -3,14 +3,25 @@
     --acc-border: #e5e7eb
 }
 
+body.accounting-app {
+    margin: 0;
+    padding: 0;
+    background-color: #f5f7fb;
+}
+
+.accounting-app .page-container {
+    margin-top: 0;
+    padding-top: 0.5rem;
+}
+
 .accounting-app .accounting-dashboard-shell {
     margin-top: 0;
-    padding-top: 1.75rem;
+    padding-top: 0.5rem;
 }
 
 @media (max-width: 991.98px) {
     .accounting-app .accounting-dashboard-shell {
-        padding-top: 1.25rem;
+        padding-top: 0.25rem;
     }
 }
 
@@ -20,6 +31,7 @@
     top: 0;
     z-index: 1020;
     background: linear-gradient(135deg, #04123b, #0c447a);
+    margin-bottom: 0;
 }
 
 .accounting-nav .navbar-brand {
@@ -103,6 +115,62 @@
 
 .no-print {
     print-color-adjust: exact
+}
+
+.accounting-app .premium-hero + .hero-summary-row {
+    margin-top: -2.5rem;
+    position: relative;
+    z-index: 5;
+}
+
+@media (max-width: 767.98px) {
+    .accounting-app .premium-hero + .hero-summary-row {
+        margin-top: -1.5rem;
+    }
+}
+
+.hero-summary-card {
+    box-shadow: 0 20px 45px rgba(15, 23, 42, 0.08);
+    border: 1px solid rgba(15, 23, 42, 0.05);
+}
+
+.accounting-workspace-nav {
+    position: sticky;
+    top: 90px;
+    background: #fff;
+}
+
+.accounting-workspace-nav .list-group-item {
+    border: 0;
+    border-bottom: 1px solid rgba(15, 23, 42, 0.05);
+    font-weight: 500;
+}
+
+.accounting-workspace-nav .list-group-item:last-child {
+    border-bottom: 0;
+}
+
+.accounting-workspace-nav .list-group-item.active {
+    color: #0f172a;
+    background: rgba(15, 23, 42, 0.06);
+    border-color: rgba(15, 23, 42, 0.08);
+}
+
+.accounting-workspace-nav .list-group-item .fa-chevron-right {
+    transition: transform 0.2s ease;
+}
+
+.accounting-workspace-nav .list-group-item:hover .fa-chevron-right {
+    transform: translateX(3px);
+}
+
+.report-chart-wrapper {
+    height: 320px;
+}
+
+.report-chart-wrapper canvas {
+    width: 100% !important;
+    height: 100% !important;
 }
 
 .accounting-subnav {

@@ -8,6 +8,7 @@ require_once __DIR__ . '/../../include/dbconn.php';
 require_once __DIR__ . '/../lib/helpers.php';
 require_once __DIR__ . '/../controllers/donation_controller.php';
 require_once __DIR__ . '/../views/donationWorkspace.php';
+require_once __DIR__ . '/../../include/premium_hero.php';
 
 if (!isAuthenticated()) {
   header('Location: /authentication/login.php');
@@ -151,139 +152,200 @@ if ($emailStatus === 'sent') {
   setToastMessage('warning', 'Email Failed', 'Donation saved but the receipt email failed.', 'club-logo');
 }
 
-require_once __DIR__ . '/../../include/header.php';
+$formatChipDate = static function (?string $value): ?string {
+  if (empty($value) || $value === '0000-00-00') {
+    return null;
+  }
+  $ts = strtotime($value);
+  return $ts ? date('M j, Y', $ts) : $value;
+};
+
+$donationHeroChips = array_values(array_filter([
+  ($filters['start_date'] ?? null) && ($filters['end_date'] ?? null)
+    ? 'Window: ' . $formatChipDate($filters['start_date']) . ' → ' . $formatChipDate($filters['end_date'])
+    : null,
+  ($filters['receipt_status'] ?? 'all') !== 'all' ? 'Receipts: ' . ucwords($filters['receipt_status']) : 'Receipts: All',
+  ($filters['tax_deductible'] ?? 'all') !== 'all' ? 'Tax: ' . (($filters['tax_deductible'] === 'yes') ? 'Deductible' : 'Non-deductible') : 'Tax: All',
+  !empty($filters['search']) ? 'Search: ' . $filters['search'] : null,
+]));
+
+$donationHeroHighlights = [
+  [
+    'label' => 'Total Giving',
+    'value' => '$' . number_format($summary['total_amount'] ?? 0, 2),
+    'meta' => number_format($summary['total_count'] ?? 0) . ' records'
+  ],
+  [
+    'label' => 'Average Gift',
+    'value' => '$' . number_format($summary['average_amount'] ?? 0, 2),
+    'meta' => 'Largest $' . number_format($summary['largest_single'] ?? 0, 2)
+  ],
+  [
+    'label' => 'Receipts Sent',
+    'value' => number_format($summary['receipt_sent'] ?? 0),
+    'meta' => number_format($summary['receipt_pending'] ?? 0) . ' pending'
+  ],
+];
+
+$donationHeroActions = array_values(array_filter([
+  $canAdd ? [
+    'label' => 'Record Donation',
+    'url' => '/accounting/donations/add.php',
+    'icon' => 'fa-plus'
+  ] : null,
+  [
+    'label' => 'Receipts Center',
+    'url' => '/accounting/donations/receipt.php',
+    'variant' => 'outline',
+    'icon' => 'fa-receipt'
+  ],
+  [
+    'label' => 'Back to Dashboard',
+    'url' => '/accounting/dashboard.php',
+    'variant' => 'outline',
+    'icon' => 'fa-arrow-left'
+  ],
+]));
+
 ?>
 
-<div class="page-container" style="margin-top:0;padding-top:0;">
-  <section class="hero hero-small mb-4">
-    <div class="hero-body py-3">
-      <div class="container-fluid">
-        <div class="row align-items-center">
-          <div class="col-md-2 d-none d-md-flex justify-content-center">
-            <img src="https://w5obm.com/images/badges/club_logo.png" alt="W5OBM Logo" class="img-fluid no-shadow" style="max-height:64px;">
-          </div>
-          <div class="col-md-6 text-center text-md-start text-white">
-            <h1 class="h4 mb-1">Donations Workspace</h1>
-            <p class="mb-0 small">Track generosity, receipts, and compliance from a single view</p>
-          </div>
-          <div class="col-md-4 text-center text-md-end mt-3 mt-md-0">
-            <?php if ($canAdd): ?>
-              <button class="btn btn-primary btn-sm me-2" data-bs-toggle="modal" data-bs-target="#addDonationModal">
-                <i class="fas fa-plus-circle me-1"></i>Record Donation
-              </button>
-            <?php endif; ?>
-            <a href="/accounting/manual.php#donations" class="btn btn-outline-light btn-sm">
-              <i class="fas fa-book me-1"></i>Documentation
-            </a>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
+<!DOCTYPE html>
+<html lang="en">
 
-  <div class="row mb-3 hero-summary-row">
-    <div class="col-md-3 col-sm-6 mb-3">
-      <div class="border rounded p-3 h-100 bg-light hero-summary-card">
-        <div class="d-flex justify-content-between align-items-center mb-2">
-          <span class="text-muted small">Total Giving</span>
-          <i class="fas fa-donate text-success"></i>
+<head>
+  <meta charset="UTF-8">
+  <title><?= htmlspecialchars($page_title, ENT_QUOTES, 'UTF-8'); ?></title>
+  <?php include __DIR__ . '/../../include/header.php'; ?>
+</head>
+
+<body class="accounting-app bg-light">
+  <?php include __DIR__ . '/../../include/menu.php'; ?>
+
+  <div class="page-container accounting-donations-shell">
+    <?php if (function_exists('displayToastMessage')): ?>
+      <?php displayToastMessage(); ?>
+    <?php endif; ?>
+
+    <?php if (function_exists('renderPremiumHero')): ?>
+      <?php renderPremiumHero([
+        'eyebrow' => 'Donor Care',
+        'title' => 'Donations Workspace',
+        'subtitle' => 'Track generosity, compliance, and receipts without leaving mission control.',
+        'chips' => $donationHeroChips,
+        'highlights' => $donationHeroHighlights,
+        'actions' => $donationHeroActions,
+        'theme' => 'cobalt',
+        'size' => 'compact',
+        'media_mode' => 'none',
+      ]); ?>
+    <?php endif; ?>
+
+    <div class="row mb-3 hero-summary-row">
+      <div class="col-md-3 col-sm-6 mb-3">
+        <div class="border rounded p-3 h-100 bg-light hero-summary-card">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <span class="text-muted small">Total Giving</span>
+            <i class="fas fa-donate text-success"></i>
+          </div>
+          <h4 class="mb-0">$<?= number_format($summary['total_amount'] ?? 0, 2) ?></h4>
+          <small class="text-muted">Across <?= number_format($summary['total_count'] ?? 0) ?> records</small>
         </div>
-        <h4 class="mb-0">$<?= number_format($summary['total_amount'] ?? 0, 2) ?></h4>
-        <small class="text-muted">Across <?= number_format($summary['total_count'] ?? 0) ?> records</small>
+      </div>
+      <div class="col-md-3 col-sm-6 mb-3">
+        <div class="border rounded p-3 h-100 bg-light hero-summary-card">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <span class="text-muted small">Average Gift</span>
+            <i class="fas fa-chart-line text-primary"></i>
+          </div>
+          <h4 class="mb-0">$<?= number_format($summary['average_amount'] ?? 0, 2) ?></h4>
+          <small class="text-muted">Largest $<?= number_format($summary['largest_single'] ?? 0, 2) ?></small>
+        </div>
+      </div>
+      <div class="col-md-3 col-sm-6 mb-3">
+        <div class="border rounded p-3 h-100 bg-light hero-summary-card">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <span class="text-muted small">Receipt Coverage</span>
+            <i class="fas fa-receipt text-info"></i>
+          </div>
+          <h4 class="mb-0">
+            <?= number_format($summary['receipt_sent'] ?? 0) ?> sent
+          </h4>
+          <small class="text-muted"><?= number_format($summary['receipt_pending'] ?? 0) ?> pending</small>
+        </div>
+      </div>
+      <div class="col-md-3 col-sm-6 mb-3">
+        <div class="border rounded p-3 h-100 bg-light hero-summary-card">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <span class="text-muted small">Unique Donors</span>
+            <i class="fas fa-user-friends text-warning"></i>
+          </div>
+          <h4 class="mb-0"><?= number_format($summary['unique_donors'] ?? 0) ?></h4>
+          <small class="text-muted">Latest <?= htmlspecialchars($summary['latest_date'] ?? '—') ?></small>
+        </div>
       </div>
     </div>
-    <div class="col-md-3 col-sm-6 mb-3">
-      <div class="border rounded p-3 h-100 bg-light hero-summary-card">
-        <div class="d-flex justify-content-between align-items-center mb-2">
-          <span class="text-muted small">Average Gift</span>
-          <i class="fas fa-chart-line text-primary"></i>
-        </div>
-        <h4 class="mb-0">$<?= number_format($summary['average_amount'] ?? 0, 2) ?></h4>
-        <small class="text-muted">Largest $<?= number_format($summary['largest_single'] ?? 0, 2) ?></small>
+
+    <div class="row g-4">
+      <div class="col-lg-3">
+        <?php if (function_exists('accounting_render_workspace_nav')): ?>
+          <?php accounting_render_workspace_nav('donations'); ?>
+        <?php else: ?>
+          <nav class="bg-light border rounded h-100 p-0 shadow-sm">
+            <div class="px-3 py-2 border-bottom">
+              <span class="text-muted text-uppercase small">Workspace</span>
+            </div>
+            <div class="list-group list-group-flush">
+              <a href="/accounting/dashboard.php" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                <span><i class="fas fa-chart-pie me-2 text-primary"></i>Dashboard</span>
+                <i class="fas fa-chevron-right small text-muted"></i>
+              </a>
+              <a href="/accounting/transactions/transactions.php" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                <span><i class="fas fa-exchange-alt me-2 text-success"></i>Transactions</span>
+                <i class="fas fa-chevron-right small text-muted"></i>
+              </a>
+              <a href="/accounting/reports_dashboard.php" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                <span><i class="fas fa-chart-bar me-2 text-info"></i>Reports</span>
+                <i class="fas fa-chevron-right small text-muted"></i>
+              </a>
+              <a href="/accounting/ledger/" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                <span><i class="fas fa-book me-2 text-warning"></i>Chart of Accounts</span>
+                <i class="fas fa-chevron-right small text-muted"></i>
+              </a>
+              <a href="/accounting/categories/" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                <span><i class="fas fa-tags me-2 text-secondary"></i>Categories</span>
+                <i class="fas fa-chevron-right small text-muted"></i>
+              </a>
+              <a href="/accounting/vendors/" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                <span><i class="fas fa-store me-2 text-danger"></i>Vendors</span>
+                <i class="fas fa-chevron-right small text-muted"></i>
+              </a>
+              <div class="list-group-item small text-muted text-uppercase">Other</div>
+              <a href="/accounting/assets/" class="list-group-item list-group-item-action">
+                <i class="fas fa-boxes me-2"></i>Assets
+              </a>
+              <a href="/accounting/donations/" class="list-group-item list-group-item-action active">
+                <i class="fas fa-hand-holding-heart me-2"></i>Donations
+              </a>
+            </div>
+          </nav>
+        <?php endif; ?>
       </div>
-    </div>
-    <div class="col-md-3 col-sm-6 mb-3">
-      <div class="border rounded p-3 h-100 bg-light hero-summary-card">
-        <div class="d-flex justify-content-between align-items-center mb-2">
-          <span class="text-muted small">Receipt Coverage</span>
-          <i class="fas fa-receipt text-info"></i>
-        </div>
-        <h4 class="mb-0">
-          <?= number_format($summary['receipt_sent'] ?? 0) ?> sent
-        </h4>
-        <small class="text-muted"><?= number_format($summary['receipt_pending'] ?? 0) ?> pending</small>
-      </div>
-    </div>
-    <div class="col-md-3 col-sm-6 mb-3">
-      <div class="border rounded p-3 h-100 bg-light hero-summary-card">
-        <div class="d-flex justify-content-between align-items-center mb-2">
-          <span class="text-muted small">Unique Donors</span>
-          <i class="fas fa-user-friends text-warning"></i>
-        </div>
-        <h4 class="mb-0"><?= number_format($summary['unique_donors'] ?? 0) ?></h4>
-        <small class="text-muted">Latest <?= htmlspecialchars($summary['latest_date'] ?? '—') ?></small>
+      <div class="col-lg-9">
+        <?php
+        renderDonationWorkspace(
+          $donations,
+          $filters,
+          $summary,
+          $contacts,
+          $canAdd,
+          $canManage
+        );
+        ?>
       </div>
     </div>
   </div>
 
-  <?php if (function_exists('displayToastMessage')): ?>
-    <?php displayToastMessage(); ?>
-  <?php endif; ?>
+  <?php include __DIR__ . '/../../include/footer.php'; ?>
+</body>
 
-  <div class="row">
-    <div class="col-lg-3 mb-4">
-      <nav class="bg-light border rounded h-100 p-0 shadow-sm">
-        <div class="px-3 py-2 border-bottom">
-          <span class="text-muted text-uppercase small">Workspace</span>
-        </div>
-        <div class="list-group list-group-flush">
-          <a href="/accounting/dashboard.php" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
-            <span><i class="fas fa-chart-pie me-2 text-primary"></i>Dashboard</span>
-            <i class="fas fa-chevron-right small text-muted"></i>
-          </a>
-          <a href="/accounting/transactions/transactions.php" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
-            <span><i class="fas fa-exchange-alt me-2 text-success"></i>Transactions</span>
-            <i class="fas fa-chevron-right small text-muted"></i>
-          </a>
-          <a href="/accounting/reports_dashboard.php" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
-            <span><i class="fas fa-chart-bar me-2 text-info"></i>Reports</span>
-            <i class="fas fa-chevron-right small text-muted"></i>
-          </a>
-          <a href="/accounting/ledger/" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
-            <span><i class="fas fa-book me-2 text-warning"></i>Chart of Accounts</span>
-            <i class="fas fa-chevron-right small text-muted"></i>
-          </a>
-          <a href="/accounting/categories/" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
-            <span><i class="fas fa-tags me-2 text-secondary"></i>Categories</span>
-            <i class="fas fa-chevron-right small text-muted"></i>
-          </a>
-          <a href="/accounting/vendors/" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
-            <span><i class="fas fa-store me-2 text-danger"></i>Vendors</span>
-            <i class="fas fa-chevron-right small text-muted"></i>
-          </a>
-          <div class="list-group-item small text-muted text-uppercase">Other</div>
-          <a href="/accounting/assets/" class="list-group-item list-group-item-action">
-            <i class="fas fa-boxes me-2"></i>Assets
-          </a>
-          <a href="/accounting/donations/" class="list-group-item list-group-item-action active">
-            <i class="fas fa-hand-holding-heart me-2"></i>Donations
-          </a>
-        </div>
-      </nav>
-    </div>
-    <div class="col-lg-9 mb-4">
-      <?php
-      renderDonationWorkspace(
-        $donations,
-        $filters,
-        $summary,
-        $contacts,
-        $canAdd,
-        $canManage
-      );
-      ?>
-    </div>
-  </div>
-</div>
-
-<?php include __DIR__ . '/../../include/footer.php';
+</html>

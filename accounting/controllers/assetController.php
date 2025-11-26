@@ -11,6 +11,23 @@
 require_once __DIR__ . '/../../include/dbconn.php';
 require_once __DIR__ . '/../lib/helpers.php';
 
+if (!function_exists('asset_db_connection')) {
+    function asset_db_connection(): mysqli
+    {
+        global $accConn, $conn;
+
+        if (isset($accConn) && $accConn instanceof mysqli && $accConn->connect_errno === 0) {
+            return $accConn;
+        }
+
+        if (isset($conn) && $conn instanceof mysqli) {
+            return $conn;
+        }
+
+        throw new \RuntimeException('No database connection available for assets module.');
+    }
+}
+
 /**
  * Add a new asset
  * @param array $data Asset data
@@ -18,7 +35,7 @@ require_once __DIR__ . '/../lib/helpers.php';
  */
 function addAsset($data)
 {
-    global $conn;
+    $db = asset_db_connection();
 
     try {
         // Validate required fields
@@ -39,7 +56,7 @@ function addAsset($data)
             throw new Exception("Invalid acquisition date");
         }
 
-        $stmt = $conn->prepare("
+        $stmt = $db->prepare("
             INSERT INTO acc_assets 
             (name, value, acquisition_date, depreciation_rate, description, created_by, created_at) 
             VALUES (?, ?, ?, ?, ?, ?, NOW())
@@ -60,7 +77,7 @@ function addAsset($data)
         );
 
         if ($stmt->execute()) {
-            $asset_id = $conn->insert_id;
+            $asset_id = $db->insert_id;
             $stmt->close();
 
             logActivity(
@@ -89,7 +106,7 @@ function addAsset($data)
  */
 function updateAsset($id, $data)
 {
-    global $conn;
+    $db = asset_db_connection();
 
     try {
         if (!$id || !is_numeric($id)) {
@@ -108,7 +125,7 @@ function updateAsset($id, $data)
             }
         }
 
-        $stmt = $conn->prepare("
+        $stmt = $db->prepare("
             UPDATE acc_assets 
             SET name = ?, value = ?, acquisition_date = ?, depreciation_rate = ?, 
                 description = ?, updated_by = ?, updated_at = NOW()
@@ -158,7 +175,7 @@ function updateAsset($id, $data)
  */
 function deleteAsset($id)
 {
-    global $conn;
+    $db = asset_db_connection();
 
     try {
         if (!$id || !is_numeric($id)) {
@@ -175,7 +192,7 @@ function deleteAsset($id)
             throw new Exception("Insufficient permissions to delete assets");
         }
 
-        $stmt = $conn->prepare("DELETE FROM acc_assets WHERE id = ?");
+        $stmt = $db->prepare("DELETE FROM acc_assets WHERE id = ?");
         $stmt->bind_param('i', $id);
 
         if ($stmt->execute()) {
@@ -206,14 +223,14 @@ function deleteAsset($id)
  */
 function getAssetById($id)
 {
-    global $conn;
+    $db = asset_db_connection();
 
     try {
         if (!$id || !is_numeric($id)) {
             return false;
         }
 
-        $stmt = $conn->prepare("
+        $stmt = $db->prepare("
             SELECT a.*, 
                    cu.username AS created_by_username,
                    uu.username AS updated_by_username
@@ -242,7 +259,7 @@ function getAssetById($id)
  */
 function getAllAssets($filters = [])
 {
-    global $conn;
+    $db = asset_db_connection();
 
     try {
         $where_conditions = [];
@@ -268,7 +285,7 @@ function getAllAssets($filters = [])
             ORDER BY a.name ASC
         ";
 
-        $stmt = $conn->prepare($query);
+        $stmt = $db->prepare($query);
 
         if (!empty($params)) {
             $stmt->bind_param($types, ...$params);
@@ -332,10 +349,10 @@ function calculateYearsSinceAcquisition($acquisition_date)
  */
 function calculateTotalAssetValue()
 {
-    global $conn;
+    $db = asset_db_connection();
 
     try {
-        $result = $conn->query("SELECT COALESCE(SUM(value), 0) AS total FROM acc_assets");
+        $result = $db->query("SELECT COALESCE(SUM(value), 0) AS total FROM acc_assets");
         $row = $result->fetch_assoc();
         return floatval($row['total'] ?? 0);
     } catch (Exception $e) {

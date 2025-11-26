@@ -1,0 +1,99 @@
+/* 
+ * W5OBM Hero Section CSS - Standardized Hero Logo Styles
+ * File: /css/hero-logo-styles.css
+ * Purpose: Consistent hero section logo styling across all pages
+ * 
+ * Include this in any page with a hero section to get standardized club logo display
+ */
+
+.hero-logo {
+    position: relative;
+    z-index: 3;
+}
+
+.club-hero-logo {
+    width: 200px;
+    height: 200px;
+    object-fit: contain;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 50%;
+    padding: 15px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    border: 4px solid var(--accent-gold, #FFD700);
+    transition: all 0.4s ease;
+}
+
+.club-hero-logo:hover {
+    transform: scale(1.05) rotate(5deg);
+    box-shadow: 0 12px 48px rgba(255, 215, 0, 0.4);
+    border-color: rgba(255, 215, 0, 0.8);
+}
+
+/* Responsive logo sizing */
+@media (max-width: 768px) {
+    .club-hero-logo {
+        width: 150px;
+        height: 150px;
+        padding: 12px;
+    }
+}
+
+@media (max-width: 576px) {
+    .club-hero-logo {
+        width: 120px;
+        height: 120px;
+        padding: 10px;
+    }
+}
+
+/* Animation for hero logo entrance */
+@keyframes heroLogoEntrance {
+    0% {
+        transform: scale(0) rotate(-180deg);
+        opacity: 0;
+    }
+
+    50% {
+        transform: scale(1.1) rotate(-10deg);
+        opacity: 0.8;
+    }
+
+    100% {
+        transform: scale(1) rotate(0deg);
+        opacity: 1;
+    }
+}
+
+.club-hero-logo.animate-entrance {
+    animation: heroLogoEntrance 1.2s ease-out;
+}
+
+/* Alternative smaller hero logo for compact layouts */
+.club-hero-logo.hero-logo-small {
+    width: 120px;
+    height: 120px;
+    padding: 10px;
+}
+
+/* Alternative larger hero logo for main pages */
+.club-hero-logo.hero-logo-large {
+    width: 250px;
+    height: 250px;
+    padding: 20px;
+}
+
+@media (max-width: 768px) {
+    .club-hero-logo.hero-logo-large {
+        width: 180px;
+        height: 180px;
+        padding: 15px;
+    }
+}
+
+@media (max-width: 576px) {
+    .club-hero-logo.hero-logo-large {
+        width: 140px;
+        height: 140px;
+        padding: 12px;
+    }
+}

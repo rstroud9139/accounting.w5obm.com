@@ -1,0 +1,781 @@
+/**
+ * W5OBM Enhanced Website CSS - Following Modern Design Guidelines
+ * File: /css/w5obm_enhanced.css
+ * Enhanced with green accent colors, improved accessibility, and modern design
+ */
+
+/* Import existing W5OBM styles and enhance them */
+@import 'w5obm.css';
+
+:root {
+    /* Enhanced W5OBM Color Palette following Design Guidelines */
+    --primary-blue: #031A54;
+    --secondary-blue: #145EFF;
+    --accent-gold: #FFD700;
+    
+    /* New Green Accent Colors for Theme Variety */
+    --medium-green: #2d8670;
+    --dark-green: #1a5d47;
+    --light-green: #4ade80;
+    --accent-green: #16a34a;
+    
+    /* Supporting Colors */
+    --dark-gray: #2c3e50;
+    --light-gray: #f8f9fa;
+    --success-green: #28a745;
+    --warning-orange: #fd7e14;
+    --danger-red: #dc3545;
+    --info-blue: #17a2b8;
+    
+    /* Enhanced Shadow System following Design Guidelines */
+    --shadow-level-1: 0 5px 15px rgba(0, 0, 0, 0.08);
+    --shadow-level-2: 0 10px 30px rgba(0, 0, 0, 0.12);
+    --shadow-level-3: 0 15px 40px rgba(0, 0, 0, 0.15);
+    --shadow-level-4: 0 25px 60px rgba(0, 0, 0, 0.2);
+    --shadow-gold-glow: 0 5px 15px rgba(255, 215, 0, 0.3);
+    --shadow-green-glow: 0 5px 15px rgba(45, 134, 112, 0.3);
+    
+    /* Typography following Design Guidelines */
+    --font-family-primary: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --font-family-secondary: 'Open Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    
+    /* Border Radius following Design Guidelines */
+    --border-radius-sm: 0.375rem;
+    --border-radius-md: 0.75rem;
+    --border-radius-lg: 1.25rem;
+    --border-radius-xl: 1.5rem;
+    --border-radius-pill: 50px;
+    
+    /* Transitions */
+    --transition-fast: 0.15s ease;
+    --transition-normal: 0.3s ease;
+    --transition-slow: 0.4s ease;
+}
+
+/* Enhanced Body and Global Styles */
+body {
+    font-family: var(--font-family-primary);
+    line-height: 1.6;
+    color: var(--dark-gray);
+    background-color: #ffffff;
+}
+
+/* Enhanced Typography System following Design Guidelines */
+h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-family-primary);
+    font-weight: 700;
+    color: var(--primary-blue);
+    margin-bottom: 1rem;
+}
+
+.display-1, .display-2, .display-3, .display-4, .display-5, .display-6 {
+    font-family: var(--font-family-primary);
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -0.5px;
+}
+
+.lead {
+    font-family: var(--font-family-secondary);
+    font-weight: 300;
+    font-size: 1.25rem;
+    line-height: 1.6;
+}
+
+/* W5OBM Callsign Styling following Design Guidelines */
+.w5obm-callsign,
+.hero-callsign {
+    background: linear-gradient(135deg, var(--accent-gold), #FFC700);
+    color: var(--primary-blue);
+    padding: 10px 25px;
+    border-radius: var(--border-radius-pill);
+    font-weight: 900;
+    font-size: 1.3rem;
+    letter-spacing: 2px;
+    display: inline-block;
+    box-shadow: var(--shadow-gold-glow);
+    animation: pulse 2s infinite;
+}
+
+/* Enhanced Button System following Design Guidelines */
+.btn {
+    font-family: var(--font-family-primary);
+    font-weight: 600;
+    border-radius: var(--border-radius-lg);
+    padding: 0.75rem 1.5rem;
+    transition: all var(--transition-normal);
+    border: none;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    text-decoration: none;
+    box-shadow: var(--shadow-level-2);
+}
+
+/* Hero Buttons following Design Guidelines */
+.btn-hero-primary {
+    background: linear-gradient(135deg, var(--accent-gold), #FFC700);
+    color: var(--primary-blue);
+    box-shadow: var(--shadow-gold-glow);
+    border-radius: var(--border-radius-pill);
+    padding: 15px 35px;
+    font-size: 1.2rem;
+}
+
+.btn-hero-primary:hover {
+    background: linear-gradient(135deg, #FFC700, var(--accent-gold));
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(255, 215, 0, 0.4);
+    color: var(--primary-blue);
+}
+
+.btn-hero-secondary {
+    background: transparent;
+    color: white;
+    border: 3px solid white;
+    border-radius: var(--border-radius-pill);
+    padding: 15px 35px;
+    font-size: 1.2rem;
+}
+
+.btn-hero-secondary:hover {
+    background: white;
+    color: var(--primary-blue);
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(255, 255, 255, 0.3);
+}
+
+/* Green Theme Buttons for Theme Variety */
+.btn-green-primary {
+    background: linear-gradient(135deg, var(--medium-green), var(--dark-green));
+    color: white;
+    box-shadow: var(--shadow-green-glow);
+}
+
+.btn-green-primary:hover {
+    background: linear-gradient(135deg, var(--dark-green), var(--medium-green));
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(45, 134, 112, 0.4);
+    color: white;
+}
+
+.btn-green-secondary {
+    background: transparent;
+    color: var(--medium-green);
+    border: 2px solid var(--medium-green);
+}
+
+.btn-green-secondary:hover {
+    background: var(--medium-green);
+    color: white;
+    transform: translateY(-2px);
+}
+
+/* Enhanced Card System following Design Guidelines */
+.card {
+    border: none;
+    border-radius: var(--border-radius-xl);
+    box-shadow: var(--shadow-level-2);
+    transition: all var(--transition-slow);
+    overflow: hidden;
+    background: white;
+    margin-bottom: 2rem;
+}
+
+.card:hover {
+    box-shadow: var(--shadow-level-4);
+    transform: translateY(-5px);
+}
+
+.card-header {
+    background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+    color: white;
+    border-radius: var(--border-radius-xl) var(--border-radius-xl) 0 0 !important;
+    border-bottom: none;
+    padding: 1.5rem;
+    font-weight: 600;
+}
+
+.card-body {
+    padding: 2rem;
+}
+
+/* Info Cards following Design Guidelines */
+.info-card {
+    background: white;
+    border-radius: var(--border-radius-xl);
+    padding: 2.5rem;
+    box-shadow: var(--shadow-level-3);
+    transition: all var(--transition-slow);
+    height: 100%;
+    border-top: 5px solid var(--secondary-blue);
+    position: relative;
+    overflow: hidden;
+}
+
+.info-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 100px;
+    height: 100px;
+    background: linear-gradient(135deg, var(--accent-gold), rgba(255, 215, 0, 0.1));
+    transform: translate(50%, -50%) rotate(45deg);
+    transition: all var(--transition-normal);
+}
+
+.info-card:hover {
+    transform: translateY(-15px);
+    box-shadow: var(--shadow-level-4);
+}
+
+.info-card:hover::before {
+    transform: translate(30%, -30%) rotate(45deg) scale(1.2);
+}
+
+.info-card .icon {
+    width: 70px;
+    height: 70px;
+    background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+    border-radius: var(--border-radius-lg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+    position: relative;
+    z-index: 2;
+    box-shadow: 0 10px 20px rgba(3, 26, 84, 0.3);
+}
+
+.info-card .icon i {
+    font-size: 1.8rem;
+    color: white;
+}
+
+.info-card h4 {
+    color: var(--primary-blue);
+    font-weight: 700;
+    margin-bottom: 1rem;
+    position: relative;
+    z-index: 2;
+}
+
+.info-card p {
+    position: relative;
+    z-index: 2;
+    line-height: 1.6;
+}
+
+.info-card .btn {
+    position: relative;
+    z-index: 2;
+    border-radius: var(--border-radius-lg);
+    padding: 8px 20px;
+    font-weight: 600;
+}
+
+/* Green Theme Variant Cards for Theme Variety */
+.info-card.green-theme {
+    border-top: 5px solid var(--medium-green);
+}
+
+.info-card.green-theme .icon {
+    background: linear-gradient(135deg, var(--medium-green), var(--dark-green));
+    box-shadow: 0 10px 20px rgba(45, 134, 112, 0.3);
+}
+
+.info-card.green-theme::before {
+    background: linear-gradient(135deg, var(--accent-green), rgba(22, 163, 74, 0.1));
+}
+
+.info-card.green-theme h4 {
+    color: var(--dark-green);
+}
+
+/* Feature Cards following Design Guidelines */
+.feature-card {
+    background: white;
+    border-radius: var(--border-radius-xl);
+    overflow: hidden;
+    box-shadow: var(--shadow-level-2);
+    transition: all var(--transition-slow);
+    margin-bottom: 2rem;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.feature-card:hover {
+    transform: translateY(-10px) scale(1.02);
+    box-shadow: var(--shadow-level-4);
+}
+
+.feature-card .card-img-top {
+    height: 280px;
+    object-fit: cover;
+    transition: transform var(--transition-slow);
+}
+
+.feature-card:hover .card-img-top {
+    transform: scale(1.1);
+}
+
+.feature-card .card-body {
+    padding: 2.5rem;
+    position: relative;
+}
+
+.feature-card .badge {
+    position: absolute;
+    top: 25px;
+    right: 25px;
+    padding: 10px 18px;
+    font-size: 0.9rem;
+    background: linear-gradient(135deg, var(--accent-gold), #FFC700);
+    color: var(--primary-blue);
+    border-radius: var(--border-radius-lg);
+    font-weight: 700;
+    box-shadow: var(--shadow-gold-glow);
+    z-index: 3;
+}
+
+.feature-card h5 {
+    color: var(--primary-blue);
+    font-weight: 700;
+    font-size: 1.4rem;
+    margin-bottom: 1rem;
+}
+
+.feature-card .btn {
+    border-radius: var(--border-radius-lg);
+    padding: 10px 25px;
+    font-weight: 600;
+    background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+    border: none;
+}
+
+.feature-card .btn:hover {
+    background: linear-gradient(135deg, var(--secondary-blue), var(--primary-blue));
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(3, 26, 84, 0.3);
+}
+
+/* News Cards following Design Guidelines */
+.news-card {
+    background: var(--light-gray);
+    border-radius: var(--border-radius-lg);
+    padding: 2rem;
+    margin-bottom: 1.5rem;
+    border-left: 4px solid var(--secondary-blue);
+    transition: all var(--transition-normal);
+}
+
+.news-card:hover {
+    transform: translateX(10px);
+    box-shadow: var(--shadow-level-1);
+}
+
+.news-date {
+    color: var(--secondary-blue);
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+}
+
+/* Enhanced Navigation following Design Guidelines */
+.navbar {
+    background: var(--dark-gray) !important;
+    box-shadow: var(--shadow-level-2);
+    backdrop-filter: blur(10px);
+}
+
+.navbar-brand {
+    font-weight: 800;
+    font-size: 1.5rem;
+    color: white !important;
+}
+
+.nav-link {
+    font-weight: 500;
+    transition: all var(--transition-normal);
+    border-radius: var(--border-radius-sm);
+    margin: 0 2px;
+}
+
+.nav-link:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateY(-1px);
+}
+
+.dropdown-menu {
+    border: none;
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-level-3);
+    padding: 0.5rem;
+}
+
+.dropdown-item {
+    border-radius: var(--border-radius-sm);
+    padding: 0.75rem 1rem;
+    transition: all var(--transition-fast);
+}
+
+.dropdown-item:hover {
+    background: var(--primary-blue);
+    color: white;
+    transform: translateX(5px);
+}
+
+/* Enhanced Forms following Design Guidelines */
+.form-control, .form-select {
+    border-radius: var(--border-radius-lg);
+    border: 2px solid #e9ecef;
+    padding: 0.75rem 1rem;
+    box-shadow: var(--shadow-level-1);
+    transition: all var(--transition-normal);
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: var(--secondary-blue);
+    box-shadow: 0 0 0 0.2rem rgba(20, 94, 255, 0.25);
+}
+
+.form-label {
+    font-weight: 600;
+    color: var(--primary-blue);
+    margin-bottom: 0.5rem;
+}
+
+/* Enhanced Tables following Design Guidelines */
+.table {
+    border-radius: var(--border-radius-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow-level-2);
+}
+
+.table thead th {
+    background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+    color: white;
+    font-weight: 600;
+    border: none;
+    padding: 1rem;
+}
+
+.table tbody tr:hover {
+    background: rgba(20, 94, 255, 0.05);
+    transform: scale(1.005);
+}
+
+/* Enhanced Alerts following Design Guidelines */
+.alert {
+    border: none;
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-level-1);
+    padding: 1.5rem;
+}
+
+.alert-success {
+    background: linear-gradient(135deg, rgba(40, 167, 69, 0.1), rgba(22, 163, 74, 0.05));
+    color: var(--success-green);
+    border-left: 4px solid var(--success-green);
+}
+
+.alert-warning {
+    background: linear-gradient(135deg, rgba(253, 126, 20, 0.1), rgba(255, 193, 7, 0.05));
+    color: var(--warning-orange);
+    border-left: 4px solid var(--warning-orange);
+}
+
+.alert-danger {
+    background: linear-gradient(135deg, rgba(220, 53, 69, 0.1), rgba(220, 53, 69, 0.05));
+    color: var(--danger-red);
+    border-left: 4px solid var(--danger-red);
+}
+
+.alert-info {
+    background: linear-gradient(135deg, rgba(23, 162, 184, 0.1), rgba(13, 202, 240, 0.05));
+    color: var(--info-blue);
+    border-left: 4px solid var(--info-blue);
+}
+
+/* Badge Enhancements following Design Guidelines */
+.badge {
+    font-weight: 600;
+    padding: 0.5rem 1rem;
+    border-radius: var(--border-radius-lg);
+}
+
+.badge-gold {
+    background: linear-gradient(135deg, var(--accent-gold), #FFC700);
+    color: var(--primary-blue);
+}
+
+.badge-green {
+    background: linear-gradient(135deg, var(--medium-green), var(--dark-green));
+    color: white;
+}
+
+/* Animation Classes following Design Guidelines */
+.fade-in {
+    animation: fadeIn 0.5s ease-in;
+}
+
+.slide-in-left {
+    animation: slideInLeft 0.5s ease-out;
+}
+
+.slide-in-right {
+    animation: slideInRight 0.5s ease-out;
+}
+
+.bounce-in {
+    animation: bounceIn 0.6s ease-out;
+}
+
+/* Keyframe Animations following Design Guidelines */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideInLeft {
+    from { transform: translateX(-100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes slideInRight {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes bounceIn {
+    0% { transform: scale(0.3); opacity: 0; }
+    50% { transform: scale(1.05); }
+    70% { transform: scale(0.9); }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
+/* Utility Classes following Design Guidelines */
+.shadow-level-1 { box-shadow: var(--shadow-level-1); }
+.shadow-level-2 { box-shadow: var(--shadow-level-2); }
+.shadow-level-3 { box-shadow: var(--shadow-level-3); }
+.shadow-level-4 { box-shadow: var(--shadow-level-4); }
+.shadow-gold-glow { box-shadow: var(--shadow-gold-glow); }
+.shadow-green-glow { box-shadow: var(--shadow-green-glow); }
+
+.text-primary-blue { color: var(--primary-blue) !important; }
+.text-secondary-blue { color: var(--secondary-blue) !important; }
+.text-accent-gold { color: var(--accent-gold) !important; }
+.text-medium-green { color: var(--medium-green) !important; }
+.text-dark-green { color: var(--dark-green) !important; }
+
+.bg-primary-blue { background-color: var(--primary-blue) !important; }
+.bg-secondary-blue { background-color: var(--secondary-blue) !important; }
+.bg-medium-green { background-color: var(--medium-green) !important; }
+.bg-dark-green { background-color: var(--dark-green) !important; }
+
+.border-primary-blue { border-color: var(--primary-blue) !important; }
+.border-secondary-blue { border-color: var(--secondary-blue) !important; }
+.border-medium-green { border-color: var(--medium-green) !important; }
+
+.gradient-primary {
+    background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+}
+
+.gradient-gold {
+    background: linear-gradient(135deg, var(--accent-gold), #FFC700);
+}
+
+.gradient-green {
+    background: linear-gradient(135deg, var(--medium-green), var(--dark-green));
+}
+
+/* Theme Support for Vision Accessibility following Design Guidelines */
+[data-theme="high-contrast"] {
+    --primary-blue: #000080;
+    --secondary-blue: #0000FF;
+    --accent-gold: #FFD700;
+    --medium-green: #008000;
+    --dark-green: #006400;
+    --dark-gray: #000000;
+    --light-gray: #FFFFFF;
+}
+
+[data-theme="dark"] {
+    --primary-blue: #4A90E2;
+    --secondary-blue: #5BA0F2;
+    --accent-gold: #FFD700;
+    --medium-green: #5DBB63;
+    --dark-green: #4A9C50;
+    --dark-gray: #FFFFFF;
+    --light-gray: #2C2C2C;
+    
+    background-color: #1a1a1a;
+    color: #FFFFFF;
+}
+
+[data-theme="dark"] .card {
+    background-color: #2C2C2C;
+    color: #FFFFFF;
+}
+
+[data-theme="dark"] .info-card {
+    background-color: #2C2C2C;
+    color: #FFFFFF;
+}
+
+/* Loading States following Design Guidelines */
+.loading {
+    position: relative;
+    pointer-events: none;
+    opacity: 0.7;
+}
+
+.loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 20px;
+    height: 20px;
+    margin: -10px 0 0 -10px;
+    border: 2px solid var(--primary-blue);
+    border-top: 2px solid transparent;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Focus States for Accessibility following Design Guidelines */
+.btn:focus,
+.form-control:focus,
+.form-select:focus,
+.nav-link:focus,
+.dropdown-item:focus {
+    outline: 2px solid var(--secondary-blue);
+    outline-offset: 2px;
+}
+
+/* Responsive Design following Design Guidelines */
+@media (max-width: 768px) {
+    .info-card {
+        padding: 2rem;
+    }
+    
+    .feature-card .card-body {
+        padding: 2rem;
+    }
+    
+    .hero-buttons .btn {
+        display: block;
+        margin: 10px auto;
+        width: 250px;
+    }
+    
+    .card-body {
+        padding: 1.5rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .info-card {
+        padding: 1.5rem;
+    }
+    
+    .card-body {
+        padding: 1.5rem;
+    }
+    
+    .btn {
+        padding: 0.5rem 1rem;
+        font-size: 0.9rem;
+    }
+    
+    .w5obm-callsign,
+    .hero-callsign {
+        font-size: 1.1rem;
+        padding: 8px 20px;
+    }
+}
+
+/* Reduced Motion Support for Accessibility following Design Guidelines */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+    
+    .w5obm-callsign,
+    .hero-callsign {
+        animation: none;
+    }
+}
+
+/* High Contrast Mode Support for Accessibility */
+@media (prefers-contrast: high) {
+    :root {
+        --primary-blue: #000080;
+        --secondary-blue: #0000FF;
+        --dark-gray: #000000;
+        --light-gray: #FFFFFF;
+    }
+    
+    .btn {
+        border: 2px solid currentColor;
+    }
+    
+    .card {
+        border: 2px solid var(--dark-gray);
+    }
+}
+
+/* Print Styles following Design Guidelines */
+@media print {
+    .navbar,
+    .hero-section,
+    .cta-section,
+    .btn,
+    .shadow-level-1,
+    .shadow-level-2,
+    .shadow-level-3,
+    .shadow-level-4 {
+        box-shadow: none !important;
+    }
+    
+    .card {
+        border: 1px solid #dee2e6 !important;
+        box-shadow: none !important;
+    }
+    
+    .text-white {
+        color: #000 !important;
+    }
+    
+    .bg-primary,
+    .bg-secondary,
+    .bg-success,
+    .bg-danger,
+    .bg-warning,
+    .bg-info,
+    .bg-dark {
+        background-color: #fff !important;
+        color: #000 !important;
+    }
+}

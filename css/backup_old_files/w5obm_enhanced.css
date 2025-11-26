@@ -1,0 +1,487 @@
+/**
+ * W5OBM Enhanced Website CSS - Following Modern Design Guidelines
+ * File: /css/w5obm_enhanced.css
+ * Enhanced with green accent colors, improved accessibility, and modern design
+ * This enhances the existing w5obm.css with additional features from the design guidelines
+ */
+
+/* Enhanced W5OBM Color Palette following Design Guidelines */
+:root {
+    /* Core W5OBM Colors (maintaining existing) */
+    --primary-blue: #031A54;
+    --secondary-blue: #145EFF;
+    --accent-gold: #FFD700;
+    
+    /* New Green Accent Colors for Theme Variety - From Design Guidelines */
+    --medium-green: #2d8670;
+    --dark-green: #1a5d47;
+    --light-green: #4ade80;
+    --accent-green: #16a34a;
+    
+    /* Supporting Colors */
+    --dark-gray: #2c3e50;
+    --light-gray: #f8f9fa;
+    --success-green: #28a745;
+    --warning-orange: #fd7e14;
+    --danger-red: #dc3545;
+    --info-blue: #17a2b8;
+    
+    /* Enhanced Shadow System following Design Guidelines */
+    --shadow-level-1: 0 5px 15px rgba(0, 0, 0, 0.08);
+    --shadow-level-2: 0 10px 30px rgba(0, 0, 0, 0.12);
+    --shadow-level-3: 0 15px 40px rgba(0, 0, 0, 0.15);
+    --shadow-level-4: 0 25px 60px rgba(0, 0, 0, 0.2);
+    --shadow-gold-glow: 0 5px 15px rgba(255, 215, 0, 0.3);
+    --shadow-green-glow: 0 5px 15px rgba(45, 134, 112, 0.3);
+    
+    /* Typography following Design Guidelines */
+    --font-family-primary: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --font-family-secondary: 'Open Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    
+    /* Border Radius following Design Guidelines */
+    --border-radius-sm: 0.375rem;
+    --border-radius-md: 0.75rem;
+    --border-radius-lg: 1.25rem;
+    --border-radius-xl: 1.5rem;
+    --border-radius-pill: 50px;
+    
+    /* Transitions */
+    --transition-fast: 0.15s ease;
+    --transition-normal: 0.3s ease;
+    --transition-slow: 0.4s ease;
+}
+
+/* Green Theme Buttons for Theme Variety - New from Design Guidelines */
+.btn-green-primary {
+    background: linear-gradient(135deg, var(--medium-green), var(--dark-green));
+    color: white;
+    box-shadow: var(--shadow-green-glow);
+    border: none;
+    border-radius: var(--border-radius-lg);
+    padding: 0.75rem 1.5rem;
+    font-weight: 600;
+    transition: all var(--transition-normal);
+}
+
+.btn-green-primary:hover {
+    background: linear-gradient(135deg, var(--dark-green), var(--medium-green));
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(45, 134, 112, 0.4);
+    color: white;
+}
+
+.btn-green-secondary {
+    background: transparent;
+    color: var(--medium-green);
+    border: 2px solid var(--medium-green);
+    border-radius: var(--border-radius-lg);
+    padding: 0.75rem 1.5rem;
+    font-weight: 600;
+    transition: all var(--transition-normal);
+}
+
+.btn-green-secondary:hover {
+    background: var(--medium-green);
+    color: white;
+    transform: translateY(-2px);
+}
+
+/* Green Theme Variant Cards for Theme Variety - New from Design Guidelines */
+.info-card.green-theme {
+    border-top: 5px solid var(--medium-green);
+}
+
+.info-card.green-theme .icon {
+    background: linear-gradient(135deg, var(--medium-green), var(--dark-green));
+    box-shadow: 0 10px 20px rgba(45, 134, 112, 0.3);
+}
+
+.info-card.green-theme::before {
+    background: linear-gradient(135deg, var(--accent-green), rgba(22, 163, 74, 0.1));
+}
+
+.info-card.green-theme h4 {
+    color: var(--dark-green);
+}
+
+.card.green-theme {
+    border-top: 3px solid var(--medium-green);
+}
+
+.card.green-theme .card-header {
+    background: linear-gradient(135deg, var(--medium-green), var(--dark-green)) !important;
+}
+
+/* Enhanced Badge System following Design Guidelines */
+.badge-gold {
+    background: linear-gradient(135deg, var(--accent-gold), #FFC700);
+    color: var(--primary-blue);
+    font-weight: 700;
+    padding: 0.5rem 1rem;
+    border-radius: var(--border-radius-lg);
+}
+
+.badge-green {
+    background: linear-gradient(135deg, var(--medium-green), var(--dark-green));
+    color: white;
+    font-weight: 700;
+    padding: 0.5rem 1rem;
+    border-radius: var(--border-radius-lg);
+}
+
+/* Enhanced Alert System following Design Guidelines */
+.alert-success {
+    background: linear-gradient(135deg, rgba(40, 167, 69, 0.1), rgba(22, 163, 74, 0.05));
+    color: var(--success-green);
+    border-left: 4px solid var(--success-green);
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-level-1);
+}
+
+.alert-info {
+    background: linear-gradient(135deg, rgba(23, 162, 184, 0.1), rgba(13, 202, 240, 0.05));
+    color: var(--info-blue);
+    border-left: 4px solid var(--info-blue);
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-level-1);
+}
+
+.alert-warning {
+    background: linear-gradient(135deg, rgba(253, 126, 20, 0.1), rgba(255, 193, 7, 0.05));
+    color: var(--warning-orange);
+    border-left: 4px solid var(--warning-orange);
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-level-1);
+}
+
+.alert-danger {
+    background: linear-gradient(135deg, rgba(220, 53, 69, 0.1), rgba(220, 53, 69, 0.05));
+    color: var(--danger-red);
+    border-left: 4px solid var(--danger-red);
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-level-1);
+}
+
+/* Utility Classes following Design Guidelines */
+.shadow-level-1 { box-shadow: var(--shadow-level-1); }
+.shadow-level-2 { box-shadow: var(--shadow-level-2); }
+.shadow-level-3 { box-shadow: var(--shadow-level-3); }
+.shadow-level-4 { box-shadow: var(--shadow-level-4); }
+.shadow-gold-glow { box-shadow: var(--shadow-gold-glow); }
+.shadow-green-glow { box-shadow: var(--shadow-green-glow); }
+
+.text-primary-blue { color: var(--primary-blue) !important; }
+.text-secondary-blue { color: var(--secondary-blue) !important; }
+.text-accent-gold { color: var(--accent-gold) !important; }
+.text-medium-green { color: var(--medium-green) !important; }
+.text-dark-green { color: var(--dark-green) !important; }
+
+.bg-primary-blue { background-color: var(--primary-blue) !important; }
+.bg-secondary-blue { background-color: var(--secondary-blue) !important; }
+.bg-medium-green { background-color: var(--medium-green) !important; }
+.bg-dark-green { background-color: var(--dark-green) !important; }
+
+.border-primary-blue { border-color: var(--primary-blue) !important; }
+.border-secondary-blue { border-color: var(--secondary-blue) !important; }
+.border-medium-green { border-color: var(--medium-green) !important; }
+
+.gradient-primary {
+    background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+}
+
+.gradient-gold {
+    background: linear-gradient(135deg, var(--accent-gold), #FFC700);
+}
+
+.gradient-green {
+    background: linear-gradient(135deg, var(--medium-green), var(--dark-green));
+}
+
+/* Enhanced Animation Classes following Design Guidelines */
+.fade-in {
+    animation: fadeIn 0.5s ease-in;
+}
+
+.slide-in-left {
+    animation: slideInLeft 0.5s ease-out;
+}
+
+.slide-in-right {
+    animation: slideInRight 0.5s ease-out;
+}
+
+.bounce-in {
+    animation: bounceIn 0.6s ease-out;
+}
+
+/* Keyframe Animations following Design Guidelines */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideInLeft {
+    from { transform: translateX(-100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes slideInRight {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes bounceIn {
+    0% { transform: scale(0.3); opacity: 0; }
+    50% { transform: scale(1.05); }
+    70% { transform: scale(0.9); }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
+/* Theme Support for Vision Accessibility following Design Guidelines */
+[data-theme="high-contrast"] {
+    --primary-blue: #000080;
+    --secondary-blue: #0000FF;
+    --accent-gold: #FFD700;
+    --medium-green: #008000;
+    --dark-green: #006400;
+    --dark-gray: #000000;
+    --light-gray: #FFFFFF;
+}
+
+[data-theme="dark"] {
+    --primary-blue: #4A90E2;
+    --secondary-blue: #5BA0F2;
+    --accent-gold: #FFD700;
+    --medium-green: #5DBB63;
+    --dark-green: #4A9C50;
+    --dark-gray: #FFFFFF;
+    --light-gray: #2C2C2C;
+}
+
+[data-theme="dark"] body {
+    background-color: #1a1a1a;
+    color: #FFFFFF;
+}
+
+[data-theme="dark"] .card {
+    background-color: #2C2C2C;
+    color: #FFFFFF;
+}
+
+[data-theme="dark"] .info-card {
+    background-color: #2C2C2C;
+    color: #FFFFFF;
+}
+
+/* Enhanced Loading States following Design Guidelines */
+.loading {
+    position: relative;
+    pointer-events: none;
+    opacity: 0.7;
+}
+
+.loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 20px;
+    height: 20px;
+    margin: -10px 0 0 -10px;
+    border: 2px solid var(--primary-blue);
+    border-top: 2px solid transparent;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+/* Enhanced Focus States for Accessibility following Design Guidelines */
+.btn:focus,
+.form-control:focus,
+.form-select:focus,
+.nav-link:focus,
+.dropdown-item:focus {
+    outline: 2px solid var(--secondary-blue);
+    outline-offset: 2px;
+}
+
+/* Enhanced Button Hover Effects following Design Guidelines */
+.btn:hover {
+    transform: translateY(-2px);
+    text-decoration: none;
+    box-shadow: var(--shadow-level-2);
+}
+
+/* Enhanced Card Hover Effects following Design Guidelines */
+.card:hover {
+    box-shadow: var(--shadow-level-3);
+    transform: translateY(-3px);
+}
+
+/* Reduced Motion Support for Accessibility following Design Guidelines */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+    
+    .btn:hover,
+    .card:hover {
+        transform: none;
+    }
+}
+
+/* High Contrast Mode Support for Accessibility */
+@media (prefers-contrast: high) {
+    :root {
+        --primary-blue: #000080;
+        --secondary-blue: #0000FF;
+        --dark-gray: #000000;
+        --light-gray: #FFFFFF;
+    }
+    
+    .btn {
+        border: 2px solid currentColor;
+    }
+    
+    .card {
+        border: 2px solid var(--dark-gray);
+    }
+}
+
+/* Print Styles following Design Guidelines */
+@media print {
+    .navbar,
+    .hero-section,
+    .cta-section,
+    .btn,
+    .shadow-level-1,
+    .shadow-level-2,
+    .shadow-level-3,
+    .shadow-level-4 {
+        box-shadow: none !important;
+    }
+    
+    .card {
+        border: 1px solid #dee2e6 !important;
+        box-shadow: none !important;
+    }
+    
+    .text-white {
+        color: #000 !important;
+    }
+    
+    .bg-primary,
+    .bg-secondary,
+    .bg-success,
+    .bg-danger,
+    .bg-warning,
+    .bg-info,
+    .bg-dark {
+        background-color: #fff !important;
+        color: #000 !important;
+    }
+}
+
+/* Enhanced Responsive Design following Design Guidelines */
+@media (max-width: 768px) {
+    .btn-green-primary,
+    .btn-green-secondary {
+        padding: 0.5rem 1rem;
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .btn-green-primary,
+    .btn-green-secondary {
+        padding: 0.5rem 1rem;
+        font-size: 0.9rem;
+        display: block;
+        width: 100%;
+        margin-bottom: 0.5rem;
+    }
+}
+
+/* Enhanced Typography following Design Guidelines */
+h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-family-primary);
+    font-weight: 700;
+    color: var(--primary-blue);
+}
+
+.display-1, .display-2, .display-3, .display-4, .display-5, .display-6 {
+    font-family: var(--font-family-primary);
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -0.5px;
+}
+
+.lead {
+    font-family: var(--font-family-secondary);
+    font-weight: 300;
+    font-size: 1.25rem;
+    line-height: 1.6;
+}
+
+/* W5OBM Callsign Styling following Design Guidelines */
+.w5obm-callsign,
+.hero-callsign {
+    background: linear-gradient(135deg, var(--accent-gold), #FFC700);
+    color: var(--primary-blue);
+    padding: 10px 25px;
+    border-radius: var(--border-radius-pill);
+    font-weight: 900;
+    font-size: 1.3rem;
+    letter-spacing: 2px;
+    display: inline-block;
+    box-shadow: var(--shadow-gold-glow);
+    animation: pulse 2s infinite;
+}
+
+/* Enhanced Form Styling following Design Guidelines */
+.form-control, .form-select {
+    border-radius: var(--border-radius-lg);
+    border: 2px solid #e9ecef;
+    padding: 0.75rem 1rem;
+    box-shadow: var(--shadow-level-1);
+    transition: all var(--transition-normal);
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: var(--secondary-blue);
+    box-shadow: 0 0 0 0.2rem rgba(20, 94, 255, 0.25);
+}
+
+.form-label {
+    font-weight: 600;
+    color: var(--primary-blue);
+    margin-bottom: 0.5rem;
+}
+
+/* Enhanced Navigation following Design Guidelines */
+.dropdown-menu {
+    border: none;
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-level-3);
+    padding: 0.5rem;
+}
+
+.dropdown-item {
+    border-radius: var(--border-radius-sm);
+    padding: 0.75rem 1rem;
+    transition: all var(--transition-fast);
+}
+
+.dropdown-item:hover {
+    background: var(--primary-blue);
+    color: white;
+    transform: translateX(5px);
+}

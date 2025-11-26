@@ -1,0 +1,281 @@
+/**
+ * W5OBM Event Pages Styles
+ * File: css/events.css
+ * Styles for events, field day, and activity pages
+ */
+
+/* Event Hero Sections */
+.event-hero {
+    background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
+    padding: 8rem 0 4rem;
+    color: white;
+    position: relative;
+    overflow: hidden;
+}
+
+.event-hero::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('../images/patterns/radio-waves.png') repeat;
+    opacity: 0.1;
+    z-index: 1;
+}
+
+/* Event Cards */
+.event-card {
+    background: var(--bg-primary);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-md);
+    padding: 2rem;
+    transition: var(--transition);
+    border: 1px solid var(--border-light);
+    margin-bottom: 2rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.event-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-lg);
+}
+
+.event-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 5px;
+    height: 100%;
+    background: linear-gradient(135deg, var(--accent-gold), var(--secondary-blue));
+}
+
+.event-date {
+    background: linear-gradient(45deg, var(--accent-gold), var(--accent-gold-dark));
+    color: var(--primary-blue);
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    display: inline-block;
+    margin-bottom: 1rem;
+}
+
+.event-title {
+    color: var(--primary-blue);
+    font-weight: 700;
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.event-location {
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.event-location i {
+    margin-right: 0.5rem;
+    color: var(--secondary-blue);
+}
+
+/* Field Day Specific */
+.field-day-section {
+    background: linear-gradient(135deg, #2d5a27, #4a7c59);
+    color: white;
+    padding: 4rem 0;
+    position: relative;
+}
+
+.field-day-section::before {
+    content: '📡';
+    position: absolute;
+    top: 2rem;
+    right: 2rem;
+    font-size: 4rem;
+    opacity: 0.2;
+}
+
+.field-day-stats {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: var(--border-radius);
+    padding: 2rem;
+    margin: 2rem 0;
+}
+
+.field-day-stat {
+    text-align: center;
+    margin-bottom: 1rem;
+}
+
+.field-day-stat .number {
+    font-size: 2.5rem;
+    font-weight: 900;
+    color: var(--accent-gold);
+    display: block;
+}
+
+.field-day-stat .label {
+    font-size: 1rem;
+    opacity: 0.9;
+}
+
+/* Contest Information */
+.contest-card {
+    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+    border: 2px solid var(--secondary-blue);
+    border-radius: var(--border-radius);
+    padding: 2rem;
+    margin-bottom: 2rem;
+}
+
+.contest-card h3 {
+    color: var(--primary-blue);
+    border-bottom: 2px solid var(--accent-gold);
+    padding-bottom: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.contest-rules {
+    background: white;
+    border-radius: var(--border-radius-sm);
+    padding: 1.5rem;
+    margin-top: 1rem;
+}
+
+.contest-rules ul {
+    margin: 0;
+    padding-left: 1.5rem;
+}
+
+.contest-rules li {
+    margin-bottom: 0.5rem;
+}
+
+/* Activity Timeline */
+.activity-timeline {
+    position: relative;
+    padding-left: 2rem;
+}
+
+.activity-timeline::before {
+    content: '';
+    position: absolute;
+    left: 1rem;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: var(--secondary-blue);
+}
+
+.timeline-item {
+    position: relative;
+    margin-bottom: 2rem;
+    background: white;
+    border-radius: var(--border-radius);
+    padding: 1.5rem;
+    box-shadow: var(--shadow-sm);
+}
+
+.timeline-item::before {
+    content: '';
+    position: absolute;
+    left: -1.75rem;
+    top: 1rem;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--accent-gold);
+    border: 3px solid var(--secondary-blue);
+}
+
+.timeline-time {
+    color: var(--secondary-blue);
+    font-weight: 600;
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+}
+
+.timeline-content h4 {
+    color: var(--primary-blue);
+    margin-bottom: 0.5rem;
+}
+
+/* Photo Gallery Grid */
+.photo-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1rem;
+    margin: 2rem 0;
+}
+
+.photo-card {
+    background: white;
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+    transition: var(--transition);
+}
+
+.photo-card:hover {
+    transform: scale(1.05);
+    box-shadow: var(--shadow-md);
+}
+
+.photo-card img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+}
+
+.photo-card .caption {
+    padding: 1rem;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .event-hero {
+        padding: 6rem 0 3rem;
+    }
+
+    .event-card {
+        padding: 1.5rem;
+    }
+
+    .field-day-section {
+        padding: 2rem 0;
+    }
+
+    .activity-timeline {
+        padding-left: 1rem;
+    }
+
+    .activity-timeline::before {
+        left: 0.5rem;
+    }
+
+    .timeline-item::before {
+        left: -1.25rem;
+    }
+
+    .photo-grid {
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 0.75rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .photo-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .timeline-item {
+        padding: 1rem;
+    }
+}

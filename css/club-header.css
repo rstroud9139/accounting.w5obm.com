@@ -1,0 +1,385 @@
+/* W5OBM Club Header Styles - Updated with Primary/Secondary Support */
+
+/* Primary Header (Main Application Entry Points) */
+.club-header {
+    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+    color: white;
+    padding-top: 20px;
+    padding-right: 0px;
+    padding-bottom: 20px;
+    padding-left: 0px;
+    margin-top: -4px;
+    /* Account for fixed navbar - increased to 100px */
+    margin-bottom: 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Secondary Header (Sub-pages) */
+.club-header-secondary {
+    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+    /* Bootstrap primary color */
+    color: white;
+    padding-top: 18px;
+    padding-right: 0px;
+    padding-bottom: 18px;
+    padding-left: 0px;
+    margin-top: -4px;
+    /* Account for fixed navbar - increased to 100px */
+    margin-bottom: 15px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Admin Header (Between Secondary and Primary) */
+.club-header-admin {
+    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+    /* Bootstrap primary color */
+    color: white;
+    padding-top: 15px;
+    padding-right: 0px;
+    padding-bottom: 15px;
+    padding-left: 0px;
+    margin-top: -4px;
+    /* Account for fixed navbar - increased to 100px */
+    margin-bottom: 18px;
+    box-shadow: 0 3px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* Container */
+.club-header .container-fluid,
+.club-header-secondary .container-fluid,
+.club-header-admin .container-fluid {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* Logo Styles */
+.club-logo {
+    object-fit: contain;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+    background: transparent;
+}
+
+/* Primary logo (large) */
+.club-logo-primary {
+    width: 150px;
+    height: 150px;
+}
+
+/* Secondary logo (smaller) */
+.club-logo-secondary {
+    width: 100px;
+    height: 100px;
+}
+
+/* Admin logo (medium) */
+.club-logo-admin {
+    width: 110px;
+    height: 110px;
+}
+
+/* Title Styles */
+.club-title {
+    font-size: 2.5rem;
+    font-weight: bold;
+    margin-bottom: 0;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.club-header-secondary .club-title {
+    font-size: 1.8rem;
+}
+
+.club-header-admin .club-title {
+    font-size: 2.1rem;
+}
+
+.page-title {
+    font-size: 1.5rem;
+    margin-bottom: 0;
+    opacity: 0.9;
+}
+
+.club-header-secondary .page-title {
+    font-size: 1.2rem;
+}
+
+.club-header-admin .page-title {
+    font-size: 1.35rem;
+}
+
+/* Header Info */
+.header-info {
+    text-align: right;
+}
+
+.date-time {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+
+.club-header-secondary .date-time {
+    font-size: 0.9rem;
+    margin-bottom: 5px;
+}
+
+.club-header-admin .date-time {
+    font-size: 1.0rem;
+    margin-bottom: 8px;
+}
+
+.net-info {
+    font-size: 0.9rem;
+}
+
+.club-header-secondary .net-info {
+    font-size: 0.8rem;
+}
+
+.club-header-admin .net-info {
+    font-size: 0.85rem;
+}
+
+.net-info .badge {
+    font-size: 0.8rem;
+    padding: 0.3rem 0.6rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.club-header-secondary .net-info .badge {
+    font-size: 0.7rem;
+    padding: 0.25rem 0.5rem;
+}
+
+.club-header-admin .net-info .badge {
+    font-size: 0.75rem;
+    padding: 0.28rem 0.55rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+
+    .club-header,
+    .club-header-secondary,
+    .club-header-admin {
+        padding: 15px 0;
+        margin-top: 56px;
+        /* Adjust for mobile navbar */
+    }
+
+    .club-header .row,
+    .club-header-secondary .row,
+    .club-header-admin .row {
+        text-align: center;
+    }
+
+    .club-logo-primary {
+        width: 100px;
+        height: 100px;
+        margin-bottom: 10px;
+    }
+
+    .club-logo-secondary {
+        width: 60px;
+        height: 60px;
+        margin-bottom: 8px;
+    }
+
+    .club-logo-admin {
+        width: 75px;
+        height: 75px;
+        margin-bottom: 9px;
+    }
+
+    .club-title {
+        font-size: 1.8rem;
+    }
+
+    .club-header-secondary .club-title {
+        font-size: 1.4rem;
+    }
+
+    .club-header-admin .club-title {
+        font-size: 1.6rem;
+    }
+
+    .page-title {
+        font-size: 1.2rem;
+    }
+
+    .club-header-secondary .page-title {
+        font-size: 1rem;
+    }
+
+    .club-header-admin .page-title {
+        font-size: 1.1rem;
+    }
+
+    .header-info {
+        text-align: center;
+        margin-top: 10px;
+    }
+
+    .date-time {
+        font-size: 0.9rem;
+        margin-bottom: 8px;
+    }
+
+    .club-header-secondary .date-time {
+        font-size: 0.8rem;
+        margin-bottom: 5px;
+    }
+
+    .club-header-admin .date-time {
+        font-size: 0.85rem;
+        margin-bottom: 6px;
+    }
+}
+
+@media (max-width: 576px) {
+
+    .club-header,
+    .club-header-secondary,
+    .club-header-admin {
+        padding: 10px 0;
+    }
+
+    .club-logo-primary {
+        width: 80px;
+        height: 80px;
+    }
+
+    .club-logo-secondary {
+        width: 50px;
+        height: 50px;
+    }
+
+    .club-logo-admin {
+        width: 65px;
+        height: 65px;
+    }
+
+    .club-title {
+        font-size: 1.5rem;
+    }
+
+    .club-header-secondary .club-title {
+        font-size: 1.2rem;
+    }
+
+    .club-header-admin .club-title {
+        font-size: 1.35rem;
+    }
+
+    .page-title {
+        font-size: 1rem;
+    }
+
+    .club-header-secondary .page-title {
+        font-size: 0.9rem;
+    }
+
+    .club-header-admin .page-title {
+        font-size: 0.95rem;
+    }
+
+    .date-time {
+        font-size: 0.8rem;
+    }
+
+    .club-header-secondary .date-time {
+        font-size: 0.7rem;
+    }
+
+    .club-header-admin .date-time {
+        font-size: 0.75rem;
+    }
+
+    .net-info .badge {
+        font-size: 0.7rem;
+        padding: 0.2rem 0.4rem;
+    }
+
+    .club-header-secondary .net-info .badge {
+        font-size: 0.6rem;
+        padding: 0.15rem 0.3rem;
+    }
+
+    .club-header-admin .net-info .badge {
+        font-size: 0.65rem;
+        padding: 0.17rem 0.35rem;
+    }
+}
+
+/* Dark theme support (optional) */
+@media (prefers-color-scheme: dark) {
+
+    .club-header,
+    .club-header-secondary,
+    .club-header-admin {
+        background: linear-gradient(135deg, #0f1419 0%, #1a2634 100%);
+    }
+
+    .club-logo {
+        box-shadow: 0 2px 4px rgba(255, 255, 255, 0.1);
+    }
+}
+
+/* Animation for smooth transitions */
+.club-header,
+.club-header-secondary,
+.club-header-admin {
+    transition: all 0.3s ease;
+}
+
+.club-logo {
+    transition: transform 0.3s ease;
+}
+
+.club-logo:hover {
+    transform: scale(1.05);
+}
+
+/* Ensure proper spacing with navbar */
+body {
+    padding-top: 56px;
+    /* Account for fixed navbar */
+}
+
+/* Toast container positioning - ensure it's below the club header */
+.toast-container {
+    position: fixed !important;
+    top: 250px !important;
+    /* Position below primary header */
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    z-index: 9999 !important;
+    pointer-events: none;
+}
+
+/* Adjust toast position for secondary header */
+.club-header-secondary~.toast-container {
+    top: 200px !important;
+    /* Position below secondary header */
+}
+
+/* Adjust toast position for admin header */
+.club-header-admin~.toast-container {
+    top: 220px !important;
+    /* Position below admin header */
+}
+
+@media (max-width: 768px) {
+    .toast-container {
+        top: 160px !important;
+        left: 10px !important;
+        right: 10px !important;
+        transform: none !important;
+        width: auto !important;
+    }
+
+    .club-header-secondary~.toast-container {
+        top: 130px !important;
+    }
+}

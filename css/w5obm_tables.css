@@ -1,0 +1,328 @@
+/* ================================================================================================
+ * W5OBM Tables CSS - Enhanced Table Styling
+ * 
+ * Version: 1.0.0
+ * Date: August 25, 2025
+ * 
+ * Specialized table styles for the W5OBM website
+ * ================================================================================================ */
+
+/* Base Table Styles */
+.w5obm-table {
+    width: 100%;
+    margin-bottom: 1.5rem;
+    color: var(--w5obm-dark-gray);
+    background-color: var(--w5obm-white);
+    border-collapse: separate;
+    border-spacing: 0;
+    border-radius: var(--w5obm-radius-xl);
+    overflow: hidden;
+    box-shadow: var(--w5obm-shadow-md);
+}
+
+.w5obm-table th,
+.w5obm-table td {
+    padding: 1rem 1.25rem;
+    vertical-align: middle;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.w5obm-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.w5obm-table thead th {
+    background: linear-gradient(135deg, var(--w5obm-primary-blue), var(--w5obm-secondary-blue));
+    color: white;
+    font-weight: var(--w5obm-font-semibold);
+    border: none;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-size: 0.9rem;
+    padding: 1.25rem;
+}
+
+.w5obm-table tbody tr {
+    transition: all var(--w5obm-transition-base);
+}
+
+.w5obm-table tbody tr:hover {
+    background-color: rgba(20, 94, 255, 0.05);
+    transform: scale(1.01);
+}
+
+/* Green Theme Table */
+.table-green thead th {
+    background: linear-gradient(135deg, var(--w5obm-medium-green), var(--w5obm-dark-green));
+}
+
+.table-green tbody tr:hover {
+    background-color: rgba(45, 134, 112, 0.05);
+}
+
+/* Gold Accent Table */
+.table-gold thead th {
+    background: linear-gradient(135deg, var(--w5obm-accent-gold), #FFC700);
+    color: var(--w5obm-primary-blue);
+}
+
+/* Striped Table */
+.table-striped tbody tr:nth-child(odd) {
+    background-color: rgba(0, 0, 0, 0.02);
+}
+
+.table-striped tbody tr:hover {
+    background-color: rgba(20, 94, 255, 0.05);
+}
+
+/* Bordered Table */
+.table-bordered th,
+.table-bordered td {
+    border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+/* Condensed Table */
+.table-condensed th,
+.table-condensed td {
+    padding: 0.5rem 0.75rem;
+}
+
+/* Responsive Tables */
+.table-responsive {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    max-width: 100%;
+    margin-bottom: 1.5rem;
+    border-radius: var(--w5obm-radius-xl);
+    box-shadow: var(--w5obm-shadow-md);
+}
+
+.table-responsive .w5obm-table {
+    margin-bottom: 0;
+    box-shadow: none;
+}
+
+/* Table with Hover Effect */
+.table-hover tbody tr {
+    transition: all var(--w5obm-transition-base);
+}
+
+.table-hover tbody tr:hover {
+    background-color: rgba(20, 94, 255, 0.1);
+    transform: translateY(-3px);
+    box-shadow: var(--w5obm-shadow-sm);
+    z-index: 1;
+    position: relative;
+}
+
+/* Table with Actions */
+.table-actions {
+    white-space: nowrap;
+    text-align: right;
+}
+
+.table-actions .btn {
+    padding: 0.375rem 0.75rem;
+    margin-left: 0.25rem;
+}
+
+/* Table Cell Types */
+.cell-highlight {
+    font-weight: var(--w5obm-font-semibold);
+    color: var(--w5obm-primary-blue);
+}
+
+.cell-success {
+    color: var(--w5obm-accent-green);
+}
+
+.cell-warning {
+    color: #b45309;
+}
+
+.cell-danger {
+    color: #dc3545;
+}
+
+/* Table Pagination */
+.table-pagination {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    margin-top: 1rem;
+}
+
+.table-pagination .pagination {
+    margin-bottom: 0;
+}
+
+/* Table Search */
+.table-search {
+    margin-bottom: 1rem;
+}
+
+.table-search .form-control {
+    max-width: 300px;
+    border-radius: var(--w5obm-radius-md);
+}
+
+/* Table Sorting */
+.sortable th {
+    cursor: pointer;
+    position: relative;
+    padding-right: 1.5rem;
+}
+
+.sortable th::after {
+    content: '↕';
+    position: absolute;
+    right: 0.5rem;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.sortable th.sort-asc::after {
+    content: '↑';
+    color: white;
+}
+
+.sortable th.sort-desc::after {
+    content: '↓';
+    color: white;
+}
+
+/* Table Footer */
+.w5obm-table tfoot {
+    background-color: rgba(0, 0, 0, 0.02);
+    font-weight: var(--w5obm-font-semibold);
+}
+
+.w5obm-table tfoot td {
+    border-top: 2px solid rgba(0, 0, 0, 0.08);
+    border-bottom: none;
+}
+
+/* Table Card Container */
+.table-card {
+    border-radius: var(--w5obm-radius-xl);
+    overflow: hidden;
+    box-shadow: var(--w5obm-shadow-md);
+    background: var(--w5obm-white);
+    margin-bottom: 2rem;
+}
+
+.table-card-header {
+    background: linear-gradient(135deg, var(--w5obm-light-gray), var(--w5obm-white));
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.table-card-title {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: var(--w5obm-font-semibold);
+    color: var(--w5obm-primary-blue);
+}
+
+.table-card .w5obm-table {
+    margin-bottom: 0;
+    box-shadow: none;
+    border-radius: 0;
+}
+
+.table-card-footer {
+    background: rgba(0, 0, 0, 0.02);
+    padding: 1rem 1.5rem;
+    border-top: 1px solid rgba(0, 0, 0, 0.08);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+/* Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+    .dark-mode-auto .w5obm-table {
+        background-color: #1e1e1e;
+        color: var(--w5obm-white);
+    }
+    
+    .dark-mode-auto .w5obm-table th,
+    .dark-mode-auto .w5obm-table td {
+        border-color: rgba(255, 255, 255, 0.1);
+    }
+    
+    .dark-mode-auto .table-striped tbody tr:nth-child(odd) {
+        background-color: rgba(255, 255, 255, 0.03);
+    }
+    
+    .dark-mode-auto .table-striped tbody tr:hover,
+    .dark-mode-auto .w5obm-table tbody tr:hover {
+        background-color: rgba(20, 94, 255, 0.1);
+    }
+    
+    .dark-mode-auto .cell-highlight {
+        color: var(--w5obm-secondary-blue);
+    }
+    
+    .dark-mode-auto .table-card {
+        background-color: #1e1e1e;
+    }
+    
+    .dark-mode-auto .table-card-header {
+        background: linear-gradient(135deg, #1a1a1a, #1e1e1e);
+        border-color: rgba(255, 255, 255, 0.1);
+    }
+    
+    .dark-mode-auto .table-card-title {
+        color: var(--w5obm-white);
+    }
+    
+    .dark-mode-auto .table-card-footer {
+        background: rgba(255, 255, 255, 0.03);
+        border-color: rgba(255, 255, 255, 0.1);
+    }
+}
+
+/* Responsive Adjustments */
+@media (max-width: 767.98px) {
+    .w5obm-table th,
+    .w5obm-table td {
+        padding: 0.75rem 1rem;
+    }
+    
+    .table-condensed th,
+    .table-condensed td {
+        padding: 0.375rem 0.5rem;
+    }
+    
+    .table-actions .btn {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.875rem;
+    }
+}
+
+/* Print Styles */
+@media print {
+    .w5obm-table {
+        box-shadow: none;
+    }
+    
+    .w5obm-table thead th {
+        background: none !important;
+        color: black !important;
+        border-bottom: 2pt solid black;
+    }
+    
+    .w5obm-table th,
+    .w5obm-table td {
+        border-color: #ddd;
+    }
+    
+    .table-actions,
+    .table-pagination,
+    .table-search {
+        display: none;
+    }
+}

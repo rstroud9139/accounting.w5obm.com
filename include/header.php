@@ -365,10 +365,10 @@ if (isset($_GET['preview_nav'])) {
 </style>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
 
-<!-- CUSTOM W5OBM CSS - Load after Bootstrap (point to main site assets) -->
-<link rel="stylesheet" href="https://w5obm.com/css/w5obm.css">
+<!-- CUSTOM W5OBM CSS - Load after Bootstrap (served locally for accounting domain) -->
+<link rel="stylesheet" href="<?= BASE_URL ?>css/w5obm.css?v=<?= filemtime(__DIR__ . '/../css/w5obm.css') ?>">
 <!-- Hero Logo Styles globally to standardize hero logos across pages -->
-<link rel="stylesheet" href="https://w5obm.com/css/hero-logo-styles.css">
+<link rel="stylesheet" href="<?= BASE_URL ?>css/hero-logo-styles.css?v=<?= filemtime(__DIR__ . '/../css/hero-logo-styles.css') ?>">
 
 <?php
 if (defined('W5OBM_ACCOUNTING_CONTEXT') && function_exists('accounting_head_assets') && !defined('W5OBM_ACCOUNTING_STYLES_EMITTED')) {

@@ -1,0 +1,55 @@
+/* (A) ENTIRE PAGE */
+* {
+  font-family: Arial, Helvetica, sans-serif;
+  box-sizing: border-box;
+}
+
+/* (B) WRAPPER */
+.upwrap { max-width: 400px; }
+
+/* (C) DRAG-DROP UPLOAD */
+/* (C1) DROP ZONE */
+.updrop {
+  color: #555;
+  font-weight: 700;
+  text-align: center;
+  padding: 50px 0;
+  border-radius: 10px;
+  border: 2px dashed #c9c9c9;
+}
+.updrop.highlight {
+  background: #ffff45;
+  border: 2px dashed #ed2e2e;
+}
+
+/* (D) UPLOAD STATS */
+.upstat { margin-top: 10px; }
+.uprow {
+  padding: 15px;
+  background: #e7e7e7;
+}
+.upstat .uprow:nth-child(even) { background: #f7f7f7; }
+.upfile { margin-bottom: 5px; }
+.upprog, .upbar, .uppercent {
+  width: 100%;
+  height: 20px;
+}
+.upprog {
+  position: relative;
+  background: #fff;
+}
+.upbar {
+  background: #d3e3ff;
+  width: 0;
+  transition: width 0.5s;
+}
+.uppercent {
+  position: absolute; top: 0; left: 0;
+  display: flex; align-items: center; justify-content: center;
+}
+.uppercent.bad {
+  text-overflow: ellipsis;
+  font-size: 14px;
+  color: #fff;
+  background: #b31717;
+}

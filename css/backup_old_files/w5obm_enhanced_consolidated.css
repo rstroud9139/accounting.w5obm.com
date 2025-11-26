@@ -1,0 +1,482 @@
+/**
+ * W5OBM Enhanced Consolidated CSS - Modern Website Design System
+ * File: /css/w5obm_enhanced_consolidated.css
+ * Consolidates all inline styles and design guidelines into single file
+ * Following W5OBM Modern Website Design Guidelines
+ * Version: 2.0 - Consolidated Edition
+ */
+
+/* ================================================================ */
+/* CSS CUSTOM PROPERTIES - W5OBM DESIGN SYSTEM */
+/* ================================================================ */
+
+:root {
+    /* Primary Color Palette */
+    --primary-blue: #031A54;
+    --secondary-blue: #145EFF;
+    --accent-gold: #FFD700;
+    --accent-green: #28a745;
+    --medium-green: #2d8670;
+    --dark-green: #1a5d47;
+    --light-green: #4ade80;
+
+    /* Legacy W5OBM Colors */
+    --w5obm-primary-1: #36486b;
+    --w5obm-primary-2: #034f84;
+    --w5obm-primary-3: #006666;
+    --w5obm-primary-4: #4040a1;
+    --w5obm-primary-5: #025ce3;
+
+    /* Semantic Colors */
+    --dark-gray: #2c3e50;
+    --light-gray: #f8f9fa;
+    --success-green: #28a745;
+    --warning-orange: #fd7e14;
+    --danger-red: #dc3545;
+    --info-blue: #17a2b8;
+
+    /* Shadow System */
+    --shadow-subtle: 0 5px 15px rgba(0, 0, 0, 0.08);
+    --shadow-moderate: 0 10px 30px rgba(0, 0, 0, 0.12);
+    --shadow-pronounced: 0 15px 40px rgba(0, 0, 0, 0.15);
+    --shadow-dramatic: 0 25px 60px rgba(0, 0, 0, 0.2);
+    --shadow-gold: 0 5px 15px rgba(255, 215, 0, 0.3);
+    --shadow-green: 0 5px 15px rgba(40, 167, 69, 0.3);
+
+    /* Typography */
+    --font-family-base: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --font-family-headings: "Avant Garde", Avantgarde, "Century Gothic", CenturyGothic, "AppleGothic", sans-serif;
+
+    /* Spacing System */
+    --spacing-xs: 0.25rem;
+    --spacing-sm: 0.5rem;
+    --spacing-md: 1rem;
+    --spacing-lg: 1.5rem;
+    --spacing-xl: 3rem;
+    --spacing-xxl: 4.5rem;
+
+    /* Border Radius */
+    --border-radius-sm: 8px;
+    --border-radius-md: 12px;
+    --border-radius-lg: 20px;
+    --border-radius-xl: 25px;
+    --border-radius-pill: 50px;
+}
+
+/* ================================================================ */
+/* GLOBAL STYLES AND RESETS */
+/* ================================================================ */
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: var(--font-family-base);
+    margin: 0 !important;
+    padding: 0 !important;
+    background-color: #ffffff;
+    line-height: 1.6;
+    color: var(--dark-gray);
+}
+
+/* Remove default margins from Bootstrap navbar */
+.navbar {
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+}
+
+/* ================================================================ */
+/* HERO SECTION SYSTEM */
+/* ================================================================ */
+
+.hero-section {
+    position: relative;
+    height: 75vh;
+    min-height: 600px;
+    overflow: hidden;
+    margin-top: 0;
+    border-bottom: 5px solid var(--accent-gold);
+}
+
+.hero-carousel {
+    height: 100%;
+}
+
+.hero-carousel .carousel-inner,
+.hero-carousel .carousel-item {
+    height: 100%;
+}
+
+.hero-carousel .carousel-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: brightness(0.6);
+}
+
+.hero-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(3, 26, 84, 0.85) 0%, rgba(20, 94, 255, 0.7) 100%);
+    z-index: 1;
+}
+
+.hero-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    color: white;
+    z-index: 15;
+    width: 95%;
+    max-width: 900px;
+}
+
+.hero-content h1 {
+    font-size: 3.8rem;
+    font-weight: 800;
+    margin-bottom: 1.5rem;
+    text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.7);
+    animation: fadeInDown 1s ease;
+    letter-spacing: -1px;
+    font-family: var(--font-family-headings);
+}
+
+.hero-content .lead {
+    font-size: 1.6rem;
+    margin-bottom: 2.5rem;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+    animation: fadeInUp 1s ease;
+    font-weight: 300;
+}
+
+.hero-callsign {
+    background: linear-gradient(135deg, var(--accent-gold), #FFC700);
+    color: var(--primary-blue);
+    padding: 10px 25px;
+    border-radius: var(--border-radius-pill);
+    font-weight: 900;
+    font-size: 1.3rem;
+    letter-spacing: 2px;
+    margin-bottom: 2rem;
+    display: inline-block;
+    box-shadow: var(--shadow-gold);
+    animation: pulse 2s infinite;
+}
+
+.hero-buttons {
+    animation: fadeIn 1.5s ease;
+}
+
+.hero-buttons .btn {
+    margin: 0 10px 10px;
+    padding: 15px 35px;
+    font-size: 1.2rem;
+    border-radius: var(--border-radius-pill);
+    transition: all 0.3s ease;
+    font-weight: 600;
+}
+
+/* ================================================================ */
+/* BUTTON SYSTEM */
+/* ================================================================ */
+
+.btn {
+    display: inline-block;
+    padding: 10px 20px;
+    font-size: 1em;
+    font-weight: 600;
+    border: none;
+    border-radius: var(--border-radius-sm);
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    box-shadow: var(--shadow-subtle);
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-moderate);
+    text-decoration: none;
+}
+
+.btn:focus {
+    outline: 2px solid var(--primary-blue);
+    outline-offset: 2px;
+}
+
+/* Hero Buttons */
+.btn-hero-primary {
+    background: linear-gradient(135deg, var(--accent-gold), #FFC700);
+    color: var(--primary-blue);
+    border: none;
+    box-shadow: var(--shadow-gold);
+}
+
+.btn-hero-primary:hover {
+    background: linear-gradient(135deg, #FFC700, var(--accent-gold));
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(255, 215, 0, 0.4);
+    color: var(--primary-blue);
+}
+
+.btn-hero-secondary {
+    background: transparent;
+    color: white;
+    border: 3px solid white;
+}
+
+.btn-hero-secondary:hover {
+    background: white;
+    color: var(--primary-blue);
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(255, 255, 255, 0.3);
+}
+
+/* Standard Buttons */
+.btn-primary {
+    background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+    color: white;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, var(--secondary-blue), var(--primary-blue));
+    color: white;
+}
+
+.btn-green-primary {
+    background: linear-gradient(135deg, var(--medium-green), var(--accent-green));
+    color: white;
+}
+
+.btn-green-primary:hover {
+    background: linear-gradient(135deg, var(--accent-green), var(--medium-green));
+    color: white;
+}
+
+.btn-gold-accent {
+    background: linear-gradient(135deg, var(--accent-gold), #FFC700);
+    color: var(--primary-blue);
+    box-shadow: var(--shadow-gold);
+}
+
+.btn-outline-primary {
+    background: transparent;
+    color: var(--primary-blue);
+    border: 2px solid var(--primary-blue);
+}
+
+.btn-outline-primary:hover {
+    background: var(--primary-blue);
+    color: white;
+}
+
+/* Button Sizes */
+.btn-sm {
+    padding: 8px 16px;
+    font-size: 0.875rem;
+    border-radius: var(--border-radius-sm);
+}
+
+.btn-lg {
+    padding: 0.875rem 1rem;
+    font-size: 1.125rem;
+    border-radius: var(--border-radius-md);
+}
+
+/* Legacy Button Styles */
+.btn-add {
+    background-color: #047a10;
+    color: white;
+}
+
+.btn-update {
+    background-color: #ab8105;
+    color: white;
+}
+
+.btn-warning {
+    background-color: #7e0713f5;
+    color: white;
+}
+
+.btn-dark-success {
+    background-color: darkgreen !important;
+    border-color: darkgreen !important;
+    color: white;
+}
+
+/* W5OBM Branded Buttons */
+.W5OBM-botton-1 {
+    color: white !important;
+    background-color: #057bcf !important;
+}
+
+.W5OBM-botton-2 {
+    color: white !important;
+    background-color: #034f84 !important;
+}
+
+.W5OBM-botton-3 {
+    color: white !important;
+    background-color: #006666 !important;
+}
+
+/* ================================================================ */
+/* ANIMATIONS */
+/* ================================================================ */
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes pulse {
+
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.05);
+    }
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* ================================================================ */
+/* RESPONSIVE DESIGN */
+/* ================================================================ */
+
+@media (max-width: 768px) {
+    .hero-content h1 {
+        font-size: 2.5rem;
+    }
+
+    .hero-content .lead {
+        font-size: 1.2rem;
+    }
+
+    .hero-section {
+        height: 65vh;
+        min-height: 500px;
+    }
+
+    .club-logo {
+        width: 180px;
+        height: 180px;
+    }
+
+    .info-cards {
+        margin-top: -40px;
+    }
+
+    .events-header h2 {
+        font-size: 2.2rem;
+    }
+
+    .cta-content h2 {
+        font-size: 2.2rem;
+    }
+
+    .hero-buttons .btn {
+        display: block;
+        margin: 10px auto;
+        width: 250px;
+    }
+
+    .page-container {
+        max-width: 90%;
+        margin: 20px auto;
+        padding: 20px;
+    }
+
+    .header-logo {
+        width: 120px !important;
+        height: 120px !important;
+    }
+
+    .btn-lg {
+        padding: 0.75rem 1rem;
+        font-size: 1rem;
+    }
+
+    .form-control-lg {
+        height: calc(2.5rem + 2px);
+        padding: 0.75rem 1rem;
+        font-size: 1rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .hero-content h1 {
+        font-size: 2rem;
+    }
+
+    .hero-callsign {
+        font-size: 1.1rem;
+        padding: 8px 20px;
+    }
+
+    .info-card {
+        padding: 2rem;
+    }
+
+    .feature-card .card-body {
+        padding: 2rem;
+    }
+
+    .page-container {
+        margin: 5px;
+        padding: 10px;
+    }
+
+    .header-logo {
+        width: 80px !important;
+        height: 80px !important;
+    }
+}
+
+/* Include all existing W5OBM styles from w5obm.css */

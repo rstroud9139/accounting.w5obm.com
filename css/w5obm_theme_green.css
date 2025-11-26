@@ -1,0 +1,99 @@
+/* ================================================================================================
+ * W5OBM Green Theme CSS - Alternative Theme for Accessibility
+ * 
+ * Version: 1.0.0
+ * Date: August 25, 2025
+ * 
+ * Provides a green color scheme variant for the W5OBM website
+ * ================================================================================================ */
+
+/* Override default color scheme with green variant */
+.theme-green {
+    /* Color System */
+    --w5obm-primary-blue: #1a5d47;    /* Primary color changed to dark green */
+    --w5obm-secondary-blue: #2d8670;  /* Secondary color changed to medium green */
+    --w5obm-accent-gold: #FFD700;     /* Gold remains unchanged for contrast */
+    
+    /* Button variants */
+    --w5obm-shadow-blue: 0 5px 15px rgba(45, 134, 112, 0.3);  /* Shadows updated to match green */
+}
+
+/* Button Overrides */
+.theme-green .btn-primary {
+    background: linear-gradient(135deg, var(--w5obm-primary-blue), var(--w5obm-secondary-blue));
+}
+
+.theme-green .btn-primary:hover, 
+.theme-green .btn-primary:focus {
+    background: linear-gradient(135deg, var(--w5obm-secondary-blue), var(--w5obm-primary-blue));
+    box-shadow: 0 10px 25px rgba(45, 134, 112, 0.4);
+}
+
+/* Card Border Overrides */
+.theme-green .card-border-top {
+    border-top: 5px solid var(--w5obm-secondary-blue);
+}
+
+/* Link Colors */
+.theme-green a {
+    color: var(--w5obm-secondary-blue);
+}
+
+.theme-green a:hover, 
+.theme-green a:focus {
+    color: var(--w5obm-primary-blue);
+}
+
+/* Table Headers */
+.theme-green .table thead th {
+    background: linear-gradient(135deg, var(--w5obm-primary-blue), var(--w5obm-secondary-blue));
+}
+
+/* Navigation */
+.theme-green .nav-link:hover,
+.theme-green .nav-link:focus {
+    color: var(--w5obm-secondary-blue);
+    background-color: rgba(45, 134, 112, 0.1);
+}
+
+.theme-green .nav-link.active {
+    color: var(--w5obm-primary-blue);
+    background-color: rgba(45, 134, 112, 0.15);
+}
+
+/* Header and Footer */
+.theme-green .navbar-w5obm {
+    background: var(--w5obm-primary-blue);
+}
+
+.theme-green .footer {
+    background: var(--w5obm-primary-blue);
+}
+
+/* Hero Section */
+.theme-green .hero-overlay {
+    background: linear-gradient(135deg, rgba(26, 93, 71, 0.85), rgba(45, 134, 112, 0.7));
+}
+
+/* Utility Classes */
+.theme-green .bg-primary { 
+    background: linear-gradient(135deg, var(--w5obm-primary-blue), var(--w5obm-secondary-blue)) !important; 
+}
+
+.theme-green .text-primary { 
+    color: var(--w5obm-primary-blue) !important; 
+}
+
+.theme-green .text-secondary { 
+    color: var(--w5obm-secondary-blue) !important; 
+}
+
+/* Card Primary */
+.theme-green .card-primary {
+    background: linear-gradient(135deg, var(--w5obm-primary-blue), var(--w5obm-secondary-blue));
+}
+
+/* Focus Styles */
+.theme-green *:focus {
+    outline: 2px solid var(--w5obm-accent-gold);
+}

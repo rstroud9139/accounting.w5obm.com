@@ -1,0 +1,252 @@
+/* Dedicated Hero + Carousel styles for pages that need the hero section */
+
+/* Hero Section (isolated from global w5obm.css flex version) */
+.hero-section.hero--carousel {
+    position: relative;
+    display: block;
+    /* override global flex */
+    height: 78vh;
+    /* slight increase for better card overlap */
+    min-height: 640px;
+    /* adjust min-height for consistency */
+    width: 100%;
+    overflow: hidden;
+    margin: 0;
+    border-bottom: 5px solid var(--accent-gold);
+    background: transparent;
+    /* gradient handled by overlay */
+}
+
+.hero-section.hero--carousel .hero-carousel {
+    position: absolute;
+    inset: 0;
+    /* full bleed */
+    height: 100%;
+    width: 100%;
+    z-index: 0;
+}
+
+.hero-section.hero--carousel .hero-carousel .carousel-inner,
+.hero-section.hero--carousel .hero-carousel .carousel-item {
+    height: 100%;
+}
+
+.hero-section.hero--carousel .hero-carousel .carousel-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: brightness(0.6);
+}
+
+/* Controls and indicators styled similar to production */
+.hero-section.hero--carousel .carousel-control-prev,
+.hero-section.hero--carousel .carousel-control-next {
+    width: 5%;
+    opacity: 0.8;
+    z-index: 2;
+    transition: opacity 0.3s ease;
+}
+
+.hero-section.hero--carousel .carousel-control-prev:hover,
+.hero-section.hero--carousel .carousel-control-next:hover {
+    opacity: 1;
+}
+
+.hero-section.hero--carousel .carousel-indicators {
+    bottom: 18px;
+    z-index: 3;
+}
+
+.hero-section.hero--carousel .carousel-indicators [data-bs-target] {
+    width: 28px;
+    height: 4px;
+    border-radius: 10px;
+    margin: 0 4px;
+    background-color: rgba(255, 255, 255, 0.7);
+    border: none;
+}
+
+.hero-section.hero--carousel .carousel-indicators .active {
+    background-color: var(--accent-gold);
+}
+
+/* Overlay */
+.hero-section.hero--carousel .hero-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(3, 26, 84, 0.85) 0%, rgba(20, 94, 255, 0.7) 100%);
+    z-index: 1;
+    pointer-events: none;
+}
+
+/* Centered content */
+.hero-section.hero--carousel .hero-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    color: #fff;
+    z-index: 2;
+    width: 95%;
+    max-width: 900px;
+    padding-bottom: 40px;
+    /* create space so overlapping cards don't cover buttons */
+}
+
+.hero-content h1 {
+    font-size: 3.8rem;
+    font-weight: 800;
+    margin-bottom: 1.5rem;
+    text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.7);
+    animation: fadeInDown 1s ease;
+    letter-spacing: -1px;
+}
+
+.hero-content .lead {
+    font-size: 1.6rem;
+    margin-bottom: 2.5rem;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+    animation: fadeInUp 1s ease;
+    font-weight: 300;
+}
+
+.hero-section.hero--carousel .hero-callsign {
+    background: linear-gradient(135deg, var(--accent-gold), #FFC700);
+    color: var(--primary-blue);
+    padding: 10px 25px;
+    border-radius: 50px;
+    font-weight: 900;
+    font-size: 1.3rem;
+    letter-spacing: 2px;
+    margin-bottom: 2rem;
+    display: inline-block;
+    box-shadow: 0 5px 15px rgba(255, 215, 0, 0.4);
+    animation: pulse 2s infinite;
+}
+
+/* Buttons */
+.hero-section.hero--carousel .hero-buttons {
+    animation: fadeIn 1.5s ease;
+}
+
+.hero-section.hero--carousel .hero-buttons .btn {
+    margin: 0 10px 10px;
+    padding: 15px 35px;
+    font-size: 1.2rem;
+    border-radius: 50px;
+    transition: all 0.3s ease;
+    font-weight: 600;
+}
+
+.hero-section.hero--carousel .btn-hero-primary {
+    background: linear-gradient(135deg, var(--accent-gold), #FFC700);
+    color: var(--primary-blue);
+    border: none;
+    box-shadow: 0 5px 15px rgba(255, 215, 0, 0.3);
+}
+
+.hero-section.hero--carousel .btn-hero-primary:hover {
+    background: linear-gradient(135deg, #FFC700, var(--accent-gold));
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(255, 215, 0, 0.4);
+    color: var(--primary-blue);
+}
+
+.hero-section.hero--carousel .btn-hero-secondary {
+    background: transparent;
+    color: white;
+    border: 3px solid white;
+}
+
+.hero-section.hero--carousel .btn-hero-secondary:hover {
+    background: white;
+    color: var(--primary-blue);
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(255, 255, 255, 0.3);
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes pulse {
+
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.05);
+    }
+}
+
+/* Responsive tweaks */
+@media (max-width: 768px) {
+    .hero-section.hero--carousel .hero-content h1 {
+        font-size: 2.5rem;
+    }
+
+    .hero-section.hero--carousel .hero-content .lead {
+        font-size: 1.2rem;
+    }
+
+    .hero-section.hero--carousel {
+        height: 70vh;
+        /* slightly taller for mobile readability */
+        min-height: 520px;
+    }
+
+    .hero-section.hero--carousel .hero-buttons .btn {
+        display: block;
+        margin: 10px auto;
+        width: 250px;
+    }
+}
+
+/* Overlap tuning: ensure info-cards sit nicely over lower hero without obscuring content */
+.row.info-cards {
+    margin-top: -140px;
+    /* adjust overlap depth */
+    position: relative;
+    z-index: 5;
+}
+
+@media (max-width: 992px) {
+    .row.info-cards {
+        margin-top: -110px;
+        /* reduce overlap on smaller screens */
+    }
+}

@@ -1,0 +1,111 @@
+    .header-logo {
+        width: 80px !important;
+        height: 80px !important;
+    }
+    
+    h1 { font-size: 1.6rem; }
+    h2 { font-size: 1.4rem; }
+    h3 { font-size: 1.2rem; }
+}
+
+/* ================================================================================================
+ * ENHANCED COMPONENT SPECIFIC STYLES
+ * ================================================================================================ */
+
+/* DataTables Enhancement */
+.dataTables_wrapper {
+    margin: var(--spacing-lg) 0;
+}
+
+.dataTables_filter input {
+    border: 2px solid #e0e0e0;
+    border-radius: var(--border-radius-small);
+    padding: var(--spacing-sm);
+    transition: all var(--transition-normal);
+}
+
+.dataTables_filter input:focus {
+    border-color: var(--w5obm-secondary-blue);
+    box-shadow: 0 0 0 0.2rem rgba(20, 94, 255, 0.25);
+}
+
+.dataTables_length select {
+    border: 2px solid #e0e0e0;
+    border-radius: var(--border-radius-small);
+    padding: var(--spacing-sm);
+}
+
+/* Contact Form Enhancement */
+.contact-form {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(15px);
+    border-radius: var(--border-radius-large);
+    padding: var(--spacing-xxl);
+    box-shadow: var(--shadow-pronounced);
+}
+
+.honeypot {
+    position: absolute !important;
+    left: -9999px !important;
+    width: 1px !important;
+    height: 1px !important;
+    overflow: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+}
+
+/* Loading State */
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    backdrop-filter: blur(5px);
+}
+
+/* End of Enhanced CSS */
+
+/* ================================================================================================
+ * CSS VALIDATION AND BROWSER SUPPORT NOTES
+ * ================================================================================================
+ *
+ * This CSS is designed to work with:
+ * - Chrome 80+
+ * - Firefox 75+ 
+ * - Safari 13+
+ * - Edge 80+
+ * 
+ * Features used:
+ * - CSS Custom Properties (CSS Variables)
+ * - CSS Grid and Flexbox
+ * - CSS Transforms and Transitions
+ * - CSS backdrop-filter (with fallbacks)
+ * - Modern CSS selectors and pseudo-elements
+ * 
+ * Fallbacks provided for:
+ * - Older browsers without CSS custom property support
+ * - Systems with reduced motion preferences
+ * - High contrast mode
+ * - Print media
+ * 
+ * Performance considerations:
+ * - Minimized repaints and reflows
+ * - GPU-accelerated transforms
+ * - Efficient selectors
+ * - Reduced animation complexity on mobile
+ * 
+ * Accessibility features:
+ * - WCAG 2.1 AA compliant color contrasts
+ * - Focus indicators
+ * - Screen reader support
+ * - Keyboard navigation
+ * - Reduced motion support
+ * 
+ * ================================================================================================
+ */

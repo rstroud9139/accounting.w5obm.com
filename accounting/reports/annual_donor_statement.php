@@ -1,8 +1,10 @@
 <?php
 // /accounting/reports/annual_donor_statement.php
-     require_once __DIR__ . '/../utils/session_manager.php';
-     require_once __DIR__ . '/../../include/dbconn.php';
-     require_once __DIR__ . '/../controllers/donation_controller.php';
+    require_once __DIR__ . '/../utils/session_manager.php';
+    require_once __DIR__ . '/../../include/dbconn.php';
+    require_once __DIR__ . '/../lib/helpers.php';
+    require_once __DIR__ . '/../controllers/donation_controller.php';
+    require_once __DIR__ . '/../../include/premium_hero.php';
 
     // Validate session
     validate_session();
@@ -10,6 +12,9 @@
     // Get parameters
     $year = $_GET['year'] ?? date('Y');
     $generate_all = isset($_GET['generate_all']) && $_GET['generate_all'] == 1;
+
+    $generated_count = 0;
+    $email_count = 0;
 
     // Get all donors with donations in the selected year
     $query = "SELECT DISTINCT c.id, c.name, c.email
@@ -71,6 +76,63 @@
             $error_message = "No statements were generated. Please try again.";
         }
     }
+
+    $donor_count = count($donors);
+    $email_ready_count = 0;
+    foreach ($donors as $donor) {
+        if (!empty($donor['email'])) {
+            $email_ready_count++;
+        }
+    }
+
+    $generation_mode = $generate_all ? 'Bulk run' : 'Interactive';
+    $email_mode = isset($_POST['send_email']) && $_POST['send_email'] == 1 ? 'Emails: enabled' : 'Emails: optional';
+
+    $annualDonorHeroChips = [
+        'Year: ' . $year,
+        'Mode: ' . $generation_mode,
+        $email_mode,
+    ];
+
+    $annualDonorHeroHighlights = [
+        [
+            'label' => 'Eligible Donors',
+            'value' => number_format($donor_count),
+            'meta' => 'With donations in ' . $year,
+        ],
+        [
+            'label' => 'Email Ready',
+            'value' => number_format($email_ready_count),
+            'meta' => 'Contacts with email',
+        ],
+        [
+            'label' => 'Statements Today',
+            'value' => number_format($generated_count),
+            'meta' => $email_count > 0 ? number_format($email_count) . ' emailed' : 'Email optional',
+        ],
+    ];
+
+    $annualDonorHeroActions = [
+        [
+            'label' => 'Generate All',
+            'url' => '/accounting/reports/annual_donor_statement.php?year=' . urlencode($year) . '&generate_all=1',
+            'variant' => 'outline',
+            'icon' => 'fa-copy',
+        ],
+        [
+            'label' => 'Donations Workspace',
+            'url' => '/accounting/donations/',
+            'variant' => 'outline',
+            'icon' => 'fa-hand-holding-heart',
+        ],
+        [
+            'label' => 'Reporting Dashboard',
+            'url' => '/accounting/reports/reports_dashboard.php',
+            'variant' => 'outline',
+            'icon' => 'fa-chart-line',
+        ],
+    ];
+
     ?>
  <!DOCTYPE html>
  <html lang="en">
@@ -84,9 +146,28 @@
      <?php include '../../include/menu.php'; ?>
      <?php include '../../include/report_header.php'; ?>
 
+     <?php
+     if (function_exists('displayToastMessage')) {
+         displayToastMessage();
+     }
+     ?>
+
      <div class="container mt-5">
          <!-- Standard Report Header -->
-         <?php renderReportHeader('Annual Donor Statements', 'Generate year-end statements for tax purposes', ['Year' => $year]); ?>
+         <?php renderReportHeader(
+             'Annual Donor Statements',
+             'Generate year-end statements for tax purposes',
+             ['Year' => $year],
+             [
+                 'eyebrow' => 'Donations Reporting',
+                 'chips' => $annualDonorHeroChips,
+                 'highlights' => $annualDonorHeroHighlights,
+                 'actions' => $annualDonorHeroActions,
+                 'theme' => 'berry',
+                 'size' => 'compact',
+                 'media_mode' => 'none',
+             ]
+         ); ?>
 
          <?php if (isset($success_message)): ?>
              <div class="alert alert-success"><?php echo $success_message; ?></div>

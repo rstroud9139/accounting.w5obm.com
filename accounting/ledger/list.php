@@ -3,6 +3,7 @@ require_once __DIR__ . '/../utils/session_manager.php';
 require_once __DIR__ . '/../../include/dbconn.php';
 require_once __DIR__ . '/../controllers/ledgerController.php';
 require_once __DIR__ . '/../lib/helpers.php';
+require_once __DIR__ . '/../../include/premium_hero.php';
 
 validate_session();
 
@@ -121,37 +122,95 @@ $statusMessages = [
 ];
 
 $page_title = 'Ledger Accounts - W5OBM Accounting';
+$ledgerHeroChips = array_values(array_filter([
+    $filters['category'] !== 'all' ? 'Category: ' . $filters['category'] : 'Category: All',
+    !empty($filters['search']) ? 'Search: ' . $filters['search'] : null,
+    'Sort: ' . strtoupper(str_replace('_', ' ', $filters['sort'])),
+]));
+
+$ledgerHeroHighlights = [
+    [
+        'label' => 'Active Accounts',
+        'value' => number_format($summaryTotals['total']),
+        'meta' => 'Across all categories'
+    ],
+    [
+        'label' => 'Categories',
+        'value' => number_format(max($summaryTotals['categories'], 1)),
+        'meta' => 'Unique classifications'
+    ],
+    [
+        'label' => 'Filtered',
+        'value' => number_format($summaryTotals['filtered']),
+        'meta' => 'Matches current filters'
+    ],
+];
+
+$ledgerHeroActions = [
+    [
+        'label' => 'Add Account',
+        'url' => '/accounting/ledger/add.php',
+        'icon' => 'fa-plus-circle'
+    ],
+    [
+        'label' => 'Export CSV',
+        'url' => '/accounting/ledger/list.php?' . http_build_query(array_merge($_GET, ['export' => '1'])),
+        'variant' => 'outline',
+        'icon' => 'fa-file-export'
+    ],
+    [
+        'label' => 'Back to Dashboard',
+        'url' => '/accounting/dashboard.php',
+        'variant' => 'outline',
+        'icon' => 'fa-arrow-left'
+    ],
+];
 include __DIR__ . '/../../include/header.php';
 ?>
 
-<body>
+<body class="accounting-app bg-light">
     <?php include __DIR__ . '/../../include/menu.php'; ?>
 
     <div class="page-container" style="margin-top:0;padding-top:0;">
-        <section class="hero hero-small mb-4">
-            <div class="hero-body py-3">
-                <div class="container-fluid">
-                    <div class="row align-items-center">
-                        <div class="col-md-2 d-none d-md-flex justify-content-center">
-                            <?php $logoSrc = accounting_logo_src_for(__DIR__); ?>
-                            <img src="<?= htmlspecialchars($logoSrc); ?>" alt="W5OBM Logo" class="img-fluid no-shadow" style="max-height:64px;">
-                        </div>
-                        <div class="col-md-6 text-center text-md-start text-white">
-                            <h1 class="h4 mb-1">Ledger Accounts</h1>
-                            <p class="mb-0 small">Manage the chart of accounts powering every transaction.</p>
-                        </div>
-                        <div class="col-md-4 text-center text-md-end mt-3 mt-md-0">
-                            <a href="../dashboard.php" class="btn btn-outline-light btn-sm me-2">
-                                <i class="fas fa-arrow-left me-1"></i>Back to Accounting
-                            </a>
-                            <a href="add.php" class="btn btn-primary btn-sm">
-                                <i class="fas fa-plus-circle me-1"></i>Add Account
-                            </a>
+        <?php if (function_exists('renderPremiumHero')): ?>
+            <?php renderPremiumHero([
+                'eyebrow' => 'Chart of Accounts',
+                'title' => 'Ledger Accounts',
+                'subtitle' => 'Keep every debit and credit aligned by curating the club’s financial backbone.',
+                'description' => 'Filter, export, and add accounts while maintaining accurate categories and descriptions.',
+                'theme' => 'emerald',
+                'size' => 'compact',
+                'media_mode' => 'none',
+                'chips' => $ledgerHeroChips,
+                'highlights' => $ledgerHeroHighlights,
+                'actions' => $ledgerHeroActions,
+            ]); ?>
+        <?php else: ?>
+            <section class="hero hero-small mb-4">
+                <div class="hero-body py-3">
+                    <div class="container-fluid">
+                        <div class="row align-items-center">
+                            <div class="col-md-2 d-none d-md-flex justify-content-center">
+                                <?php $logoSrc = accounting_logo_src_for(__DIR__); ?>
+                                <img src="<?= htmlspecialchars($logoSrc); ?>" alt="W5OBM Logo" class="img-fluid no-shadow" style="max-height:64px;">
+                            </div>
+                            <div class="col-md-6 text-center text-md-start text-white">
+                                <h1 class="h4 mb-1">Ledger Accounts</h1>
+                                <p class="mb-0 small">Manage the chart of accounts powering every transaction.</p>
+                            </div>
+                            <div class="col-md-4 text-center text-md-end mt-3 mt-md-0">
+                                <a href="../dashboard.php" class="btn btn-outline-light btn-sm me-2">
+                                    <i class="fas fa-arrow-left me-1"></i>Back to Accounting
+                                </a>
+                                <a href="add.php" class="btn btn-primary btn-sm">
+                                    <i class="fas fa-plus-circle me-1"></i>Add Account
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        </section>
+            </section>
+        <?php endif; ?>
 
         <?php if ($status && isset($statusMessages[$status])): ?>
             <div class="alert alert-<?= $statusMessages[$status]['type']; ?> alert-dismissible fade show shadow" role="alert">

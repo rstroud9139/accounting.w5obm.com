@@ -1,8 +1,10 @@
 <?php
 // /accounting/reports/balance_sheet.php
-     require_once __DIR__ . '/../utils/session_manager.php';
-     require_once __DIR__ . '/../../include/dbconn.php';
-     require_once __DIR__ . '/../controllers/reportController.php';
+    require_once __DIR__ . '/../utils/session_manager.php';
+    require_once __DIR__ . '/../../include/dbconn.php';
+    require_once __DIR__ . '/../lib/helpers.php';
+    require_once __DIR__ . '/../controllers/reportController.php';
+    require_once __DIR__ . '/../../include/premium_hero.php';
 
     // Validate session
     validate_session();
@@ -66,6 +68,57 @@
         require_once __DIR__ . '/../lib/export_bridge.php';
         accounting_export('balance_sheet_' . $section, $rows, $report_meta);
     }
+
+    $assets_total = (float)($balance_sheet['assets']['total'] ?? 0);
+    $liabilities_total = (float)($balance_sheet['liabilities'] ?? 0);
+    $equity_total = (float)($balance_sheet['equity'] ?? 0);
+    $balanced = abs($assets_total - ($liabilities_total + $equity_total)) < 0.01;
+
+    $balanceHeroChips = [
+        'As of: ' . $display_date,
+        'Exports: CSV · Excel · PDF',
+        $balanced ? 'Status: Balanced' : 'Status: Unbalanced',
+    ];
+
+    $balanceHeroHighlights = [
+        [
+            'label' => 'Total Assets',
+            'value' => '$' . number_format($assets_total, 2),
+            'meta' => 'Cash + property',
+        ],
+        [
+            'label' => 'Liabilities',
+            'value' => '$' . number_format($liabilities_total, 2),
+            'meta' => 'Obligations',
+        ],
+        [
+            'label' => 'Equity',
+            'value' => '$' . number_format($equity_total, 2),
+            'meta' => 'Net assets',
+        ],
+    ];
+
+    $balanceHeroActions = [
+        [
+            'label' => 'Download PDF',
+            'url' => '/accounting/reports/download.php?type=balance_sheet&date=' . urlencode($date),
+            'variant' => 'outline',
+            'icon' => 'fa-file-pdf',
+        ],
+        [
+            'label' => 'Reports Dashboard',
+            'url' => '/accounting/reports/reports_dashboard.php',
+            'variant' => 'outline',
+            'icon' => 'fa-chart-line',
+        ],
+        [
+            'label' => 'Accounting Dashboard',
+            'url' => '/accounting/dashboard.php',
+            'variant' => 'outline',
+            'icon' => 'fa-arrow-left',
+        ],
+    ];
+
     ?>
  <!DOCTYPE html>
  <html lang="en">
@@ -79,9 +132,28 @@
      <?php include '../../include/menu.php'; ?>
      <?php include '../../include/report_header.php'; ?>
 
+     <?php
+     if (function_exists('displayToastMessage')) {
+         displayToastMessage();
+     }
+     ?>
+
      <div class="container mt-5">
          <!-- Standard Report Header -->
-         <?php renderReportHeader('Balance Sheet', 'As of ' . $display_date); ?>
+         <?php renderReportHeader(
+             'Balance Sheet',
+             'As of ' . $display_date,
+             [],
+             [
+                 'eyebrow' => 'Financial Position',
+                 'chips' => $balanceHeroChips,
+                 'highlights' => $balanceHeroHighlights,
+                 'actions' => $balanceHeroActions,
+                 'theme' => 'emerald',
+                 'size' => 'compact',
+                 'media_mode' => 'none',
+             ]
+         ); ?>
 
          <!-- Date Selector -->
          <div class="card shadow mb-4">

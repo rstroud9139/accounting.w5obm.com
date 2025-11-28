@@ -13,6 +13,7 @@ require_once __DIR__ . '/../../include/dbconn.php';
 require_once __DIR__ . '/../lib/helpers.php';
 require_once __DIR__ . '/../controllers/reportController.php';
 require_once __DIR__ . '/../../include/report_header.php';
+require_once __DIR__ . '/../../include/premium_hero.php';
 
 // Authentication check
 if (!isAuthenticated()) {
@@ -143,6 +144,57 @@ if (isset($_GET['export'])) {
     }
 }
 
+$income_total = (float)($report_data['income']['total'] ?? 0);
+$expenses_total = (float)($report_data['expenses']['total'] ?? 0);
+$net_income = (float)($report_data['net_income'] ?? 0);
+$report_period_display = $report_data['period']['display'] ?? ($display_month . ' ' . (string)$year);
+$report_generated = $generate_report && !empty($report_data);
+
+$incomeHeroChips = [
+    'Period: ' . $report_period_display,
+    $report_generated ? 'Status: Generated' : 'Status: Awaiting run',
+    'Exports: CSV · Excel · PDF',
+];
+
+$incomeHeroHighlights = [
+    [
+        'label' => 'Revenue',
+        'value' => '$' . number_format($income_total, 2),
+        'meta' => 'Total income',
+    ],
+    [
+        'label' => 'Expenses',
+        'value' => '$' . number_format($expenses_total, 2),
+        'meta' => 'Total spend',
+    ],
+    [
+        'label' => 'Net Income',
+        'value' => ($net_income >= 0 ? '+' : '−') . '$' . number_format(abs($net_income), 2),
+        'meta' => $net_income >= 0 ? 'Operating surplus' : 'Operating deficit',
+    ],
+];
+
+$incomeHeroActions = [
+    [
+        'label' => 'Download PDF',
+        'url' => '/accounting/reports/download.php?type=income_statement&month=' . urlencode((string)$month) . '&year=' . urlencode((string)$year),
+        'variant' => 'outline',
+        'icon' => 'fa-file-pdf',
+    ],
+    [
+        'label' => 'Reports Dashboard',
+        'url' => '/accounting/reports/reports_dashboard.php',
+        'variant' => 'outline',
+        'icon' => 'fa-chart-line',
+    ],
+    [
+        'label' => 'Accounting Dashboard',
+        'url' => '/accounting/dashboard.php',
+        'variant' => 'outline',
+        'icon' => 'fa-arrow-left',
+    ],
+];
+
 ?>
 
 <!DOCTYPE html>
@@ -157,7 +209,6 @@ if (isset($_GET['export'])) {
 
 <body>
     <?php include __DIR__ . '/../../include/menu.php'; ?>
-    <?php renderReportHeader('Income Statement', 'Formal revenue and expense statement', ['Year' => $year, 'Month' => $display_month]); ?>
 
     <!-- Toast Message Display -->
     <?php
@@ -168,25 +219,20 @@ if (isset($_GET['export'])) {
 
     <!-- Page Container -->
     <div class="page-container">
-        <!-- Header Card -->
-        <div class="card shadow mb-4">
-            <div class="card-header bg-success text-white">
-                <div class="row align-items-center">
-                    <div class="col-auto">
-                        <i class="fas fa-chart-pie fa-2x"></i>
-                    </div>
-                    <div class="col">
-                        <h3 class="mb-0">Income Statement</h3>
-                        <small>Formal revenue and expense statement</small>
-                    </div>
-                    <div class="col-auto">
-                        <a href="/accounting/reports/reports_dashboard.php" class="btn btn-light btn-sm">
-                            <i class="fas fa-arrow-left me-1"></i>Back to Reports
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <?php renderReportHeader(
+            'Income Statement',
+            'Formal revenue and expense statement',
+            ['Year' => $year, 'Month' => $display_month],
+            [
+                'eyebrow' => 'Financial Performance',
+                'chips' => $incomeHeroChips,
+                'highlights' => $incomeHeroHighlights,
+                'actions' => $incomeHeroActions,
+                'theme' => 'emerald',
+                'size' => 'compact',
+                'media_mode' => 'none',
+            ]
+        ); ?>
 
         <!-- Report Parameters -->
         <div class="card shadow mb-4">

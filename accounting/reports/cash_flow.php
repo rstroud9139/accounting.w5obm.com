@@ -1,8 +1,10 @@
 <?php
 // /accounting/reports/cash_flow.php
-     require_once __DIR__ . '/../utils/session_manager.php';
-     require_once __DIR__ . '/../../include/dbconn.php';
-     require_once __DIR__ . '/../controllers/reportController.php';
+    require_once __DIR__ . '/../utils/session_manager.php';
+    require_once __DIR__ . '/../../include/dbconn.php';
+    require_once __DIR__ . '/../lib/helpers.php';
+    require_once __DIR__ . '/../controllers/reportController.php';
+    require_once __DIR__ . '/../../include/premium_hero.php';
 
     // Validate session
     validate_session();
@@ -21,6 +23,56 @@
     // Format dates for display
     $display_start = date('F 1, Y', strtotime($start_date));
     $display_end = date('F j, Y', strtotime($end_date));
+
+    $beginning_balance = (float)($cash_flow['beginning_balance'] ?? 0);
+    $ending_balance = (float)($cash_flow['ending_balance'] ?? 0);
+    $net_change = $ending_balance - $beginning_balance;
+
+    $cashFlowHeroChips = [
+        'Period: ' . date('M Y', strtotime($start_date)),
+        'Range: ' . $display_start . ' – ' . $display_end,
+        $net_change >= 0 ? 'Trend: Positive' : 'Trend: Negative',
+    ];
+
+    $cashFlowHeroHighlights = [
+        [
+            'label' => 'Beginning Balance',
+            'value' => '$' . number_format($beginning_balance, 2),
+            'meta' => 'Start of period',
+        ],
+        [
+            'label' => 'Net Change',
+            'value' => ($net_change >= 0 ? '+' : '−') . '$' . number_format(abs($net_change), 2),
+            'meta' => 'Operating + Investing + Financing',
+        ],
+        [
+            'label' => 'Ending Balance',
+            'value' => '$' . number_format($ending_balance, 2),
+            'meta' => 'End of period',
+        ],
+    ];
+
+    $cashFlowHeroActions = [
+        [
+            'label' => 'Download PDF',
+            'url' => '/accounting/reports/download.php?type=cash_flow&month=' . urlencode($month) . '&year=' . urlencode($year),
+            'variant' => 'outline',
+            'icon' => 'fa-file-pdf',
+        ],
+        [
+            'label' => 'Reports Dashboard',
+            'url' => '/accounting/reports/reports_dashboard.php',
+            'variant' => 'outline',
+            'icon' => 'fa-chart-line',
+        ],
+        [
+            'label' => 'Accounting Dashboard',
+            'url' => '/accounting/dashboard.php',
+            'variant' => 'outline',
+            'icon' => 'fa-arrow-left',
+        ],
+    ];
+
     ?>
  <!DOCTYPE html>
  <html lang="en">
@@ -34,9 +86,28 @@
      <?php include '../../include/menu.php'; ?>
      <?php include '../../include/report_header.php'; ?>
 
+     <?php
+     if (function_exists('displayToastMessage')) {
+         displayToastMessage();
+     }
+     ?>
+
      <div class="container mt-5">
          <!-- Standard Report Header -->
-         <?php renderReportHeader('Cash Flow Statement', 'For the period ' . $display_start . ' to ' . $display_end); ?>
+         <?php renderReportHeader(
+             'Cash Flow Statement',
+             'For the period ' . $display_start . ' to ' . $display_end,
+             [],
+             [
+                 'eyebrow' => 'Liquidity Overview',
+                 'chips' => $cashFlowHeroChips,
+                 'highlights' => $cashFlowHeroHighlights,
+                 'actions' => $cashFlowHeroActions,
+                 'theme' => 'cobalt',
+                 'size' => 'compact',
+                 'media_mode' => 'none',
+             ]
+         ); ?>
 
          <!-- Period Selector -->
          <div class="card shadow mb-4">

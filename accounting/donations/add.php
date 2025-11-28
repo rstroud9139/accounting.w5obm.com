@@ -2,9 +2,10 @@
 // /accounting/donations/add.php
      require_once __DIR__ . '/../utils/session_manager.php';
      require_once __DIR__ . '/../../include/dbconn.php';
-     require_once __DIR__ . '/../controllers/donation_controller.php';
+    require_once __DIR__ . '/../controllers/donation_controller.php';
     require_once __DIR__ . '/../utils/email_utils.php';
     require_once __DIR__ . '/../lib/email_bridge.php';
+    require_once __DIR__ . '/../../include/premium_hero.php';
 
     // Validate session
     validate_session();
@@ -51,6 +52,58 @@
     // Fetch contacts for dropdown
     $query = "SELECT id, name FROM acc_contacts ORDER BY name ASC";
     $contacts_result = $conn->query($query);
+    $contacts = $contacts_result ? $contacts_result->fetch_all(MYSQLI_ASSOC) : [];
+    if ($contacts_result instanceof mysqli_result) {
+        $contacts_result->free();
+    }
+    $contactCount = count($contacts);
+    $defaultDonationDate = date('Y-m-d');
+
+    $donationAddHeroChips = [
+        'Mode: Manual entry',
+        'Auto receipt: enabled',
+        'Tax default: deductible',
+    ];
+
+    $donationAddHeroHighlights = [
+        [
+            'label' => 'Donors Available',
+            'value' => number_format($contactCount),
+            'meta' => 'From contacts',
+        ],
+        [
+            'label' => 'Default Date',
+            'value' => date('M j, Y', strtotime($defaultDonationDate)),
+            'meta' => 'Prefilled',
+        ],
+        [
+            'label' => 'Receipt Emails',
+            'value' => 'Enabled',
+            'meta' => 'Sends on save',
+        ],
+    ];
+
+    $donationAddHeroActions = [
+        [
+            'label' => 'View Donations',
+            'url' => '/accounting/donations/',
+            'variant' => 'outline',
+            'icon' => 'fa-list',
+        ],
+        [
+            'label' => 'Receipt Center',
+            'url' => '/accounting/donations/receipt.php',
+            'variant' => 'outline',
+            'icon' => 'fa-receipt',
+        ],
+        [
+            'label' => 'Accounting Dashboard',
+            'url' => '/accounting/dashboard.php',
+            'variant' => 'outline',
+            'icon' => 'fa-arrow-left',
+        ],
+    ];
+
     ?>
  <!DOCTYPE html>
  <html lang="en">
@@ -63,12 +116,53 @@
  <body>
      <?php include '../../include/menu.php'; ?>
 
-     <div class="container mt-5">
-         <div class="d-flex align-items-center mb-4">
-             <?php $logoSrc = accounting_logo_src_for(__DIR__); ?>
-             <img src="<?php echo htmlspecialchars($logoSrc); ?>" alt="Club Logo" class="img-card-175">
-             <h2 class="ms-3">Add Donation</h2>
-         </div>
+     <?php
+     if (function_exists('displayToastMessage')) {
+         displayToastMessage();
+     }
+     ?>
+
+     <?php if (function_exists('renderPremiumHero')): ?>
+         <?php renderPremiumHero([
+             'eyebrow' => 'Donations Workspace',
+             'title' => 'Record Donation',
+             'subtitle' => 'Capture gifts, issue receipts, and keep the tax trail tight.',
+             'chips' => $donationAddHeroChips,
+             'highlights' => $donationAddHeroHighlights,
+             'actions' => $donationAddHeroActions,
+             'theme' => 'berry',
+             'size' => 'compact',
+             'media_mode' => 'none',
+         ]); ?>
+     <?php endif; ?>
+
+     <div class="page-container">
+         <?php if (!function_exists('renderPremiumHero')): ?>
+             <?php $fallbackLogo = accounting_logo_src_for(__DIR__); ?>
+             <section class="hero hero-small mb-4">
+                 <div class="hero-body py-3">
+                     <div class="container-fluid">
+                         <div class="row align-items-center">
+                             <div class="col-md-2 d-none d-md-flex justify-content-center">
+                                 <img src="<?= htmlspecialchars($fallbackLogo); ?>" alt="W5OBM Logo" class="img-fluid no-shadow" style="max-height:64px;">
+                             </div>
+                             <div class="col-md-6 text-center text-md-start text-white">
+                                 <h1 class="h4 mb-1">Add Donation</h1>
+                                 <p class="mb-0 small">Register a contribution and optionally email the receipt.</p>
+                             </div>
+                             <div class="col-md-4 text-center text-md-end mt-3 mt-md-0">
+                                 <a href="/accounting/donations/" class="btn btn-outline-light btn-sm me-2">
+                                     <i class="fas fa-arrow-left me-1"></i>Donations Workspace
+                                 </a>
+                                 <a href="/accounting/donations/receipt.php" class="btn btn-primary btn-sm">
+                                     <i class="fas fa-receipt me-1"></i>Receipt Center
+                                 </a>
+                             </div>
+                         </div>
+                     </div>
+                 </div>
+             </section>
+         <?php endif; ?>
 
          <div class="card shadow">
              <div class="card-header">
@@ -83,9 +177,9 @@
                          <label for="contact_id" class="form-label">Donor</label>
                          <select id="contact_id" name="contact_id" class="form-control" required>
                              <option value="">Select a donor</option>
-                             <?php while ($contact = $contacts_result->fetch_assoc()): ?>
-                                 <option value="<?php echo $contact['id']; ?>"><?php echo htmlspecialchars($contact['name']); ?></option>
-                             <?php endwhile; ?>
+                             <?php foreach ($contacts as $contact): ?>
+                                 <option value="<?= (int)$contact['id']; ?>"><?= htmlspecialchars($contact['name']); ?></option>
+                             <?php endforeach; ?>
                          </select>
                          <small class="form-text text-muted">
                              <a href="#" data-bs-toggle="modal" data-bs-target="#newContactModal">Add new donor</a>
@@ -97,7 +191,7 @@
                      </div>
                      <div class="mb-3">
                          <label for="donation_date" class="form-label">Donation Date</label>
-                         <input type="date" id="donation_date" name="donation_date" class="form-control" value="<?php echo date('Y-m-d'); ?>" required>
+                         <input type="date" id="donation_date" name="donation_date" class="form-control" value="<?= htmlspecialchars($defaultDonationDate); ?>" required>
                      </div>
                      <div class="mb-3">
                          <label for="description" class="form-label">Description</label>
@@ -116,7 +210,7 @@
                  </form>
              </div>
          </div>
-     </div>
+    </div>
 
      <!-- Modal for adding a new contact -->
      <div class="modal fade" id="newContactModal" tabindex="-1" aria-labelledby="newContactModalLabel" aria-hidden="true">

@@ -12,6 +12,7 @@ session_start();
 require_once __DIR__ . '/../../include/dbconn.php';
 require_once __DIR__ . '/../lib/helpers.php';
 require_once __DIR__ . '/../controllers/categoryController.php';
+require_once __DIR__ . '/../../include/premium_hero.php';
 
 // Authentication check
 if (!isAuthenticated()) {
@@ -83,13 +84,92 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 // Get all categories for parent selection
-// Get all categories for parent selection
 try {
     $all_categories = getAllCategories(['active' => true]);
 } catch (Exception $e) {
     $all_categories = [];
     logError("Error fetching categories for parent selection: " . $e->getMessage(), 'accounting');
 }
+
+$total_categories = is_array($all_categories) ? count($all_categories) : 0;
+$top_level_categories = 0;
+$type_counts = [
+    'Income' => 0,
+    'Expense' => 0,
+    'Asset' => 0,
+    'Liability' => 0,
+    'Equity' => 0,
+];
+
+foreach ($all_categories as $category) {
+    $category_type = $category['type'] ?? '';
+    if (isset($type_counts[$category_type])) {
+        $type_counts[$category_type]++;
+    }
+    if (empty($category['parent_category_id'])) {
+        $top_level_categories++;
+    }
+}
+
+$active_type_labels = array_keys(array_filter($type_counts, function ($count) {
+    return $count > 0;
+}));
+$categoryAddHeroChips = [
+    $active_type_labels ? 'Types online: ' . implode(', ', $active_type_labels) : 'Types online: pending',
+    'Parent linking ready: ' . number_format($top_level_categories),
+    'CSRF + validation enforced',
+];
+
+$categoryAddHeroHighlights = [
+    [
+        'label' => 'Active Categories',
+        'value' => number_format($total_categories),
+        'meta' => 'Available as parents',
+    ],
+    [
+        'label' => 'Top Level',
+        'value' => number_format($top_level_categories),
+        'meta' => 'No parent assigned',
+    ],
+    [
+        'label' => 'Income vs Expense',
+        'value' => number_format($type_counts['Income']) . '/' . number_format($type_counts['Expense']),
+        'meta' => 'Income / Expense',
+    ],
+];
+
+$categoryAddHeroActions = [
+    [
+        'label' => 'Categories Home',
+        'url' => '/accounting/categories/',
+        'variant' => 'outline',
+        'icon' => 'fa-list',
+    ],
+    [
+        'label' => 'Transactions',
+        'url' => '/accounting/transactions/',
+        'variant' => 'outline',
+        'icon' => 'fa-random',
+    ],
+    [
+        'label' => 'Accounting Dashboard',
+        'url' => '/accounting/dashboard.php',
+        'variant' => 'outline',
+        'icon' => 'fa-arrow-left',
+    ],
+];
+
+$categoryAddHeroConfig = [
+    'eyebrow' => 'Chart of Accounts',
+    'title' => 'Add Transaction Category',
+    'subtitle' => 'Shape the structure before transactions hit the ledger.',
+    'chips' => $categoryAddHeroChips,
+    'highlights' => $categoryAddHeroHighlights,
+    'actions' => $categoryAddHeroActions,
+    'theme' => 'sunset',
+    'size' => 'compact',
+    'media_mode' => 'none',
+];
 
 ?>
 
@@ -113,27 +193,38 @@ try {
     }
     ?>
 
+    <?php if (function_exists('renderPremiumHero')) {
+        renderPremiumHero($categoryAddHeroConfig);
+    } ?>
+
     <!-- Page Container -->
     <div class="page-container">
-        <!-- Header Card -->
-        <div class="card shadow mb-4">
-            <div class="card-header bg-warning text-dark">
-                <div class="row align-items-center">
-                    <div class="col-auto">
-                        <i class="fas fa-plus fa-2x"></i>
-                    </div>
-                    <div class="col">
-                        <h3 class="mb-0">Add Transaction Category</h3>
-                        <small>Create a new category to organize transactions</small>
-                    </div>
-                    <div class="col-auto">
-                        <a href="/accounting/categories/" class="btn btn-dark btn-sm">
-                            <i class="fas fa-arrow-left me-1"></i>Back to Categories
-                        </a>
+        <?php if (!function_exists('renderPremiumHero')): ?>
+            <?php $fallbackLogo = accounting_logo_src_for(__DIR__); ?>
+            <section class="hero hero-small mb-4">
+                <div class="hero-body py-3">
+                    <div class="container-fluid">
+                        <div class="row align-items-center">
+                            <div class="col-md-2 d-none d-md-flex justify-content-center">
+                                <img src="<?= htmlspecialchars($fallbackLogo); ?>" alt="W5OBM Logo" class="img-fluid no-shadow" style="max-height:64px;">
+                            </div>
+                            <div class="col-md-6 text-center text-md-start text-white">
+                                <h1 class="h4 mb-1">Add Transaction Category</h1>
+                                <p class="mb-0 small">Create or nest categories to keep ledgers organized.</p>
+                            </div>
+                            <div class="col-md-4 text-center text-md-end mt-3 mt-md-0">
+                                <a href="/accounting/categories/" class="btn btn-outline-light btn-sm me-2">
+                                    <i class="fas fa-list me-1"></i>Categories Home
+                                </a>
+                                <a href="/accounting/dashboard.php" class="btn btn-primary btn-sm">
+                                    <i class="fas fa-arrow-left me-1"></i>Accounting Dashboard
+                                </a>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </div>
+            </section>
+        <?php endif; ?>
 
         <!-- Category Form -->
         <div class="card shadow">

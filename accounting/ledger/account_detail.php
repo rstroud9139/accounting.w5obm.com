@@ -9,6 +9,7 @@ require_once __DIR__ . '/../../include/dbconn.php';
 require_once __DIR__ . '/../lib/helpers.php';
 require_once __DIR__ . '/../controllers/ledgerController.php';
 require_once __DIR__ . '/../utils/stats_service.php';
+require_once __DIR__ . '/../../include/premium_hero.php';
 
 if (!isAuthenticated()) {
     header('Location: /authentication/login.php');
@@ -48,21 +49,111 @@ if (!$account) {
     exit();
 }
 
-$page_title = 'Account Detail - ' . htmlspecialchars($account['name']);
+$accountNameSafe = htmlspecialchars($account['name'] ?? 'Account');
+$accountNumberSafe = htmlspecialchars($account['account_number'] ?? '—');
+$accountTypeSafe = htmlspecialchars($account['account_type'] ?? '');
+
+$page_title = 'Account Detail - ' . $accountNameSafe;
+
+$canEditAccount = hasPermission($user_id, 'accounting_manage') || hasPermission($user_id, 'accounting_add');
+
+$accountDetailHeroChips = array_values(array_filter([
+    !empty($account['account_number']) ? 'Account #' . $accountNumberSafe : null,
+    !empty($account['account_type']) ? 'Type: ' . $accountTypeSafe : null,
+    $account['active'] ? 'Status: Active' : 'Status: Inactive',
+]));
+
+$accountDetailHeroHighlights = [
+    [
+        'label' => 'Balance',
+        'value' => '$' . number_format($account['account_balance'], 2),
+        'meta' => $account['account_balance'] >= 0 ? 'Positive position' : 'Needs attention',
+    ],
+    [
+        'label' => 'Transactions',
+        'value' => number_format((int) ($account['transaction_count'] ?? 0)),
+        'meta' => 'Historical entries',
+    ],
+    [
+        'label' => 'Status',
+        'value' => $account['active'] ? 'Active' : 'Inactive',
+        'meta' => 'Availability',
+    ],
+];
+
+$accountDetailHeroActions = array_values(array_filter([
+    $canEditAccount ? [
+        'label' => 'Edit Account',
+        'url' => '/accounting/ledger/edit.php?id=' . $account_id,
+        'icon' => 'fa-edit',
+    ] : null,
+    [
+        'label' => 'Ledger Overview',
+        'url' => '/accounting/ledger/',
+        'variant' => 'outline',
+        'icon' => 'fa-sitemap',
+    ],
+    [
+        'label' => 'Dashboard',
+        'url' => '/accounting/dashboard.php',
+        'variant' => 'outline',
+        'icon' => 'fa-arrow-left',
+    ],
+]));
+
 include __DIR__ . '/../../include/header.php';
 ?>
 
 <body>
     <?php include __DIR__ . '/../../include/menu.php'; ?>
-    <div class="container mt-4">
+    <?php
+    if (function_exists('displayToastMessage')) {
+        displayToastMessage();
+    }
+    ?>
+
+    <?php if (function_exists('renderPremiumHero')): ?>
+        <?php renderPremiumHero([
+            'eyebrow' => 'Ledger Account',
+            'title' => $accountNameSafe,
+            'subtitle' => 'Review account health, history, and next steps.',
+            'chips' => $accountDetailHeroChips,
+            'highlights' => $accountDetailHeroHighlights,
+            'actions' => $accountDetailHeroActions,
+            'theme' => 'teal',
+            'size' => 'compact',
+            'media_mode' => 'none',
+        ]); ?>
+    <?php endif; ?>
+
+    <div class="page-container">
+        <?php if (!function_exists('renderPremiumHero')): ?>
+            <div class="card shadow mb-4">
+                <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
+                    <div>
+                        <h3 class="mb-0">Account Detail</h3>
+                        <small><?= $accountNumberSafe ?> • <?= $accountTypeSafe ?></small>
+                    </div>
+                    <div class="btn-group">
+                        <?php if ($canEditAccount): ?>
+                            <a href="/accounting/ledger/edit.php?id=<?= $account_id ?>" class="btn btn-light btn-sm"><i class="fas fa-edit me-1"></i>Edit</a>
+                        <?php endif; ?>
+                        <a href="/accounting/ledger/" class="btn btn-outline-light btn-sm"><i class="fas fa-arrow-left me-1"></i>Back</a>
+                    </div>
+                </div>
+            </div>
+        <?php endif; ?>
+
         <div class="card shadow mb-4">
             <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
                 <div>
                     <h3 class="mb-0">Account Detail</h3>
-                    <small><?= htmlspecialchars($account['account_number']) ?> • <?= htmlspecialchars($account['account_type']) ?></small>
+                    <small><?= $accountNumberSafe ?> • <?= $accountTypeSafe ?></small>
                 </div>
                 <div class="btn-group">
-                    <a href="/accounting/ledger/edit.php?id=<?= $account_id ?>" class="btn btn-light btn-sm"><i class="fas fa-edit me-1"></i>Edit</a>
+                    <?php if ($canEditAccount): ?>
+                        <a href="/accounting/ledger/edit.php?id=<?= $account_id ?>" class="btn btn-light btn-sm"><i class="fas fa-edit me-1"></i>Edit</a>
+                    <?php endif; ?>
                     <a href="/accounting/ledger/" class="btn btn-outline-light btn-sm"><i class="fas fa-arrow-left me-1"></i>Back</a>
                 </div>
             </div>

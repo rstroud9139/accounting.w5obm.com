@@ -4,6 +4,7 @@ require_once __DIR__ . '/../../include/dbconn.php';
 require_once __DIR__ . '/../lib/helpers.php';
 require_once __DIR__ . '/../controllers/ledgerController.php';
 require_once __DIR__ . '/../controllers/LedgerRegisterController.php';
+require_once __DIR__ . '/../../include/premium_hero.php';
 
 validate_session();
 
@@ -194,9 +195,64 @@ $coveredAccounts = array_keys($runningBalances);
 $returnUrl = htmlspecialchars($currentUrl, ENT_QUOTES);
 
 $logoSrc = accounting_logo_src_for(__DIR__);
+
+$dateChip = 'Range: ' . date('M j', strtotime($date_from)) . ' → ' . date('M j, Y', strtotime($date_to));
+$accountChip = $account_id ? 'Account #' . $account_id : 'Account: All';
+$sourceChip = 'Source: ' . ucwords(str_replace('_', ' ', $source));
+
+$registerHeroChips = [$dateChip, $accountChip, $sourceChip];
+if (!empty($search)) {
+    $registerHeroChips[] = 'Search: ' . $search;
+}
+
+$registerHeroHighlights = [
+    [
+        'label' => 'Entries',
+        'value' => number_format($entryCount),
+        'meta' => 'Matched filters'
+    ],
+    [
+        'label' => 'Total Debit',
+        'value' => '$' . number_format($totalDebit, 2),
+        'meta' => 'Period activity'
+    ],
+    [
+        'label' => 'Total Credit',
+        'value' => '$' . number_format($totalCredit, 2),
+        'meta' => 'Period activity'
+    ],
+];
+
+if ($account_id && $endingBalance !== null) {
+    $registerHeroHighlights[] = [
+        'label' => 'Ending Balance',
+        'value' => '$' . number_format($endingBalance, 2),
+        'meta' => $selectedAccount['name'] ?? 'Selected account'
+    ];
+}
+
+$registerHeroActions = array_values(array_filter([
+    [
+        'label' => 'Export CSV',
+        'url' => '/accounting/ledger/register.php?' . http_build_query(array_merge($_GET, ['export' => '1'])),
+        'variant' => 'outline',
+        'icon' => 'fa-file-export'
+    ],
+    $canManageAccounting ? [
+        'label' => 'New Journal Entry',
+        'url' => '/accounting/transactions/transactions.php',
+        'variant' => 'outline',
+        'icon' => 'fa-table'
+    ] : null,
+    [
+        'label' => 'Back to Ledger',
+        'url' => '/accounting/ledger/',
+        'icon' => 'fa-arrow-left'
+    ],
+]));
 ?>
 
-<body>
+<body class="accounting-app bg-light">
     <?php include __DIR__ . '/../../include/menu.php'; ?>
 
     <?php if (function_exists('displayToastMessage')) {
@@ -204,34 +260,49 @@ $logoSrc = accounting_logo_src_for(__DIR__);
     } ?>
 
     <div class="page-container" style="margin-top:0;padding-top:0;">
-        <section class="hero hero-small mb-4">
-            <div class="hero-body py-3">
-                <div class="container-fluid">
-                    <div class="row align-items-center">
-                        <div class="col-md-2 d-none d-md-flex justify-content-center">
-                            <img src="<?= htmlspecialchars($logoSrc); ?>" alt="W5OBM Logo" class="img-fluid no-shadow" style="max-height:64px;">
-                        </div>
-                        <div class="col-md-6 text-center text-md-start text-white">
-                            <h1 class="h4 mb-1">Ledger Register</h1>
-                            <p class="mb-0 small">Full debit/credit history across your accounts.</p>
-                        </div>
-                        <div class="col-md-4 text-center text-md-end mt-3 mt-md-0">
-                            <a href="/accounting/ledger/index.php" class="btn btn-outline-light btn-sm me-2">
-                                <i class="fas fa-sitemap me-1"></i>Chart of Accounts
-                            </a>
-                            <a href="/accounting/dashboard.php" class="btn btn-outline-light btn-sm me-2">
-                                <i class="fas fa-arrow-left me-1"></i>Dashboard
-                            </a>
-                            <?php if ($canManageAccounting): ?>
-                                <a href="/accounting/transactions/add_transaction.php?mode=journal" class="btn btn-primary btn-sm">
-                                    <i class="fas fa-plus-circle me-1"></i>New Journal Entry
+        <?php if (function_exists('renderPremiumHero')): ?>
+            <?php renderPremiumHero([
+                'eyebrow' => 'Ledger Intelligence',
+                'title' => 'Ledger Register',
+                'subtitle' => 'Trace every debit and credit with running balances, filters, and exports.',
+                'description' => 'Dial in the date span, account, and data source to reconcile activity quickly.',
+                'theme' => 'midnight',
+                'size' => 'compact',
+                'media_mode' => 'none',
+                'chips' => $registerHeroChips,
+                'highlights' => $registerHeroHighlights,
+                'actions' => $registerHeroActions,
+            ]); ?>
+        <?php else: ?>
+            <section class="hero hero-small mb-4">
+                <div class="hero-body py-3">
+                    <div class="container-fluid">
+                        <div class="row align-items-center">
+                            <div class="col-md-2 d-none d-md-flex justify-content-center">
+                                <img src="<?= htmlspecialchars($logoSrc); ?>" alt="W5OBM Logo" class="img-fluid no-shadow" style="max-height:64px;">
+                            </div>
+                            <div class="col-md-6 text-center text-md-start text-white">
+                                <h1 class="h4 mb-1">Ledger Register</h1>
+                                <p class="mb-0 small">Full debit/credit history across your accounts.</p>
+                            </div>
+                            <div class="col-md-4 text-center text-md-end mt-3 mt-md-0">
+                                <a href="/accounting/ledger/index.php" class="btn btn-outline-light btn-sm me-2">
+                                    <i class="fas fa-sitemap me-1"></i>Chart of Accounts
                                 </a>
-                            <?php endif; ?>
+                                <a href="/accounting/dashboard.php" class="btn btn-outline-light btn-sm me-2">
+                                    <i class="fas fa-arrow-left me-1"></i>Dashboard
+                                </a>
+                                <?php if ($canManageAccounting): ?>
+                                    <a href="/accounting/transactions/add_transaction.php?mode=journal" class="btn btn-primary btn-sm">
+                                        <i class="fas fa-plus-circle me-1"></i>New Journal Entry
+                                    </a>
+                                <?php endif; ?>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        </section>
+            </section>
+        <?php endif; ?>
 
         <div class="row mb-3 hero-summary-row">
             <div class="col-md-3 col-sm-6 mb-3">

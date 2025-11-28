@@ -12,6 +12,7 @@ session_start();
 require_once __DIR__ . '/../../include/dbconn.php';
 require_once __DIR__ . '/../lib/helpers.php';
 require_once __DIR__ . '/../controllers/ledgerController.php';
+require_once __DIR__ . '/../../include/premium_hero.php';
 
 // Authentication check
 if (!isAuthenticated()) {
@@ -145,6 +146,57 @@ try {
     $transaction_count = 0;
 }
 
+$currentBalance = getAccountBalance($account_id);
+
+$accountNameSafe = htmlspecialchars($account['name'] ?? 'Ledger Account');
+$accountNumberSafe = htmlspecialchars($account['account_number'] ?? '—');
+$accountTypeSafe = htmlspecialchars($account['account_type'] ?? '—');
+
+$ledgerEditHeroChips = array_values(array_filter([
+    !empty($account['account_number']) ? 'Account #' . $accountNumberSafe : null,
+    !empty($account['account_type']) ? 'Type: ' . $accountTypeSafe : null,
+    $account['active'] ? 'Status: Active' : 'Status: Inactive',
+    $has_transactions ? number_format($transaction_count) . ' transactions' : null,
+]));
+
+$ledgerEditHeroHighlights = [
+    [
+        'label' => 'Balance',
+        'value' => '$' . number_format($currentBalance, 2),
+        'meta' => 'Current total',
+    ],
+    [
+        'label' => 'Transactions',
+        'value' => number_format($transaction_count),
+        'meta' => $has_transactions ? 'History attached' : 'No history yet',
+    ],
+    [
+        'label' => 'Created',
+        'value' => date('M j, Y', strtotime($account['created_at'] ?? 'now')),
+        'meta' => 'Account start',
+    ],
+];
+
+$ledgerEditHeroActions = [
+    [
+        'label' => 'View Details',
+        'url' => '/accounting/ledger/account_detail.php?id=' . $account_id,
+        'icon' => 'fa-eye',
+    ],
+    [
+        'label' => 'Ledger Overview',
+        'url' => '/accounting/ledger/',
+        'variant' => 'outline',
+        'icon' => 'fa-sitemap',
+    ],
+    [
+        'label' => 'Dashboard',
+        'url' => '/accounting/dashboard.php',
+        'variant' => 'outline',
+        'icon' => 'fa-arrow-left',
+    ],
+];
+
 $page_title = "Edit Ledger Account - W5OBM Accounting";
 ?>
 
@@ -168,32 +220,47 @@ $page_title = "Edit Ledger Account - W5OBM Accounting";
     }
     ?>
 
+    <?php if (function_exists('renderPremiumHero')): ?>
+        <?php renderPremiumHero([
+            'eyebrow' => 'Ledger Account',
+            'title' => 'Edit ' . $accountNameSafe,
+            'subtitle' => 'Update naming, routing, and structure for this account.',
+            'chips' => $ledgerEditHeroChips,
+            'highlights' => $ledgerEditHeroHighlights,
+            'actions' => $ledgerEditHeroActions,
+            'theme' => 'amber',
+            'size' => 'compact',
+            'media_mode' => 'none',
+        ]); ?>
+    <?php endif; ?>
+
     <!-- Page Container -->
     <div class="page-container">
-        <!-- Header Card -->
-        <div class="card shadow mb-4">
-            <div class="card-header bg-warning text-dark">
-                <div class="row align-items-center">
-                    <div class="col-auto">
-                        <i class="fas fa-edit fa-2x"></i>
-                    </div>
-                    <div class="col">
-                        <h3 class="mb-0">Edit Ledger Account</h3>
-                        <small>Modify account: <?= htmlspecialchars($account['account_number']) ?> - <?= htmlspecialchars($account['name']) ?></small>
-                    </div>
-                    <div class="col-auto">
-                        <div class="btn-group" role="group">
-                            <a href="/accounting/ledger/account_detail.php?id=<?= $account_id ?>" class="btn btn-light btn-sm">
-                                <i class="fas fa-eye me-1"></i>View Details
-                            </a>
-                            <a href="/accounting/ledger/" class="btn btn-outline-dark btn-sm">
-                                <i class="fas fa-arrow-left me-1"></i>Back to Chart of Accounts
-                            </a>
+        <?php if (!function_exists('renderPremiumHero')): ?>
+            <div class="card shadow mb-4">
+                <div class="card-header bg-warning text-dark">
+                    <div class="row align-items-center">
+                        <div class="col-auto">
+                            <i class="fas fa-edit fa-2x"></i>
+                        </div>
+                        <div class="col">
+                            <h3 class="mb-0">Edit Ledger Account</h3>
+                            <small>Modify account: <?= $accountNumberSafe ?> - <?= $accountNameSafe ?></small>
+                        </div>
+                        <div class="col-auto">
+                            <div class="btn-group" role="group">
+                                <a href="/accounting/ledger/account_detail.php?id=<?= $account_id ?>" class="btn btn-light btn-sm">
+                                    <i class="fas fa-eye me-1"></i>View Details
+                                </a>
+                                <a href="/accounting/ledger/" class="btn btn-outline-dark btn-sm">
+                                    <i class="fas fa-arrow-left me-1"></i>Back to Chart of Accounts
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
+        <?php endif; ?>
 
         <!-- Error Messages -->
         <?php if (!empty($errors)): ?>
@@ -224,13 +291,13 @@ $page_title = "Edit Ledger Account - W5OBM Accounting";
                     <div class="col-md-8">
                         <div class="row">
                             <div class="col-sm-6">
-                                <strong>Account Number:</strong> <?= htmlspecialchars($account['account_number']) ?><br>
-                                <strong>Account Type:</strong> <?= htmlspecialchars($account['account_type']) ?><br>
+                                <strong>Account Number:</strong> <?= $accountNumberSafe ?><br>
+                                <strong>Account Type:</strong> <?= $accountTypeSafe ?><br>
                                 <strong>Status:</strong> <span class="badge bg-<?= $account['active'] ? 'success' : 'secondary' ?>"><?= $account['active'] ? 'Active' : 'Inactive' ?></span>
                             </div>
                             <div class="col-sm-6">
                                 <strong>Transactions:</strong> <?= number_format($transaction_count) ?><br>
-                                <strong>Current Balance:</strong> $<?= number_format(getAccountBalance($account_id), 2) ?><br>
+                                <strong>Current Balance:</strong> $<?= number_format($currentBalance, 2) ?><br>
                                 <strong>Created:</strong> <?= date('M j, Y', strtotime($account['created_at'])) ?>
                             </div>
                         </div>

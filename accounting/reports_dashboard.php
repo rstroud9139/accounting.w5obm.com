@@ -18,6 +18,157 @@ require_once __DIR__ . '/../include/dbconn.php';
 require_once __DIR__ . '/lib/helpers.php';
 require_once __DIR__ . '/../include/premium_hero.php';
 
+if (!function_exists('accounting_report_type_icon')) {
+    function accounting_report_type_icon(string $type): string
+    {
+        static $map = [
+            'income_statement' => 'fa-chart-line',
+            'balance_sheet' => 'fa-scale-balanced',
+            'cash_flow' => 'fa-droplet',
+            'expense_report' => 'fa-file-invoice-dollar',
+            'donor_list' => 'fa-hand-holding-heart',
+            'donation_summary' => 'fa-heart',
+            'asset_listing' => 'fa-boxes-stacked',
+            'ytd_income_statement' => 'fa-calendar-alt',
+            'ytd_budget_comparison' => 'fa-scale-balanced',
+        ];
+
+        $normalized = strtolower(trim($type));
+        return $map[$normalized] ?? 'fa-file-lines';
+    }
+}
+
+if (!function_exists('accounting_report_type_accent')) {
+    function accounting_report_type_accent(string $type): string
+    {
+        static $map = [
+            'income_statement' => 'success',
+            'balance_sheet' => 'primary',
+            'cash_flow' => 'info',
+            'expense_report' => 'danger',
+            'donor_list' => 'warning',
+            'donation_summary' => 'warning',
+            'asset_listing' => 'secondary',
+            'ytd_income_statement' => 'primary',
+            'ytd_budget_comparison' => 'dark',
+        ];
+
+        $normalized = strtolower(trim($type));
+        return $map[$normalized] ?? 'secondary';
+    }
+}
+
+if (!function_exists('buildReportGroupingSummary')) {
+    function buildReportGroupingSummary(array $reports, string $groupType, array $baseFilters = []): array
+    {
+        $groupType = strtolower($groupType);
+        if (!in_array($groupType, ['type', 'month'], true)) {
+            return [
+                'type' => 'none',
+                'groups' => [],
+                'group_count' => 0,
+                'item_count' => 0,
+            ];
+        }
+
+        $baseFilters = array_filter($baseFilters, static function ($value) {
+            return $value !== null && $value !== '';
+        });
+
+        $groups = [];
+        foreach ($reports as $report) {
+            $key = 'uncategorized';
+            $label = 'Uncategorized';
+            $icon = 'fa-file-lines';
+            $accent = 'secondary';
+            $filterLink = null;
+
+            if ($groupType === 'type') {
+                $rawType = strtolower(trim((string)($report['report_type'] ?? '')));
+                $key = $rawType !== '' ? $rawType : 'uncategorized';
+                $label = $key === 'uncategorized' ? 'Uncategorized' : ucwords(str_replace('_', ' ', $key));
+                $icon = accounting_report_type_icon($key);
+                $accent = accounting_report_type_accent($key);
+                $filterLink = 'reports_dashboard.php?' . http_build_query(array_merge($baseFilters, [
+                    'type' => $key,
+                    'group' => 'none',
+                ]));
+            } elseif ($groupType === 'month') {
+                $timestamp = !empty($report['generated_at']) ? strtotime($report['generated_at']) : null;
+                $key = $timestamp ? date('Y-m', $timestamp) : 'unknown';
+                $label = $timestamp ? date('F Y', $timestamp) : 'Unknown Period';
+                $icon = 'fa-calendar-days';
+                $accent = 'info';
+                $filterLink = $timestamp ? 'reports_dashboard.php?' . http_build_query(array_merge($baseFilters, [
+                    'group' => 'none',
+                    'search' => date('F Y', $timestamp),
+                    'range' => 'all',
+                ])) : null;
+            }
+
+            if (!isset($groups[$key])) {
+                $groups[$key] = [
+                    'key' => $key,
+                    'label' => $label,
+                    'icon' => $icon,
+                    'accent' => $accent,
+                    'count' => 0,
+                    'last_generated' => null,
+                    'reports' => [],
+                    'filter_link' => $filterLink,
+                ];
+            }
+
+            $groups[$key]['count']++;
+            if (!empty($report['generated_at'])) {
+                $generatedTimestamp = strtotime($report['generated_at']);
+                if (!$groups[$key]['last_generated'] || $generatedTimestamp > $groups[$key]['last_generated']) {
+                    $groups[$key]['last_generated'] = $generatedTimestamp;
+                }
+            }
+
+            if (count($groups[$key]['reports']) < 4) {
+                $paramPreview = trim((string)($report['parameters'] ?? ''));
+                if ($paramPreview !== '') {
+                    $paramPreview = function_exists('mb_strimwidth')
+                        ? mb_strimwidth($paramPreview, 0, 90, '…')
+                        : substr($paramPreview, 0, 87) . '…';
+                }
+
+                $groups[$key]['reports'][] = [
+                    'id' => $report['id'],
+                    'title' => ucwords(str_replace('_', ' ', $report['report_type'] ?? 'Report')),
+                    'generated_at' => !empty($report['generated_at']) ? date('M d, Y g:i A', strtotime($report['generated_at'])) : '—',
+                    'parameters' => $paramPreview,
+                    'view_url' => 'reports/view_report.php?id=' . urlencode((string)$report['id']),
+                    'download_url' => 'reports/download_report.php?id=' . urlencode((string)$report['id']),
+                ];
+            }
+        }
+
+        $groups = array_values($groups);
+        usort($groups, static function ($a, $b) {
+            return $b['count'] <=> $a['count'];
+        });
+
+        foreach ($groups as &$group) {
+            $group['last_generated_display'] = $group['last_generated']
+                ? date('M d, Y', $group['last_generated'])
+                : '—';
+        }
+        unset($group);
+
+        return [
+            'type' => $groupType,
+            'groups' => $groups,
+            'group_count' => count($groups),
+            'item_count' => array_sum(array_map(static function ($group) {
+                return $group['count'];
+            }, $groups)),
+        ];
+    }
+}
+
 // Check authentication using consolidated functions
 if (!isAuthenticated()) {
     setToastMessage('info', 'Login Required', 'Please login to access reports.', 'fas fa-chart-line');
@@ -115,6 +266,7 @@ $filters = [
     'range' => sanitizeInput($_GET['range'] ?? '90', 'string'),
     'search' => sanitizeInput($_GET['search'] ?? '', 'string'),
     'sort' => sanitizeInput($_GET['sort'] ?? 'generated_desc', 'string'),
+    'group' => sanitizeInput($_GET['group'] ?? 'none', 'string'),
 ];
 
 $allowedRanges = ['30', '90', '365', 'ytd', 'all'];
@@ -126,6 +278,17 @@ $allowedSorts = ['generated_desc', 'generated_asc', 'type_asc', 'type_desc'];
 if (!in_array($filters['sort'], $allowedSorts, true)) {
     $filters['sort'] = 'generated_desc';
 }
+
+$allowedGroups = ['none', 'type', 'month'];
+if (!in_array($filters['group'], $allowedGroups, true)) {
+    $filters['group'] = 'none';
+}
+
+$groupLabels = [
+    'none' => 'Disabled',
+    'type' => 'Report type',
+    'month' => 'Month generated',
+];
 
 $availableTypes = array_values(array_unique(array_filter(array_map(static function ($report) {
     return $report['report_type'] ?? '';
@@ -179,6 +342,15 @@ $filteredReports = array_values(array_filter($reports, static function ($report)
 
     return $matchesType && $matchesRange && $matchesSearch;
 }));
+
+$groupLinkBaseFilters = [
+    'range' => $filters['range'],
+    'sort' => $filters['sort'],
+    'search' => $filters['search'],
+    'type' => 'all',
+];
+
+$reportGroupSummary = buildReportGroupingSummary($filteredReports, $filters['group'], $groupLinkBaseFilters);
 
 if (!empty($filteredReports)) {
     usort($filteredReports, static function ($a, $b) use ($filters) {
@@ -240,6 +412,7 @@ $reportHeroChips = [
     'Type: ' . $activeTypeLabel,
     'Range: ' . $currentRangeLabel,
 ];
+$reportHeroChips[] = 'Group: ' . ($groupLabels[$filters['group']] ?? 'Disabled');
 if (!empty($filters['search'])) {
     $reportHeroChips[] = 'Keyword: ' . $filters['search'];
 }
@@ -736,6 +909,14 @@ $page_title = "Reports Dashboard - W5OBM";
                                         <option value="type_desc" <?= $filters['sort'] === 'type_desc' ? 'selected' : '' ?>>Type (Z-A)</option>
                                     </select>
                                 </div>
+                                <div class="col">
+                                    <label for="group" class="form-label text-muted text-uppercase small mb-1">Group By</label>
+                                    <select id="group" name="group" class="form-select form-select-sm">
+                                        <option value="none" <?= $filters['group'] === 'none' ? 'selected' : '' ?>>Disabled</option>
+                                        <option value="type" <?= $filters['group'] === 'type' ? 'selected' : '' ?>>Report Type</option>
+                                        <option value="month" <?= $filters['group'] === 'month' ? 'selected' : '' ?>>Month Generated</option>
+                                    </select>
+                                </div>
                             </div>
                             <div class="row mt-3">
                                 <div class="col-12 col-lg-8">
@@ -757,6 +938,81 @@ $page_title = "Reports Dashboard - W5OBM";
                 </div>
             </div>
         </div>
+
+        <?php if ($reportGroupSummary['type'] !== 'none'): ?>
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header bg-light border-0 d-flex flex-wrap align-items-center justify-content-between">
+                    <div>
+                        <h5 class="mb-0"><i class="fas fa-object-group me-2 text-primary"></i>Grouping Overview</h5>
+                        <small class="text-muted">Showing <?= number_format($reportGroupSummary['item_count']) ?> reports across <?= number_format($reportGroupSummary['group_count']) ?> groups.</small>
+                    </div>
+                    <a href="reports_dashboard.php?<?= htmlspecialchars(http_build_query(array_merge($groupLinkBaseFilters, ['group' => 'none']))) ?>" class="btn btn-outline-secondary btn-sm mt-3 mt-sm-0">
+                        <i class="fas fa-times me-1"></i>Clear Grouping
+                    </a>
+                </div>
+                <div class="card-body">
+                    <?php if (empty($reportGroupSummary['groups'])): ?>
+                        <div class="text-center py-5 text-muted">
+                            <i class="fas fa-inbox fa-2x mb-2"></i>
+                            <p class="mb-0">No matching groups for the current filters.</p>
+                        </div>
+                    <?php else: ?>
+                        <div class="row g-4">
+                            <?php foreach ($reportGroupSummary['groups'] as $group): ?>
+                                <div class="col-xl-4 col-lg-6">
+                                    <div class="card report-group-card h-100">
+                                        <div class="card-header d-flex justify-content-between align-items-start">
+                                            <div>
+                                                <div class="text-muted text-uppercase small fw-bold mb-1"><?= htmlspecialchars($group['count']) ?> reports</div>
+                                                <h5 class="mb-0"><?= htmlspecialchars($group['label']) ?></h5>
+                                                <small class="text-muted">Last generated <?= htmlspecialchars($group['last_generated_display'] ?? '—') ?></small>
+                                            </div>
+                                            <span class="badge bg-<?= htmlspecialchars($group['accent']) ?> bg-opacity-10 text-<?= htmlspecialchars($group['accent']) ?>">
+                                                <i class="fas <?= htmlspecialchars($group['icon']) ?>"></i>
+                                            </span>
+                                        </div>
+                                        <ul class="list-group list-group-flush">
+                                            <?php if (empty($group['reports'])): ?>
+                                                <li class="list-group-item text-muted fst-italic">Generate more activity to see details.</li>
+                                            <?php else: ?>
+                                                <?php foreach ($group['reports'] as $report): ?>
+                                                    <li class="list-group-item">
+                                                        <div class="d-flex justify-content-between">
+                                                            <div>
+                                                                <div class="fw-semibold"><?= htmlspecialchars($report['title']) ?></div>
+                                                                <small class="text-muted d-block">Generated <?= htmlspecialchars($report['generated_at']) ?></small>
+                                                                <?php if (!empty($report['parameters'])): ?>
+                                                                    <small class="text-muted d-block"><?= htmlspecialchars($report['parameters']) ?></small>
+                                                                <?php endif; ?>
+                                                            </div>
+                                                            <div class="btn-group btn-group-sm">
+                                                                <a href="<?= htmlspecialchars($report['view_url']) ?>" class="btn btn-outline-primary" title="View">
+                                                                    <i class="fas fa-eye"></i>
+                                                                </a>
+                                                                <a href="<?= htmlspecialchars($report['download_url']) ?>" class="btn btn-outline-success" title="Download">
+                                                                    <i class="fas fa-download"></i>
+                                                                </a>
+                                                            </div>
+                                                        </div>
+                                                    </li>
+                                                <?php endforeach; ?>
+                                            <?php endif; ?>
+                                        </ul>
+                                        <?php if (!empty($group['filter_link'])): ?>
+                                            <div class="card-footer bg-transparent border-0 text-end">
+                                                <a href="<?= htmlspecialchars($group['filter_link']) ?>" class="btn btn-outline-secondary btn-sm">
+                                                    Focus Group <i class="fas fa-arrow-up-right-from-square ms-1"></i>
+                                                </a>
+                                            </div>
+                                        <?php endif; ?>
+                                    </div>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
+                    <?php endif; ?>
+                </div>
+            </div>
+        <?php endif; ?>
 
         <?php if (!empty($reportCollections)): ?>
             <div class="card shadow-sm border-0 mb-4 report-collections-card">
@@ -1023,6 +1279,7 @@ $page_title = "Reports Dashboard - W5OBM";
             const typeSelect = document.getElementById('type');
             const rangeSelect = document.getElementById('range');
             const sortSelect = document.getElementById('sort');
+            const groupSelect = document.getElementById('group');
             const searchInput = document.getElementById('search');
             const exportBtn = document.getElementById('reportExportBtn');
             const presetButtons = document.querySelectorAll('.report-chip');
@@ -1035,6 +1292,9 @@ $page_title = "Reports Dashboard - W5OBM";
                         }
                         if (rangeSelect) {
                             rangeSelect.value = '90';
+                        }
+                        if (groupSelect) {
+                            groupSelect.value = 'none';
                         }
                         if (sortSelect) {
                             sortSelect.value = 'generated_desc';

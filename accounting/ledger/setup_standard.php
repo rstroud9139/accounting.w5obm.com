@@ -12,6 +12,7 @@ session_start();
 require_once __DIR__ . '/../../include/dbconn.php';
 require_once __DIR__ . '/../lib/helpers.php';
 require_once __DIR__ . '/../controllers/ledgerController.php';
+require_once __DIR__ . '/../../include/premium_hero.php';
 
 // Authentication check
 if (!isAuthenticated()) {
@@ -148,6 +149,65 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_accounts'])) {
 }
 
 $page_title = "Setup Standard Chart of Accounts - W5OBM Accounting";
+
+$templateCount = count($standard_accounts);
+$selectedAccountCount = 0;
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['accounts']) && is_array($_POST['accounts'])) {
+    $selectedAccountCount = count(array_filter($_POST['accounts'], static function ($index) use ($standard_accounts) {
+        return isset($standard_accounts[$index]);
+    }));
+}
+
+$createdCount = count($created_accounts);
+$errorCount = count($errors);
+
+$setupHeroChips = array_values(array_filter([
+    'Templates: ' . number_format($templateCount),
+    $selectedAccountCount ? 'Selected: ' . number_format($selectedAccountCount) : null,
+    $setup_complete ? 'Status: Complete' : 'Status: Ready',
+]));
+
+$setupHeroHighlights = [
+    [
+        'label' => 'Template Accounts',
+        'value' => number_format($templateCount),
+        'meta' => 'Ready to import',
+    ],
+    [
+        'label' => 'Created Now',
+        'value' => number_format($createdCount),
+        'meta' => $setup_complete ? 'Provisioned this run' : 'Awaiting selection',
+    ],
+    [
+        'label' => 'Issues',
+        'value' => number_format($errorCount),
+        'meta' => $errorCount ? 'Needs review' : 'All clear',
+    ],
+];
+
+$setupHeroActions = array_values(array_filter([
+    $setup_complete ? [
+        'label' => 'View Results',
+        'url' => '#setup-results',
+        'icon' => 'fa-check-circle',
+    ] : [
+        'label' => 'Begin Selection',
+        'url' => '#setupForm',
+        'icon' => 'fa-list-check',
+    ],
+    [
+        'label' => 'Add Custom Account',
+        'url' => '/accounting/ledger/add.php',
+        'variant' => 'outline',
+        'icon' => 'fa-plus',
+    ],
+    [
+        'label' => 'Back to Ledger',
+        'url' => '/accounting/ledger/',
+        'variant' => 'outline',
+        'icon' => 'fa-arrow-left',
+    ],
+]));
 ?>
 
 <!DOCTYPE html>
@@ -170,27 +230,43 @@ $page_title = "Setup Standard Chart of Accounts - W5OBM Accounting";
     }
     ?>
 
+    <?php if (function_exists('renderPremiumHero')): ?>
+        <?php renderPremiumHero([
+            'eyebrow' => 'Chart of Accounts',
+            'title' => 'Standard Ledger Setup',
+            'subtitle' => 'Provision a complete amateur radio chart of accounts in minutes.',
+            'description' => 'Select templates, review coverage, and deploy the entire backbone before transactions begin.',
+            'chips' => $setupHeroChips,
+            'highlights' => $setupHeroHighlights,
+            'actions' => $setupHeroActions,
+            'theme' => 'teal',
+            'size' => 'compact',
+            'media_mode' => 'none',
+        ]); ?>
+    <?php endif; ?>
+
     <!-- Page Container -->
     <div class="page-container">
-        <!-- Header Card -->
-        <div class="card shadow mb-4">
-            <div class="card-header bg-info text-white">
-                <div class="row align-items-center">
-                    <div class="col-auto">
-                        <i class="fas fa-magic fa-2x"></i>
-                    </div>
-                    <div class="col">
-                        <h3 class="mb-0">Setup Standard Chart of Accounts</h3>
-                        <small>Create a complete chart of accounts for your amateur radio club</small>
-                    </div>
-                    <div class="col-auto">
-                        <a href="/accounting/ledger/" class="btn btn-light btn-sm">
-                            <i class="fas fa-arrow-left me-1"></i>Back to Chart of Accounts
-                        </a>
+        <?php if (!function_exists('renderPremiumHero')): ?>
+            <div class="card shadow mb-4">
+                <div class="card-header bg-info text-white">
+                    <div class="row align-items-center">
+                        <div class="col-auto">
+                            <i class="fas fa-magic fa-2x"></i>
+                        </div>
+                        <div class="col">
+                            <h3 class="mb-0">Setup Standard Chart of Accounts</h3>
+                            <small>Create a complete chart of accounts for your amateur radio club</small>
+                        </div>
+                        <div class="col-auto">
+                            <a href="/accounting/ledger/" class="btn btn-light btn-sm">
+                                <i class="fas fa-arrow-left me-1"></i>Back to Chart of Accounts
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
+        <?php endif; ?>
 
         <!-- Error Messages -->
         <?php if (!empty($errors)): ?>
@@ -211,7 +287,7 @@ $page_title = "Setup Standard Chart of Accounts - W5OBM Accounting";
 
         <!-- Success Message -->
         <?php if ($setup_complete): ?>
-            <div class="alert alert-success border-0 shadow mb-4">
+            <div class="alert alert-success border-0 shadow mb-4" id="setup-results">
                 <div class="d-flex">
                     <i class="fas fa-check-circle me-3 mt-1 text-success"></i>
                     <div>
@@ -283,8 +359,8 @@ $page_title = "Setup Standard Chart of Accounts - W5OBM Accounting";
             </div>
 
             <!-- Account Selection Form -->
-            <form method="POST" action="">
-                <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
+            <form method="POST" action="" id="setupForm">
+                <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token']) ?>">
 
                 <!-- Quick Actions -->
                 <div class="card shadow mb-4">
@@ -375,7 +451,10 @@ $page_title = "Setup Standard Chart of Accounts - W5OBM Accounting";
     <script>
         function updateSelectedCount() {
             const selected = document.querySelectorAll('input[name="accounts[]"]:checked').length;
-            document.getElementById('selectedCount').textContent = `${selected} accounts selected`;
+            const selectedCountEl = document.getElementById('selectedCount');
+            if (selectedCountEl) {
+                selectedCountEl.textContent = `${selected} accounts selected`;
+            }
         }
 
         function toggleCategory(category) {
@@ -425,27 +504,29 @@ $page_title = "Setup Standard Chart of Accounts - W5OBM Accounting";
         }
 
         document.addEventListener('DOMContentLoaded', function() {
-            // Update count on checkbox changes
+            const setupForm = document.getElementById('setupForm');
+
             document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
                 checkbox.addEventListener('change', updateSelectedCount);
             });
 
-            // Form submission validation
-            document.querySelector('form').addEventListener('submit', function(e) {
-                const selected = document.querySelectorAll('input[name="accounts[]"]:checked');
+            if (setupForm) {
+                setupForm.addEventListener('submit', function(e) {
+                    const selected = document.querySelectorAll('input[name="accounts[]"]:checked');
 
-                if (selected.length === 0) {
-                    e.preventDefault();
-                    showToast('warning', 'No Selection', 'Please select at least one account to create.', 'club-logo');
-                    return false;
-                }
+                    if (selected.length === 0) {
+                        e.preventDefault();
+                        showToast('warning', 'No Selection', 'Please select at least one account to create.', 'club-logo');
+                        return false;
+                    }
 
-                const accountCount = selected.length;
-                if (!confirm(`Are you sure you want to create ${accountCount} accounts? This action cannot be undone.`)) {
-                    e.preventDefault();
-                    return false;
-                }
-            });
+                    const accountCount = selected.length;
+                    if (!confirm(`Are you sure you want to create ${accountCount} accounts? This action cannot be undone.`)) {
+                        e.preventDefault();
+                        return false;
+                    }
+                });
+            }
 
             updateSelectedCount();
         });

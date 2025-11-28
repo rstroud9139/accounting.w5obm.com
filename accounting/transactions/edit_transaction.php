@@ -16,6 +16,7 @@ require_once __DIR__ . '/../lib/helpers.php';
 require_once __DIR__ . '/../controllers/transactionController.php';
 require_once __DIR__ . '/../views/transactionForm.php';
 require_once __DIR__ . '/../utils/csrf.php';
+require_once __DIR__ . '/../../include/premium_hero.php';
 
 // Authentication check
 if (!isAuthenticated()) {
@@ -156,6 +157,69 @@ try {
     logError("Error fetching vendors: " . $e->getMessage(), 'accounting');
 }
 
+// Build hero configuration
+$transaction_type = $transaction['type'] ?? 'Unknown';
+$transaction_amount = isset($transaction['amount']) ? number_format((float)$transaction['amount'], 2) : '0.00';
+$transaction_date = isset($transaction['transaction_date']) ? date('M j, Y', strtotime($transaction['transaction_date'])) : 'N/A';
+$transaction_description = $transaction['description'] ?? 'Untitled';
+
+$transactionEditHeroChips = [
+    'Type: ' . $transaction_type,
+    'Date: ' . $transaction_date,
+    'Amount: $' . $transaction_amount,
+];
+
+$transactionEditHeroHighlights = [
+    [
+        'label' => 'Transaction Type',
+        'value' => htmlspecialchars($transaction_type),
+        'meta' => 'Current',
+    ],
+    [
+        'label' => 'Amount',
+        'value' => '$' . $transaction_amount,
+        'meta' => $transaction_type === 'Income' ? 'Revenue' : 'Expenditure',
+    ],
+    [
+        'label' => 'Date',
+        'value' => $transaction_date,
+        'meta' => 'Transaction date',
+    ],
+];
+
+$transactionEditHeroActions = [
+    [
+        'label' => 'Transactions List',
+        'url' => '/accounting/transactions/',
+        'variant' => 'outline',
+        'icon' => 'fa-list',
+    ],
+    [
+        'label' => 'Add Transaction',
+        'url' => '/accounting/transactions/add_transaction.php',
+        'variant' => 'outline',
+        'icon' => 'fa-plus',
+    ],
+    [
+        'label' => 'Dashboard',
+        'url' => '/accounting/dashboard.php',
+        'variant' => 'outline',
+        'icon' => 'fa-arrow-left',
+    ],
+];
+
+$transactionEditHeroConfig = [
+    'eyebrow' => 'Transaction Editor',
+    'title' => 'Edit Transaction',
+    'subtitle' => 'Update amounts, categories, dates, and notes to keep the books clean.',
+    'chips' => $transactionEditHeroChips,
+    'highlights' => $transactionEditHeroHighlights,
+    'actions' => $transactionEditHeroActions,
+    'theme' => 'sky',
+    'size' => 'compact',
+    'media_mode' => 'none',
+];
+
 ?>
 
 <!DOCTYPE html>
@@ -178,27 +242,38 @@ try {
     }
     ?>
 
+    <?php if (function_exists('renderPremiumHero')) {
+        renderPremiumHero($transactionEditHeroConfig);
+    } ?>
+
     <!-- Page Container -->
     <div class="page-container">
-        <!-- Header Card -->
-        <div class="card shadow mb-4">
-            <div class="card-header bg-primary text-white">
-                <div class="row align-items-center">
-                    <div class="col-auto">
-                        <i class="fas fa-edit fa-2x"></i>
-                    </div>
-                    <div class="col">
-                        <h3 class="mb-0">Edit Transaction</h3>
-                        <small>Modify transaction details</small>
-                    </div>
-                    <div class="col-auto">
-                        <a href="/accounting/transactions/" class="btn btn-light btn-sm">
-                            <i class="fas fa-arrow-left me-1"></i>Back to Transactions
-                        </a>
+        <?php if (!function_exists('renderPremiumHero')): ?>
+            <?php $fallbackLogo = accounting_logo_src_for(__DIR__); ?>
+            <section class="hero hero-small mb-4">
+                <div class="hero-body py-3">
+                    <div class="container-fluid">
+                        <div class="row align-items-center">
+                            <div class="col-md-2 d-none d-md-flex justify-content-center">
+                                <img src="<?= htmlspecialchars($fallbackLogo); ?>" alt="W5OBM Logo" class="img-fluid no-shadow" style="max-height:64px;">
+                            </div>
+                            <div class="col-md-6 text-center text-md-start text-white">
+                                <h1 class="h4 mb-1">Edit Transaction</h1>
+                                <p class="mb-0 small">Update transaction details to keep your books accurate.</p>
+                            </div>
+                            <div class="col-md-4 text-center text-md-end mt-3 mt-md-0">
+                                <a href="/accounting/transactions/" class="btn btn-outline-light btn-sm me-2">
+                                    <i class="fas fa-list me-1"></i>Transactions
+                                </a>
+                                <a href="/accounting/dashboard.php" class="btn btn-primary btn-sm">
+                                    <i class="fas fa-arrow-left me-1"></i>Dashboard
+                                </a>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </div>
+            </section>
+        <?php endif; ?>
 
         <!-- Transaction Info Card -->
         <div class="card shadow mb-4">

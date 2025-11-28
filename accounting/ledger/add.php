@@ -105,6 +105,8 @@ try {
     logError("Error getting parent accounts: " . $e->getMessage(), 'accounting');
 }
 
+$parent_account_count = count($parent_accounts);
+$account_type_label = $form_data['account_type'] !== '' ? ucwords($form_data['account_type']) : 'Unassigned';
 $page_title = "Add Ledger Account - W5OBM Accounting";
 ?>
 
@@ -118,7 +120,7 @@ $page_title = "Add Ledger Account - W5OBM Accounting";
     <?php include __DIR__ . '/../../include/header.php'; ?>
 </head>
 
-<body>
+<body class="accounting-app bg-light">
     <?php include __DIR__ . '/../../include/menu.php'; ?>
 
     <!-- Toast Message Display -->
@@ -128,9 +130,52 @@ $page_title = "Add Ledger Account - W5OBM Accounting";
     }
     ?>
 
-    <!-- Page Container -->
-    <div class="page-container">
-        <!-- Header Card -->
+    <?php if (function_exists('renderPremiumHero')): ?>
+        <?php renderPremiumHero([
+            'eyebrow' => 'Chart of Accounts',
+            'title' => 'Add Ledger Account',
+            'subtitle' => 'Introduce a new ledger line with proper hierarchy, numbering, and governance.',
+            'description' => 'Capture the metadata below to keep reporting clean and double-entry ready.',
+            'theme' => 'emerald',
+            'size' => 'compact',
+            'media_mode' => 'none',
+            'chips' => array_filter([
+                'Account Type: ' . $account_type_label,
+                !empty($form_data['parent_account_id']) ? 'Parent #' . (int)$form_data['parent_account_id'] : null,
+            ]),
+            'highlights' => [
+                [
+                    'label' => 'Parent Options',
+                    'value' => number_format($parent_account_count),
+                    'meta' => 'Active ledger'
+                ],
+                [
+                    'label' => 'CSRF Token',
+                    'value' => 'Synced',
+                    'meta' => 'Session secure'
+                ],
+                [
+                    'label' => 'Permissions',
+                    'value' => 'Add / Manage',
+                    'meta' => 'Required role'
+                ],
+            ],
+            'actions' => [
+                [
+                    'label' => 'Back to Chart',
+                    'url' => '/accounting/ledger/',
+                    'variant' => 'outline',
+                    'icon' => 'fa-arrow-left'
+                ],
+                [
+                    'label' => 'Standard Setup',
+                    'url' => '/accounting/ledger/setup_standard.php',
+                    'variant' => 'outline',
+                    'icon' => 'fa-magic'
+                ],
+            ],
+        ]); ?>
+    <?php else: ?>
         <div class="card shadow mb-4">
             <div class="card-header bg-success text-white">
                 <div class="row align-items-center">
@@ -149,7 +194,10 @@ $page_title = "Add Ledger Account - W5OBM Accounting";
                 </div>
             </div>
         </div>
+    <?php endif; ?>
 
+    <!-- Page Container -->
+    <div class="page-container">
         <!-- Error Messages -->
         <?php if (!empty($errors)): ?>
             <div class="alert alert-danger border-0 shadow mb-4">

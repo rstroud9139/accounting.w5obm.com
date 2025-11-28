@@ -136,26 +136,89 @@ accounting_head_assets();
 ?>
 
 <body class="accounting-app bg-light">
-    <?php accounting_render_nav(__DIR__); ?>
+    <?php include __DIR__ . '/../include/menu.php'; ?>
 
     <div class="page-container accounting-dashboard-shell">
-        <div class="container mt-4">
-        <!-- Compact hero / top bar -->
-        <div class="d-flex justify-content-between align-items-center mb-3">
-            <div>
-                <h2 class="h4 mb-1"><i class="<?php echo $APP_ICON; ?> me-2 text-success"></i><?php echo $APP_NAME; ?></h2>
-                <p class="text-muted mb-0 small"><?php echo $APP_DESCRIPTION; ?></p>
+        <?php if (function_exists('renderPremiumHero')): ?>
+            <?php
+            $roleLabel = $is_super_admin_db ? 'Super Admin' : ($is_admin_db ? 'Admin' : 'Authorized');
+            renderPremiumHero([
+                'eyebrow' => 'Accounting Portal',
+                'title' => 'Finance Operations HQ',
+                'subtitle' => 'Launch into transactions, reporting, and stewardship workflows from one secure gateway.',
+                'description' => 'Use the tiles below for quick navigation or jump straight into a workspace with the primary actions.',
+                'theme' => 'midnight',
+                'size' => 'compact',
+                'chips' => [
+                    'Secure role-based entry',
+                    'Audit logging enabled',
+                    'Modern UI kit'
+                ],
+                'highlights' => [
+                    [
+                        'label' => 'Primary Modules',
+                        'value' => '4',
+                        'meta' => 'Transactions · Reports · Assets · Donations'
+                    ],
+                    [
+                        'label' => 'Security Role',
+                        'value' => $roleLabel,
+                        'meta' => 'Session verified'
+                    ],
+                    [
+                        'label' => 'Today',
+                        'value' => date('M d'),
+                        'meta' => date('Y')
+                    ],
+                ],
+                'actions' => [
+                    [
+                        'label' => 'Enter Transactions',
+                        'url' => '/accounting/transactions/',
+                        'icon' => 'fa-table'
+                    ],
+                    [
+                        'label' => 'Open Reports',
+                        'url' => '/accounting/reports_dashboard.php',
+                        'variant' => 'outline',
+                        'icon' => 'fa-chart-line'
+                    ],
+                    [
+                        'label' => 'Asset Center',
+                        'url' => '/accounting/assets/',
+                        'variant' => 'outline',
+                        'icon' => 'fa-boxes-stacked'
+                    ],
+                ],
+                'media' => [
+                    'type' => 'image',
+                    'src' => 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=1000&q=80',
+                    'alt' => 'Finance team collaborating'
+                ],
+            ]);
+            ?>
+        <?php else: ?>
+            <div class="bg-dark text-white py-4 shadow-sm">
+                <div class="container">
+                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center">
+                        <div class="mb-3 mb-md-0">
+                            <h2 class="h4 mb-1"><i class="<?= $APP_ICON; ?> me-2 text-success"></i><?= htmlspecialchars($APP_NAME); ?></h2>
+                            <p class="text-white-50 mb-0 small"><?= htmlspecialchars($APP_DESCRIPTION); ?></p>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <a href="transactions/new.php" class="btn btn-success btn-sm">
+                                <i class="fas fa-plus-circle me-1"></i>New Transaction
+                            </a>
+                            <a href="reports/" class="btn btn-outline-light btn-sm">
+                                <i class="fas fa-chart-line me-1"></i>Quick Reports
+                            </a>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="text-end">
-                <a href="transactions/new.php" class="btn btn-success btn-sm me-2">
-                    <i class="fas fa-plus-circle me-1"></i>New Transaction
-                </a>
-                <a href="reports/" class="btn btn-outline-primary btn-sm">
-                    <i class="fas fa-chart-line me-1"></i>Quick Reports
-                </a>
-            </div>
-        </div>
+        <?php endif; ?>
 
+        <div class="container mt-4">
         <div class="row">
             <!-- Left Column: Activity & Maintenance Navigation -->
             <div class="col-md-3 mb-4">

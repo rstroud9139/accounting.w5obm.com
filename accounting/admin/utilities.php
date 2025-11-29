@@ -23,11 +23,25 @@ $page_title = 'Accounting Admin Utilities - W5OBM';
 
 $utilityLinks = [
     [
-        'title' => 'Reseed Chart of Accounts',
-        'description' => 'Deletes all ledger accounts and related transactions, then reloads the standard seed data.',
-        'url' => '../scripts/reseed_chart_of_accounts.php',
-        'icon' => 'fa-database',
+        'title' => 'Reset Accounting Data',
+        'description' => 'Truncates transactional tables while optionally preserving the chart of accounts.',
+        'url' => '../scripts/reset_accounting_data.php',
+        'icon' => 'fa-broom',
         'impact' => 'Destructive'
+    ],
+    [
+        'title' => 'Seed Chart & Categories',
+        'description' => 'Reloads the industry-standard chart of accounts and synchronized category list.',
+        'url' => '../scripts/seed_chart_and_categories.php',
+        'icon' => 'fa-sitemap',
+        'impact' => 'Destructive'
+    ],
+    [
+        'title' => 'Manage Bank Links',
+        'description' => 'Configure external bank connections and map them to ledger accounts.',
+        'url' => 'bank_link.php',
+        'icon' => 'fa-plug-circle-bolt',
+        'impact' => 'Configuration'
     ],
 ];
 

@@ -2,6 +2,7 @@
 
 /** @var mysqli $conn */
 require_once __DIR__ . '/dbconn.php';
+require_once __DIR__ . '/remember_me.php';
 
 /**
  * COMPLETE Helper Functions for W5OBM - WITH SUPER ADMIN HIERARCHY
@@ -244,7 +245,9 @@ function isAuthenticated()
 
     // Check basic authentication markers
     if (!isset($_SESSION['user_id']) || empty($_SESSION['user_id']) || !isset($_SESSION['username'])) {
-        return false;
+        if (!function_exists('rememberMeAutoLogin') || !rememberMeAutoLogin()) {
+            return false;
+        }
     }
 
     // Check session timeout if available

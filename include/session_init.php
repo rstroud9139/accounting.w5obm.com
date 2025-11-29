@@ -39,14 +39,22 @@ function initializeW5OBMSession()
         session_name('W5OBM_SESSION');
     }
 
+    // Determine if we can share the cookie across subdomains (production/staging)
+    $host = $_SERVER['HTTP_HOST'] ?? '';
+    $host = strtolower(explode(':', $host)[0]);
+    $cookieDomain = '';
+    if ($host && preg_match('/(^|\.)w5obm\.com$/', $host)) {
+        $cookieDomain = '.w5obm.com';
+    }
+
     // Set consistent cookie parameters
     session_set_cookie_params([
         'lifetime' => 0,           // Session cookie
         'path' => '/',             // Available site-wide
-        'domain' => '',            // Current domain
+        'domain' => $cookieDomain, // Share across *.w5obm.com when available
         'secure' => $is_https,     // HTTPS only if available
         'httponly' => true,        // Not accessible via JavaScript
-        'samesite' => 'Strict'     // CSRF protection
+        'samesite' => 'Lax'        // Allow top-level cross-subdomain navigation
     ]);
 
     // Start the session

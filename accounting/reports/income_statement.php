@@ -195,6 +195,18 @@ $incomeHeroActions = [
     ],
 ];
 
+$incomeHeroConfig = [
+    'eyebrow' => 'Financial Performance',
+    'title' => 'Income Statement',
+    'subtitle' => 'Monitor revenue, expenses, and net income in one pass.',
+    'chips' => $incomeHeroChips,
+    'highlights' => $incomeHeroHighlights,
+    'actions' => $incomeHeroActions,
+    'theme' => 'emerald',
+    'size' => 'compact',
+    'media_mode' => 'none',
+];
+
 ?>
 
 <!DOCTYPE html>
@@ -217,21 +229,42 @@ $incomeHeroActions = [
     }
     ?>
 
+    <?php if (function_exists('renderPremiumHero')) {
+        renderPremiumHero($incomeHeroConfig);
+    } ?>
+
     <!-- Page Container -->
     <div class="page-container">
+        <?php if (!function_exists('renderPremiumHero')): ?>
+            <?php $fallbackLogo = accounting_logo_src_for(__DIR__); ?>
+            <section class="hero hero-small mb-4">
+                <div class="hero-body py-3">
+                    <div class="container-fluid">
+                        <div class="row align-items-center">
+                            <div class="col-md-2 d-none d-md-flex justify-content-center">
+                                <img src="<?= htmlspecialchars($fallbackLogo); ?>" alt="W5OBM Logo" class="img-fluid no-shadow" style="max-height:64px;">
+                            </div>
+                            <div class="col-md-6 text-center text-md-start text-white">
+                                <h1 class="h4 mb-1">Income Statement</h1>
+                                <p class="mb-0 small">Review revenue, expenses, and net income for <?= htmlspecialchars($report_period_display); ?>.</p>
+                            </div>
+                            <div class="col-md-4 text-center text-md-end mt-3 mt-md-0">
+                                <a href="/accounting/reports/reports_dashboard.php" class="btn btn-outline-light btn-sm me-2">
+                                    <i class="fas fa-chart-line me-1"></i>Reports Dashboard
+                                </a>
+                                <a href="/accounting/dashboard.php" class="btn btn-primary btn-sm">
+                                    <i class="fas fa-arrow-left me-1"></i>Accounting Dashboard
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        <?php endif; ?>
         <?php renderReportHeader(
             'Income Statement',
             'Formal revenue and expense statement',
-            ['Year' => $year, 'Month' => $display_month],
-            [
-                'eyebrow' => 'Financial Performance',
-                'chips' => $incomeHeroChips,
-                'highlights' => $incomeHeroHighlights,
-                'actions' => $incomeHeroActions,
-                'theme' => 'emerald',
-                'size' => 'compact',
-                'media_mode' => 'none',
-            ]
+            ['Year' => $year, 'Month' => $display_month]
         ); ?>
 
         <!-- Report Parameters -->

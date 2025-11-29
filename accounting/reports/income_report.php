@@ -13,6 +13,7 @@ require_once __DIR__ . '/../../include/dbconn.php';
 require_once __DIR__ . '/../lib/helpers.php';
 require_once __DIR__ . '/../controllers/reportController.php';
 require_once __DIR__ . '/../../include/report_header.php';
+require_once __DIR__ . '/../../include/premium_hero.php';
 
 // Authentication check
 if (!isAuthenticated()) {
@@ -239,6 +240,79 @@ try {
     logError("Error fetching categories: " . $e->getMessage(), 'accounting');
 }
 
+$selectedCategoryName = null;
+if (!empty($category_id)) {
+    foreach ($categories as $category) {
+        if ((int)$category['id'] === (int)$category_id) {
+            $selectedCategoryName = $category['name'];
+            break;
+        }
+    }
+}
+
+$reportPeriodDisplay = $report_data['period']['display'] ?? (date('M j, Y', strtotime($start_date)) . ' - ' . date('M j, Y', strtotime($end_date)));
+$incomeReportTotal = (float)($report_data['total_income'] ?? 0);
+$incomeReportCategories = !empty($income_breakdown['categories']) ? count($income_breakdown['categories']) : 0;
+$incomeReportTransactions = isset($report_data['transactions']) && is_array($report_data['transactions']) ? count($report_data['transactions']) : 0;
+$incomeReportStatus = $generate_report && $report_data ? 'Status: Generated' : 'Status: Awaiting run';
+
+$incomeReportHeroChips = array_filter([
+    'Period: ' . $reportPeriodDisplay,
+    $selectedCategoryName ? 'Category: ' . $selectedCategoryName : ($category_id ? 'Category: #' . $category_id : 'Category: All'),
+    $incomeReportStatus,
+]);
+
+$incomeReportHeroHighlights = [
+    [
+        'label' => 'Total Income',
+        'value' => '$' . number_format($incomeReportTotal, 2),
+        'meta' => 'Across selected period',
+    ],
+    [
+        'label' => 'Categories',
+        'value' => number_format($incomeReportCategories),
+        'meta' => 'With activity',
+    ],
+    [
+        'label' => 'Transactions',
+        'value' => number_format($incomeReportTransactions),
+        'meta' => 'Detailed rows',
+    ],
+];
+
+$incomeReportHeroActions = [
+    [
+        'label' => 'Reports Dashboard',
+        'url' => '/accounting/reports/reports_dashboard.php',
+        'variant' => 'outline',
+        'icon' => 'fa-chart-line',
+    ],
+    [
+        'label' => 'Download PDF',
+        'url' => '/accounting/reports/download.php?type=income_report&start_date=' . urlencode($start_date) . '&end_date=' . urlencode($end_date) . ($category_id ? '&category_id=' . urlencode((string)$category_id) : ''),
+        'variant' => 'outline',
+        'icon' => 'fa-file-pdf',
+    ],
+    [
+        'label' => 'Accounting Dashboard',
+        'url' => '/accounting/dashboard.php',
+        'variant' => 'outline',
+        'icon' => 'fa-arrow-left',
+    ],
+];
+
+$incomeReportHeroConfig = [
+    'eyebrow' => 'Revenue Intelligence',
+    'title' => 'Income Report',
+    'subtitle' => 'See which categories drive income and how transactions trend.',
+    'chips' => $incomeReportHeroChips,
+    'highlights' => $incomeReportHeroHighlights,
+    'actions' => $incomeReportHeroActions,
+    'theme' => 'emerald',
+    'size' => 'compact',
+    'media_mode' => 'none',
+];
+
 ?>
 
 <!DOCTYPE html>
@@ -261,27 +335,38 @@ try {
     }
     ?>
 
+    <?php if (function_exists('renderPremiumHero')) {
+        renderPremiumHero($incomeReportHeroConfig);
+    } ?>
+
     <!-- Page Container -->
     <div class="page-container">
-        <!-- Header Card -->
-        <div class="card shadow mb-4">
-            <div class="card-header bg-success text-white">
-                <div class="row align-items-center">
-                    <div class="col-auto">
-                        <i class="fas fa-dollar-sign fa-2x"></i>
-                    </div>
-                    <div class="col">
-                        <h3 class="mb-0">Income Report</h3>
-                        <small>Detailed income analysis by category and time period</small>
-                    </div>
-                    <div class="col-auto">
-                        <a href="/accounting/reports/reports_dashboard.php" class="btn btn-light btn-sm">
-                            <i class="fas fa-arrow-left me-1"></i>Back to Reports
-                        </a>
+        <?php if (!function_exists('renderPremiumHero')): ?>
+            <?php $fallbackLogo = accounting_logo_src_for(__DIR__); ?>
+            <section class="hero hero-small mb-4">
+                <div class="hero-body py-3">
+                    <div class="container-fluid">
+                        <div class="row align-items-center">
+                            <div class="col-md-2 d-none d-md-flex justify-content-center">
+                                <img src="<?= htmlspecialchars($fallbackLogo); ?>" alt="W5OBM Logo" class="img-fluid no-shadow" style="max-height:64px;">
+                            </div>
+                            <div class="col-md-6 text-center text-md-start text-white">
+                                <h1 class="h4 mb-1">Income Report</h1>
+                                <p class="mb-0 small">Detailed income analysis by category and time period.</p>
+                            </div>
+                            <div class="col-md-4 text-center text-md-end mt-3 mt-md-0">
+                                <a href="/accounting/reports/reports_dashboard.php" class="btn btn-outline-light btn-sm me-2">
+                                    <i class="fas fa-chart-line me-1"></i>Reports Dashboard
+                                </a>
+                                <a href="/accounting/dashboard.php" class="btn btn-primary btn-sm">
+                                    <i class="fas fa-arrow-left me-1"></i>Accounting Dashboard
+                                </a>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </div>
+            </section>
+        <?php endif; ?>
 
         <!-- Report Parameters -->
         <div class="card shadow mb-4">

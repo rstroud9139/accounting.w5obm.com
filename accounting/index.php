@@ -50,9 +50,21 @@ if (!function_exists('route')) {
     }
 }
 
-// For current phase: always use DEV main site for authentication
-// This keeps accounting.w5obm.com pointing at dev.w5obm.com auth
-$mainSiteBase = 'https://dev.w5obm.com/';
+// Determine where the authentication module lives. Prefer the local copy that now ships with
+// accounting.w5obm.com; fall back to historic remote hosts only if those files are missing.
+$authBase = '/authentication/';
+$authFolder = realpath(__DIR__ . '/../authentication') ?: (__DIR__ . '/../authentication');
+if (!is_dir($authFolder)) {
+    $hostName = $_SERVER['HTTP_HOST'] ?? 'accounting.w5obm.com';
+    if (stripos($hostName, 'dev.') !== false || stripos($hostName, 'localhost') !== false) {
+        $authBase = 'https://dev.w5obm.com/authentication/';
+    } else {
+        $authBase = 'https://www.w5obm.com/authentication/';
+    }
+}
+
+$loginEndpoint = rtrim($authBase, '/') . '/login.php';
+$dashboardEndpoint = rtrim($authBase, '/') . '/dashboard.php';
 
 // Build return URL so that, after login, control returns here and
 // this script can continue with permission checks and routing.
@@ -65,7 +77,8 @@ $returnUrl = urlencode($scheme . '://' . $host . $currentScript);
 // Check authentication using consolidated functions
 if (!isAuthenticated()) {
     setToastMessage('info', 'Login Required', "Please login to access {$APP_NAME}.", 'club-logo');
-    header('Location: ' . $mainSiteBase . 'authentication/login.php?return_url=' . $returnUrl);
+    $loginTarget = $loginEndpoint . '?return_url=' . $returnUrl;
+    header('Location: ' . $loginTarget);
     exit();
 }
 
@@ -103,7 +116,8 @@ try {
 // If somehow authenticated() is true but user_id is missing, treat as not logged in
 if (!$user_id) {
     setToastMessage('info', 'Login Required', "Please login to access {$APP_NAME}.", 'club-logo');
-    header('Location: ' . $mainSiteBase . 'authentication/login.php?return_url=' . $returnUrl);
+    $loginTarget = $loginEndpoint . '?return_url=' . $returnUrl;
+    header('Location: ' . $loginTarget);
     exit();
 }
 
@@ -114,7 +128,7 @@ if (!$user_id) {
 // - Otherwise require the configured permission (admin.access)
 if (!$is_super_admin_db && !$is_admin_db && !$has_app_perm) {
     setToastMessage('danger', 'Access Denied', "You do not have permission to access {$APP_NAME}.", 'club-logo');
-    header('Location: ' . $mainSiteBase . 'authentication/dashboard.php');
+    header('Location: ' . $dashboardEndpoint);
     exit();
 }
 

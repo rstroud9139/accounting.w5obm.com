@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<gnc-v2
+     xmlns:gnc="http://www.gnucash.org/XML/gnc"
+     xmlns:act="http://www.gnucash.org/XML/act"
+     xmlns:book="http://www.gnucash.org/XML/book"
+     xmlns:cd="http://www.gnucash.org/XML/cd"
+     xmlns:cmdty="http://www.gnucash.org/XML/cmdty"
+     xmlns:price="http://www.gnucash.org/XML/price"
+     xmlns:slot="http://www.gnucash.org/XML/slot"
+     xmlns:split="http://www.gnucash.org/XML/split"
+     xmlns:sx="http://www.gnucash.org/XML/sx"
+     xmlns:trn="http://www.gnucash.org/XML/trn"
+     xmlns:ts="http://www.gnucash.org/XML/ts"
+     xmlns:fs="http://www.gnucash.org/XML/fs"
+     xmlns:bgt="http://www.gnucash.org/XML/bgt"
+     xmlns:recurrence="http://www.gnucash.org/XML/recurrence"
+     xmlns:lot="http://www.gnucash.org/XML/lot"
+     xmlns:cust="http://www.gnucash.org/XML/cust"
+     xmlns:job="http://www.gnucash.org/XML/job"
+     xmlns:addr="http://www.gnucash.org/XML/addr"
+     xmlns:owner="http://www.gnucash.org/XML/owner"
+     xmlns:billterm="http://www.gnucash.org/XML/billterm"
+     xmlns:bt-days="http://www.gnucash.org/XML/bt-days"
+     xmlns:bt-prox="http://www.gnucash.org/XML/bt-prox"
+     xmlns:invoice="http://www.gnucash.org/XML/invoice"
+     xmlns:entry="http://www.gnucash.org/XML/entry"
+     xmlns:order="http://www.gnucash.org/XML/order"
+     xmlns:taxtable="http://www.gnucash.org/XML/taxtable"
+     xmlns:tte="http://www.gnucash.org/XML/tte"
+     xmlns:employee="http://www.gnucash.org/XML/employee"
+     xmlns:vendor="http://www.gnucash.org/XML/vendor">
+<gnc:count-data cd:type="book">1</gnc:count-data>
+<gnc:book version="2.0.0">
+<book:id type="guid">abc123def456</book:id>
+<gnc:count-data cd:type="account">2</gnc:count-data>
+<gnc:account version="2.0.0">
+  <act:name>Checking Account</act:name>
+  <act:id type="guid">account-001</act:id>
+  <act:type>BANK</act:type>
+  <act:code>1000</act:code>
+  <act:description>Main checking account</act:description>
+  <act:commodity>
+    <cmdty:space>ISO4217</cmdty:space>
+    <cmdty:id>USD</cmdty:id>
+  </act:commodity>
+</gnc:account>
+<gnc:account version="2.0.0">
+  <act:name>Membership Dues</act:name>
+  <act:id type="guid">account-002</act:id>
+  <act:type>INCOME</act:type>
+  <act:code>4000</act:code>
+  <act:description>Member dues income</act:description>
+  <act:commodity>
+    <cmdty:space>ISO4217</cmdty:space>
+    <cmdty:id>USD</cmdty:id>
+  </act:commodity>
+</gnc:account>
+<gnc:count-data cd:type="transaction">1</gnc:count-data>
+<gnc:transaction version="2.0.0">
+  <trn:id type="guid">txn-001</trn:id>
+  <trn:currency>
+    <cmdty:space>ISO4217</cmdty:space>
+    <cmdty:id>USD</cmdty:id>
+  </trn:currency>
+  <trn:num>001</trn:num>
+  <trn:date-posted>
+    <ts:date>2025-01-15 10:00:00 -0600</ts:date>
+  </trn:date-posted>
+  <trn:date-entered>
+    <ts:date>2025-01-15 10:00:00 -0600</ts:date>
+  </trn:date-entered>
+  <trn:description>Member dues payment - John Doe</trn:description>
+  <trn:splits>
+    <trn:split>
+      <split:id type="guid">split-001-a</split:id>
+      <split:reconciled-state>n</split:reconciled-state>
+      <split:value>5000/100</split:value>
+      <split:quantity>5000/100</split:quantity>
+      <split:account type="guid">account-001</split:account>
+      <split:memo>Dues payment received</split:memo>
+      <split:action>Deposit</split:action>
+    </trn:split>
+    <trn:split>
+      <split:id type="guid">split-001-b</split:id>
+      <split:reconciled-state>n</split:reconciled-state>
+      <split:value>-5000/100</split:value>
+      <split:quantity>-5000/100</split:quantity>
+      <split:account type="guid">account-002</split:account>
+      <split:memo>Member dues</split:memo>
+      <split:action>Income</split:action>
+    </trn:split>
+  </trn:splits>
+</gnc:transaction>
+</gnc:book>
+</gnc-v2>

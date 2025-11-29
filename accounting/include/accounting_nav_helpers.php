@@ -93,6 +93,13 @@ if (!function_exists('accounting_render_workspace_nav')) {
                     'chevron' => true,
                 ],
                 [
+                    'key' => 'imports',
+                    'label' => 'Imports',
+                    'icon' => 'fa-file-import text-info',
+                    'url' => '/accounting/imports.php',
+                    'chevron' => true,
+                ],
+                [
                     'key' => 'ledger',
                     'label' => 'Chart of Accounts',
                     'icon' => 'fa-book text-warning',
@@ -164,5 +171,120 @@ if (!function_exists('accounting_render_workspace_nav')) {
         }
         echo '</div>';
         echo '</nav>';
+    }
+}
+
+if (!function_exists('accounting_quick_cash_contact_name')) {
+    function accounting_quick_cash_contact_name(): string
+    {
+        return 'Anonymous - Cash Collections';
+    }
+}
+
+if (!function_exists('accounting_quick_cash_resolve_context')) {
+    /**
+     * Resolve quick-post cash donation context: categories, accounts, defaults, contact
+     * @param mysqli|null $conn Database connection
+     * @return array Context data for quick-post widget
+     */
+    function accounting_quick_cash_resolve_context($conn = null): array
+    {
+        if (!$conn) {
+            global $conn;
+        }
+        
+        $context = [
+            'contact_id' => null,
+            'contact_name' => accounting_quick_cash_contact_name(),
+            'categories' => [],
+            'accounts' => [],
+            'default_category_id' => null,
+            'default_account_id' => null,
+        ];
+
+        if (!$conn instanceof mysqli) {
+            return $context;
+        }
+
+        try {
+            // Ensure anonymous contact exists
+            $contactName = $context['contact_name'];
+            $stmt = $conn->prepare("SELECT id FROM acc_contacts WHERE name = ? LIMIT 1");
+            $stmt->bind_param('s', $contactName);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            $row = $result->fetch_assoc();
+            $stmt->close();
+
+            if ($row) {
+                $context['contact_id'] = (int)$row['id'];
+            } else {
+                // Create the anonymous contact
+                $stmt = $conn->prepare("
+                    INSERT INTO acc_contacts (name, email, notes, created_at) 
+                    VALUES (?, NULL, 'System-generated contact for quick-post cash donations', NOW())
+                ");
+                $stmt->bind_param('s', $contactName);
+                if ($stmt->execute()) {
+                    $context['contact_id'] = (int)$conn->insert_id;
+                }
+                $stmt->close();
+            }
+
+            // Fetch income categories
+            $stmt = $conn->prepare("
+                SELECT id, name, type, description 
+                FROM acc_transaction_categories 
+                WHERE type = 'Income'
+                ORDER BY 
+                    CASE WHEN name LIKE '%Donation%' THEN 1 
+                         WHEN name LIKE '%Contribution%' THEN 2 
+                         ELSE 3 END,
+                    name
+            ");
+            $stmt->execute();
+            $result = $stmt->get_result();
+            while ($row = $result->fetch_assoc()) {
+                $context['categories'][] = $row;
+                if (!$context['default_category_id'] && 
+                    (stripos($row['name'], 'Donation') !== false || stripos($row['name'], 'Contribution') !== false)) {
+                    $context['default_category_id'] = (int)$row['id'];
+                }
+            }
+            $stmt->close();
+
+            // If no donation category found, set first income category as default
+            if (!$context['default_category_id'] && !empty($context['categories'])) {
+                $context['default_category_id'] = (int)$context['categories'][0]['id'];
+            }
+
+            // Fetch cash/checking accounts
+            $stmt = $conn->prepare("
+                SELECT id, name, account_number, account_type 
+                FROM acc_ledger_accounts 
+                WHERE active = 1 
+                  AND account_type = 'Asset'
+                  AND (name LIKE '%Cash%' OR name LIKE '%Checking%' OR account_number LIKE '11%')
+                ORDER BY 
+                    CASE WHEN name LIKE '%Cash%' THEN 1 
+                         WHEN name LIKE '%Checking%' THEN 2 
+                         ELSE 3 END,
+                    name
+            ");
+            $stmt->execute();
+            $result = $stmt->get_result();
+            while ($row = $result->fetch_assoc()) {
+                $context['accounts'][] = $row;
+                if (!$context['default_account_id']) {
+                    $context['default_account_id'] = (int)$row['id'];
+                }
+            }
+            $stmt->close();
+
+        } catch (Exception $e) {
+            error_log("Error resolving quick-post context: " . $e->getMessage());
+        }
+
+        return $context;
     }
 }

@@ -1,0 +1,853 @@
+﻿<?php
+
+/**
+ * Two-Factor Authentication Utilities
+ * File: /authentication/totp_utils.php
+ * Purpose: Complete 2FA implementation for W5OBM
+ */
+
+// filepath: w5obm.com/authentication/totp_utils.php
+
+require_once __DIR__ . '/../include/dbconn.php';
+require_once __DIR__ . '/../include/helper_functions.php';
+
+/**
+ * TOTP (Time-based One-Time Password) Utility Functions
+ * RFC 6238 compliant implementation
+ */
+
+if (!function_exists('base32_decode')) {
+    /**
+     * Decode a base32 string
+     */
+    function base32_decode($data)
+    {
+        $data = strtoupper($data);
+        $data = str_replace(array('=', ' ', "\t", "\r", "\n"), '', $data);
+
+        $alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
+        $output = '';
+        $v = 0;
+        $vbits = 0;
+
+        for ($i = 0; $i < strlen($data); $i++) {
+            $v = ($v << 5) | strpos($alphabet, $data[$i]);
+            $vbits += 5;
+            if ($vbits >= 8) {
+                $output .= chr(($v >> ($vbits - 8)) & 255);
+                $vbits -= 8;
+            }
+        }
+
+        return $output;
+    }
+}
+
+if (!function_exists('base32_encode')) {
+    /**
+     * Encode a string to base32
+     */
+    function base32_encode($data)
+    {
+        $alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
+        $output = '';
+        $v = 0;
+        $vbits = 0;
+
+        for ($i = 0; $i < strlen($data); $i++) {
+            $v = ($v << 8) | ord($data[$i]);
+            $vbits += 8;
+            while ($vbits >= 5) {
+                $output .= $alphabet[($v >> ($vbits - 5)) & 31];
+                $vbits -= 5;
+            }
+        }
+
+        if ($vbits > 0) {
+            $output .= $alphabet[($v << (5 - $vbits)) & 31];
+        }
+
+        return $output;
+    }
+}
+
+if (!function_exists('generateTOTPSecret')) {
+    /**
+     * Generate a random secret for TOTP
+     */
+    function generateTOTPSecret($length = 32)
+    {
+        try {
+            $secret = random_bytes($length);
+            return base32_encode($secret);
+        } catch (Exception $e) {
+            error_log("TOTP Secret generation error: " . $e->getMessage());
+            // Fallback to less secure method
+            $chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
+            $secret = '';
+            for ($i = 0; $i < $length; $i++) {
+                $secret .= $chars[mt_rand(0, strlen($chars) - 1)];
+            }
+            return $secret;
+        }
+    }
+}
+
+if (!function_exists('generateTOTPCode')) {
+    /**
+     * Generate TOTP code
+     */
+    function generateTOTPCode($secret, $time = null)
+    {
+        if ($time === null) {
+            $time = time();
+        }
+
+        try {
+            $timeSlice = intval($time / 30);
+            $secretKey = base32_decode($secret);
+
+            if (!$secretKey) {
+                throw new Exception("Invalid secret key");
+            }
+
+            $time = pack('N*', 0, $timeSlice);
+            $hash = hash_hmac('sha1', $time, $secretKey, true);
+            $offset = ord($hash[19]) & 0xf;
+
+            $code = (
+                ((ord($hash[$offset]) & 0x7f) << 24) |
+                ((ord($hash[$offset + 1]) & 0xff) << 16) |
+                ((ord($hash[$offset + 2]) & 0xff) << 8) |
+                (ord($hash[$offset + 3]) & 0xff)
+            ) % 1000000;
+
+            return sprintf('%06d', $code);
+        } catch (Exception $e) {
+            error_log("TOTP Code generation error: " . $e->getMessage());
+            return false;
+        }
+    }
+}
+
+if (!function_exists('verifyTOTPCodeWithSecret')) {
+    /**
+     * Verify TOTP code with secret and time tolerance
+     */
+    function verifyTOTPCodeWithSecret($secret, $code, $tolerance = 1)
+    {
+        $currentTime = time();
+
+        // Check current time slice and adjacent ones for tolerance
+        for ($i = -$tolerance; $i <= $tolerance; $i++) {
+            $testTime = $currentTime + ($i * 30);
+            $expectedCode = generateTOTPCode($secret, $testTime);
+
+            if ($expectedCode && hash_equals($expectedCode, $code)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+}
+
+if (!function_exists('verifyTOTPCode')) {
+    /**
+     * Verify TOTP code for a specific user
+     */
+    function verifyTOTPCode($user_id, $code)
+    {
+        global $conn;
+
+        try {
+            $stmt = $conn->prepare("SELECT two_factor_secret FROM auth_users WHERE id = ? AND two_factor_enabled = 1");
+            $stmt->bind_param('i', $user_id);
+            $stmt->execute();
+            $result = $stmt->get_result()->fetch_assoc();
+            $stmt->close();
+
+            if (!$result || !$result['two_factor_secret']) {
+                return false;
+            }
+
+            return verifyTOTPCodeWithSecret($result['two_factor_secret'], $code);
+        } catch (Exception $e) {
+            error_log("TOTP verification error: " . $e->getMessage());
+            return false;
+        }
+    }
+}
+
+if (!function_exists('generateTOTPQRCode')) {
+    /**
+     * Generate QR code URL for TOTP setup
+     */
+    function generateTOTPQRCode($username, $secret, $issuer = 'W5OBM Authorization')
+    {
+        $issuer = urlencode($issuer);
+        $username = urlencode($username);
+
+        $otpauthURL = "otpauth://totp/{$issuer}:{$username}?secret={$secret}&issuer={$issuer}";
+        $qrCodeURL = "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=" . urlencode($otpauthURL);
+
+        return array(
+            'qr_url' => $qrCodeURL,
+            'manual_entry' => $secret,
+            'otpauth_url' => $otpauthURL
+        );
+    }
+}
+
+if (!function_exists('generateBackupCodes')) {
+    /**
+     * Generate backup codes for account recovery
+     */
+    function generateBackupCodes($count = 10)
+    {
+        $codes = array();
+
+        try {
+            for ($i = 0; $i < $count; $i++) {
+                $code = '';
+                for ($j = 0; $j < 8; $j++) {
+                    $code .= mt_rand(0, 9);
+                }
+                // Format as XXXX-XXXX
+                $codes[] = substr($code, 0, 4) . '-' . substr($code, 4);
+            }
+
+            return $codes;
+        } catch (Exception $e) {
+            error_log("Backup codes generation error: " . $e->getMessage());
+            return array();
+        }
+    }
+}
+
+if (!function_exists('validateTOTPSecret')) {
+    /**
+     * Validate that a secret is properly formatted
+     */
+    function validateTOTPSecret($secret)
+    {
+        // Remove any whitespace
+        $secret = preg_replace('/\s+/', '', $secret);
+
+        // Check if it's valid base32
+        if (!preg_match('/^[A-Z2-7]+$/', $secret)) {
+            return false;
+        }
+
+        // Check minimum length (should be at least 16 characters for security)
+        if (strlen($secret) < 16) {
+            return false;
+        }
+
+        return true;
+    }
+}
+
+/**
+ * Simple Base32 encoding/decoding for TOTP secrets
+ */
+class SimpleBase32
+{
+    private static $alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
+
+    public static function encode($input)
+    {
+        if (empty($input)) return '';
+
+        $binary = '';
+        foreach (str_split($input) as $char) {
+            $binary .= str_pad(decbin(ord($char)), 8, '0', STR_PAD_LEFT);
+        }
+
+        $chunks = str_split($binary, 5);
+        $encoded = '';
+
+        foreach ($chunks as $chunk) {
+            $chunk = str_pad($chunk, 5, '0', STR_PAD_RIGHT);
+            $encoded .= self::$alphabet[bindec($chunk)];
+        }
+
+        return $encoded;
+    }
+
+    public static function decode($input)
+    {
+        if (empty($input)) return '';
+
+        $input = strtoupper(str_replace(['=', ' ', "\t", "\r", "\n"], '', $input));
+        $binary = '';
+
+        foreach (str_split($input) as $char) {
+            $pos = strpos(self::$alphabet, $char);
+            if ($pos !== false) {
+                $binary .= str_pad(decbin($pos), 5, '0', STR_PAD_LEFT);
+            }
+        }
+
+        $chunks = str_split($binary, 8);
+        $decoded = '';
+
+        foreach ($chunks as $chunk) {
+            if (strlen($chunk) === 8) {
+                $decoded .= chr(bindec($chunk));
+            }
+        }
+
+        return $decoded;
+    }
+}
+
+/**
+ * Simple TOTP implementation
+ */
+class SimpleTOTP
+{
+    private $secret;
+    private $digits;
+    private $period;
+
+    public function __construct($secret, $digits = 6, $period = 30)
+    {
+        $this->secret = $secret;
+        $this->digits = $digits;
+        $this->period = $period;
+    }
+
+    public function generateCode($timestamp = null)
+    {
+        if ($timestamp === null) {
+            $timestamp = time();
+        }
+
+        $timeSlice = intval($timestamp / $this->period);
+        $secretKey = SimpleBase32::decode($this->secret);
+
+        $time = pack('N*', 0) . pack('N*', $timeSlice);
+        $hash = hash_hmac('sha1', $time, $secretKey, true);
+
+        $offset = ord($hash[19]) & 0xf;
+        $code = (
+            ((ord($hash[$offset + 0]) & 0x7f) << 24) |
+            ((ord($hash[$offset + 1]) & 0xff) << 16) |
+            ((ord($hash[$offset + 2]) & 0xff) << 8) |
+            (ord($hash[$offset + 3]) & 0xff)
+        ) % pow(10, $this->digits);
+
+        return str_pad($code, $this->digits, '0', STR_PAD_LEFT);
+    }
+
+    public function verify($code, $timestamp = null, $window = 1)
+    {
+        if ($timestamp === null) {
+            $timestamp = time();
+        }
+
+        $code = str_pad($code, $this->digits, '0', STR_PAD_LEFT);
+
+        for ($i = -$window; $i <= $window; $i++) {
+            $testTime = $timestamp + ($i * $this->period);
+            if ($this->generateCode($testTime) === $code) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+}
+
+/**
+ * Generate a new 2FA secret key
+ */
+function generate2FASecret()
+{
+    return SimpleBase32::encode(random_bytes(20));
+}
+
+/**
+ * Get QR code data URL for 2FA setup
+ */
+function get2FAQRCodeData($username, $secret)
+{
+    $label = urlencode($username);
+    $issuer = urlencode('W5OBM');
+
+    return "otpauth://totp/{$issuer}:{$label}?secret={$secret}&issuer={$issuer}&algorithm=SHA1&digits=6&period=30";
+}
+
+/**
+ * Verify TOTP code for a user
+ */
+function verifyTOTPCode($user_id, $code)
+{
+    global $conn;
+
+    try {
+        $stmt = $conn->prepare("SELECT two_factor_secret FROM auth_users WHERE id = ? AND two_factor_enabled = 1");
+        $stmt->bind_param('i', $user_id);
+        $stmt->execute();
+        $result = $stmt->get_result()->fetch_assoc();
+        $stmt->close();
+
+        if (!$result || !$result['two_factor_secret']) {
+            return false;
+        }
+
+        return verifyTOTPCodeWithSecret($result['two_factor_secret'], $code);
+    } catch (Exception $e) {
+        error_log("TOTP verification error: " . $e->getMessage());
+        return false;
+    }
+}
+
+/**
+ * Verify TOTP code with specific secret
+ */
+function verifyTOTPCodeWithSecret($secret, $code)
+{
+    try {
+        $totp = new SimpleTOTP($secret);
+        return $totp->verify($code, null, 1);
+    } catch (Exception $e) {
+        error_log("TOTP verification error: " . $e->getMessage());
+        return false;
+    }
+}
+
+/**
+ * Generate backup codes
+ */
+function generateBackupCodes($count = 10)
+{
+    $codes = [];
+    for ($i = 0; $i < $count; $i++) {
+        $codes[] = strtoupper(substr(str_replace(['/', '+', '='], '', base64_encode(random_bytes(6))), 0, 8));
+    }
+    return $codes;
+}
+
+/**
+ * Verify backup code
+ */
+function verifyBackupCode($user_id, $code)
+{
+    global $conn;
+
+    try {
+        $stmt = $conn->prepare("SELECT two_factor_backup_codes FROM auth_users WHERE id = ? AND two_factor_enabled = 1");
+        $stmt->bind_param('i', $user_id);
+        $stmt->execute();
+        $result = $stmt->get_result()->fetch_assoc();
+        $stmt->close();
+
+        if (!$result || !$result['two_factor_backup_codes']) {
+            return false;
+        }
+
+        $backup_codes = json_decode($result['two_factor_backup_codes'], true);
+        if (!is_array($backup_codes)) {
+            return false;
+        }
+
+        $code_upper = strtoupper(trim($code));
+        $key = array_search($code_upper, $backup_codes);
+
+        if ($key !== false) {
+            // Remove used code
+            unset($backup_codes[$key]);
+            $backup_codes = array_values($backup_codes);
+
+            // Update database
+            $stmt = $conn->prepare("UPDATE auth_users SET two_factor_backup_codes = ? WHERE id = ?");
+            $codes_json = json_encode($backup_codes);
+            $stmt->bind_param('si', $codes_json, $user_id);
+            $stmt->execute();
+            $success = $stmt->affected_rows > 0;
+            $stmt->close();
+
+            if ($success && function_exists('logAuditEvent')) {
+                logAuditEvent($user_id, 'backup_code_used', json_encode([
+                    'table' => 'auth_users',
+                    'record_id' => $user_id,
+                    'code_used' => substr($code_upper, 0, 2) . '***'
+                ]));
+            }
+
+            return $success;
+        }
+
+        return false;
+    } catch (Exception $e) {
+        error_log("Backup code verification error: " . $e->getMessage());
+        return false;
+    }
+}
+
+/**
+ * Enable 2FA for a user
+ */
+function enable2FAForUser($user_id, $secret, $backup_codes = null)
+{
+    global $conn;
+
+    try {
+        if ($backup_codes === null) {
+            $backup_codes = generateBackupCodes();
+        }
+
+        $stmt = $conn->prepare("
+            UPDATE auth_users 
+            SET two_factor_enabled = 1, 
+                two_factor_secret = ?, 
+                two_factor_backup_codes = ?,
+                two_factor_setup_at = NOW()
+            WHERE id = ?
+        ");
+
+        $codes_json = json_encode($backup_codes);
+        $stmt->bind_param('ssi', $secret, $codes_json, $user_id);
+        $stmt->execute();
+        $success = $stmt->affected_rows > 0;
+        $stmt->close();
+
+        if ($success && function_exists('logAuditEvent')) {
+            logAuditEvent($user_id, '2fa_enabled', json_encode([
+                'table' => 'auth_users',
+                'record_id' => $user_id,
+                'backup_codes_count' => count($backup_codes)
+            ]));
+        }
+
+        return $success ? $backup_codes : false;
+    } catch (Exception $e) {
+        error_log("2FA enable error: " . $e->getMessage());
+        return false;
+    }
+}
+
+/**
+ * Disable 2FA for a user
+ */
+function disable2FAForUser($user_id)
+{
+    global $conn;
+
+    try {
+        $stmt = $conn->prepare("
+            UPDATE auth_users 
+            SET two_factor_enabled = 0, 
+                two_factor_secret = NULL, 
+                two_factor_backup_codes = NULL,
+                two_factor_setup_at = NULL
+            WHERE id = ?
+        ");
+
+        $stmt->bind_param('i', $user_id);
+        $stmt->execute();
+        $success = $stmt->affected_rows > 0;
+        $stmt->close();
+
+        if ($success) {
+            // Remove all trusted devices for this user
+            if (tableExists('auth_trusted_devices')) {
+                $stmt = $conn->prepare("DELETE FROM auth_trusted_devices WHERE user_id = ?");
+                $stmt->bind_param('i', $user_id);
+                $stmt->execute();
+                $stmt->close();
+            }
+
+            if (function_exists('logAuditEvent')) {
+                logAuditEvent($user_id, '2fa_disabled', 'auth_users', $user_id);
+            }
+        }
+
+        return $success;
+    } catch (Exception $e) {
+        error_log("2FA disable error: " . $e->getMessage());
+        return false;
+    }
+}
+
+/**
+ * Check if user needs 2FA
+ */
+function userNeeds2FA($user_id)
+{
+    global $conn;
+
+    try {
+        $stmt = $conn->prepare("SELECT two_factor_enabled FROM auth_users WHERE id = ?");
+        $stmt->bind_param('i', $user_id);
+        $stmt->execute();
+        $result = $stmt->get_result()->fetch_assoc();
+        $stmt->close();
+
+        if (!$result || !$result['two_factor_enabled']) {
+            return false;
+        }
+
+        // Check if device is trusted (if table exists)
+        if (tableExists('auth_trusted_devices')) {
+            $device_token = $_COOKIE['trusted_device'] ?? null;
+            if ($device_token && isTrustedDevice($user_id, $device_token)) {
+                return false;
+            }
+        }
+
+        return true;
+    } catch (Exception $e) {
+        error_log("Check 2FA requirement error: " . $e->getMessage());
+        return false;
+    }
+}
+
+/**
+ * Check if device is trusted
+ */
+function isTrustedDevice($user_id, $device_token)
+{
+    global $conn;
+
+    if (!tableExists('auth_trusted_devices')) {
+        return false;
+    }
+
+    try {
+        $stmt = $conn->prepare("
+            SELECT id FROM auth_trusted_devices 
+            WHERE user_id = ? AND device_token = ? AND expires_at > NOW()
+        ");
+
+        $stmt->bind_param('is', $user_id, $device_token);
+        $stmt->execute();
+        $result = $stmt->get_result()->fetch_assoc();
+        $stmt->close();
+
+        if ($result) {
+            // Update last used
+            $stmt = $conn->prepare("UPDATE auth_trusted_devices SET last_used_at = NOW() WHERE id = ?");
+            $stmt->bind_param('i', $result['id']);
+            $stmt->execute();
+            $stmt->close();
+
+            return true;
+        }
+
+        return false;
+    } catch (Exception $e) {
+        error_log("Trusted device check error: " . $e->getMessage());
+        return false;
+    }
+}
+
+/**
+ * Create trusted device
+ */
+function createTrustedDevice($user_id, $ip_address, $user_agent)
+{
+    global $conn;
+
+    if (!tableExists('auth_trusted_devices')) {
+        return false;
+    }
+
+    try {
+        $device_token = bin2hex(random_bytes(32));
+        $device_name = getBrowserInfo($user_agent);
+        $trusted_days = 30;
+        $expires_at = date('Y-m-d H:i:s', time() + ($trusted_days * 24 * 60 * 60));
+
+        $stmt = $conn->prepare("
+            INSERT INTO auth_trusted_devices 
+            (user_id, device_token, device_name, ip_address, user_agent, expires_at) 
+            VALUES (?, ?, ?, ?, ?, ?)
+        ");
+
+        $stmt->bind_param('isssss', $user_id, $device_token, $device_name, $ip_address, $user_agent, $expires_at);
+        $stmt->execute();
+        $success = $stmt->affected_rows > 0;
+        $stmt->close();
+
+        if ($success) {
+            setcookie('trusted_device', $device_token, time() + ($trusted_days * 24 * 60 * 60), '/', '', true, true);
+            if (function_exists('logAuditEvent')) {
+                logAuditEvent($user_id, 'trusted_device_created', json_encode([
+                    'table' => 'auth_trusted_devices',
+                    'device_name' => $device_name
+                ]));
+            }
+            return $device_token;
+        }
+        return false;
+    } catch (Exception $e) {
+        error_log("Create trusted device error: " . $e->getMessage());
+        return false;
+    }
+}
+
+/**
+ * Get browser info from user agent
+ */
+function getBrowserInfo($user_agent)
+{
+    $browser = 'Unknown Browser';
+    $os = 'Unknown OS';
+
+    // Detect browser
+    if (strpos($user_agent, 'Chrome') !== false) {
+        $browser = 'Chrome';
+    } elseif (strpos($user_agent, 'Firefox') !== false) {
+        $browser = 'Firefox';
+    } elseif (strpos($user_agent, 'Safari') !== false) {
+        $browser = 'Safari';
+    } elseif (strpos($user_agent, 'Edge') !== false) {
+        $browser = 'Edge';
+    }
+
+    // Detect OS
+    if (strpos($user_agent, 'Windows') !== false) {
+        $os = 'Windows';
+    } elseif (strpos($user_agent, 'Mac') !== false) {
+        $os = 'macOS';
+    } elseif (strpos($user_agent, 'Linux') !== false) {
+        $os = 'Linux';
+    } elseif (strpos($user_agent, 'Android') !== false) {
+        $os = 'Android';
+    } elseif (strpos($user_agent, 'iOS') !== false) {
+        $os = 'iOS';
+    }
+
+    return $browser . ' on ' . $os;
+}
+
+/**
+ * Get user's 2FA status
+ */
+function get2FAStatus($user_id)
+{
+    global $conn;
+
+    try {
+        $stmt = $conn->prepare("
+            SELECT 
+                two_factor_enabled,
+                two_factor_setup_at,
+                two_factor_backup_codes
+            FROM auth_users 
+            WHERE id = ?
+        ");
+
+        $stmt->bind_param('i', $user_id);
+        $stmt->execute();
+        $result = $stmt->get_result()->fetch_assoc();
+        $stmt->close();
+
+        if ($result) {
+            $backup_codes = $result['two_factor_backup_codes'] ? json_decode($result['two_factor_backup_codes'], true) : [];
+
+            return [
+                'enabled' => (bool)$result['two_factor_enabled'],
+                'setup_at' => $result['two_factor_setup_at'],
+                'backup_codes_remaining' => is_array($backup_codes) ? count($backup_codes) : 0
+            ];
+        }
+
+        return [
+            'enabled' => false,
+            'setup_at' => null,
+            'backup_codes_remaining' => 0
+        ];
+    } catch (Exception $e) {
+        error_log("Get 2FA status error: " . $e->getMessage());
+        return false;
+    }
+}
+
+/**
+ * Verify user password for critical operations
+ */
+function verifyUserPassword($user_id, $password)
+{
+    global $conn;
+
+    try {
+        $stmt = $conn->prepare("SELECT password_hash FROM auth_users WHERE id = ?");
+        $stmt->bind_param('i', $user_id);
+        $stmt->execute();
+        $result = $stmt->get_result()->fetch_assoc();
+        $stmt->close();
+
+        if ($result && password_verify($password, $result['password_hash'])) {
+            return true;
+        }
+
+        return false;
+    } catch (Exception $e) {
+        error_log("Password verification error: " . $e->getMessage());
+        return false;
+    }
+}
+
+/**
+ * Check if table exists
+ */
+function tableExists($table_name)
+{
+    global $conn;
+
+    try {
+        $result = $conn->query("SHOW TABLES LIKE '{$table_name}'");
+        return $result->num_rows > 0;
+    } catch (Exception $e) {
+        return false;
+    }
+}
+
+
+/**
+ * Clean up expired data
+ */
+function cleanup2FAData()
+{
+    global $conn;
+
+    try {
+        $deleted_devices = 0;
+        $deleted_sessions = 0;
+
+        // Clean expired trusted devices if table exists
+        if (tableExists('auth_trusted_devices')) {
+            $stmt = $conn->prepare("DELETE FROM auth_trusted_devices WHERE expires_at < NOW()");
+            $stmt->execute();
+            $deleted_devices = $stmt->affected_rows;
+            $stmt->close();
+        }
+
+        // Clean expired 2FA sessions if table exists
+        if (tableExists('auth_2fa_sessions')) {
+            $stmt = $conn->prepare("DELETE FROM auth_2fa_sessions WHERE expires_at < NOW()");
+            $stmt->execute();
+            $deleted_sessions = $stmt->affected_rows;
+            $stmt->close();
+        }
+
+        if ($deleted_devices > 0 || $deleted_sessions > 0) {
+            error_log("2FA Cleanup: Removed {$deleted_devices} devices and {$deleted_sessions} sessions");
+        }
+
+        return true;
+    } catch (Exception $e) {
+        error_log("2FA cleanup error: " . $e->getMessage());
+        return false;
+    }
+}
+
+// Run cleanup periodically
+if (rand(1, 100) === 1) {
+    cleanup2FAData();
+}
+

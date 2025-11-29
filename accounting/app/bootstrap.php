@@ -11,7 +11,38 @@ require_once __DIR__ . '/../lib/helpers.php';
 // Auth gate (reuse site helpers if available)
 if (function_exists('isAuthenticated')) {
     if (!isAuthenticated()) {
-        header('Location: /authentication/login.php');
+        $loginUrl = trim((string)($_ENV['AUTH_LOGIN_URL'] ?? ''));
+        $host = $_SERVER['HTTP_HOST'] ?? '';
+
+        if ($loginUrl === '') {
+            $loginUrl = '/authentication/login.php';
+        }
+
+        if ($loginUrl === '/authentication/login.php') {
+            $siteRoot = dirname(__DIR__, 2); // Jump from app/ to accounting root
+            $localLogin = $siteRoot . '/authentication/login.php';
+            if (!file_exists($localLogin)) {
+                // Fallback to historical centralized hosts only if local files missing
+                if (stripos($host, 'dev.') !== false || stripos($host, 'localhost') !== false) {
+                    $loginUrl = 'https://dev.w5obm.com/authentication/login.php';
+                } else {
+                    $loginUrl = 'https://www.w5obm.com/authentication/login.php';
+                }
+            }
+        }
+
+        $currentUrl = '';
+        if (!empty($_SERVER['REQUEST_URI'])) {
+            $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https://' : 'http://';
+            $currentUrl = $host ? $scheme . $host . $_SERVER['REQUEST_URI'] : $_SERVER['REQUEST_URI'];
+        }
+
+        $redirectUrl = $loginUrl;
+        if ($currentUrl !== '') {
+            $redirectUrl .= (strpos($loginUrl, '?') === false ? '?' : '&') . 'redirect=' . urlencode($currentUrl);
+        }
+
+        header('Location: ' . $redirectUrl);
         exit();
     }
 }

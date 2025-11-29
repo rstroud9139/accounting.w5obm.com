@@ -1,0 +1,714 @@
+Date,Transaction ID,Number,Description,Notes,Commodity/Currency,Void Reason,Action,Memo,Full Account Name,Account Name,Amount With Sym,Amount Num.,Value With Sym,Value Num.,Reconcile,Reconcile Date,Rate/Price
+04/30/2013,401917faafc722d11beb48c21ff13cae,,Opening Balance,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,"$1,245.50",1245.50,"$1,245.50",1245.50,y,05/31/2013,1.00
+04/30/2013,401917faafc722d11beb48c21ff13cae,,Opening Balance,,CURRENCY::USD,,,,Equity:Opening Balances,Opening Balances,"$(1,245.50)",(1245.50),"$(1,245.50)",(1245.50),n,,1.00
+05/07/2013,fe088bfa4571f6722b812e2c2f27eaee,,Hayes Companies,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$(300.00),(300.00),$(300.00),(300.00),y,05/31/2013,1.00
+05/07/2013,fe088bfa4571f6722b812e2c2f27eaee,,Hayes Companies,,CURRENCY::USD,,,,Expenses:Insurance:Liability Insurance,Liability Insurance,$300.00,300.00,$300.00,300.00,n,,1.00
+05/11/2013,d08c0ed22e89c6ff1a769a1ce2c4d9e9,,Repeater Fund,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$(86.00),(86.00),$(86.00),(86.00),y,09/30/2013,1.00
+05/11/2013,d08c0ed22e89c6ff1a769a1ce2c4d9e9,,Repeater Fund,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account:Repeater Fund,Repeater Fund,$86.00,86.00,$86.00,86.00,y,09/30/2013,1.00
+05/31/2013,58342554ec639ce8d6c42e90c79912c1,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.03,0.03,$0.03,0.03,y,05/31/2013,1.00
+05/31/2013,58342554ec639ce8d6c42e90c79912c1,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.03),(0.03),$(0.03),(0.03),n,,1.00
+06/18/2013,51a9ccf5b2c189894a2db539fc8b23c3,,Deposit,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$41.34,41.34,$41.34,41.34,y,06/28/2013,1.00
+06/18/2013,51a9ccf5b2c189894a2db539fc8b23c3,,Deposit,,CURRENCY::USD,,,,Income:Donations,Donations,$(41.34),(41.34),$(41.34),(41.34),n,,1.00
+06/18/2013,5b9cbcbd0a6a3450bec5360c9ec061aa,1002,Arrow Portables,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$(76.46),(76.46),$(76.46),(76.46),y,06/28/2013,1.00
+06/18/2013,5b9cbcbd0a6a3450bec5360c9ec061aa,1002,Arrow Portables,,CURRENCY::USD,,,,Expenses:Rent,Rent,$76.46,76.46,$76.46,76.46,n,,1.00
+06/25/2013,feab132a0d91241b7764364aded496d4,,Deposit - OB Park Refund,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$120.00,120.00,$120.00,120.00,y,06/28/2013,1.00
+06/25/2013,feab132a0d91241b7764364aded496d4,,Deposit - OB Park Refund,,CURRENCY::USD,,,,Income:Other Income,Other Income,$(120.00),(120.00),$(120.00),(120.00),n,,1.00
+06/26/2013,267b692da0aadde1d8af55e4de1e5fe6,,Hanover Insurance Group,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$(73.00),(73.00),$(73.00),(73.00),y,06/28/2013,1.00
+06/26/2013,267b692da0aadde1d8af55e4de1e5fe6,,Hanover Insurance Group,,CURRENCY::USD,,,,Expenses:Insurance,Insurance,$73.00,73.00,$73.00,73.00,n,,1.00
+06/26/2013,1e59fe460340cc55c6bdf281c32f2fd5,,Deposit,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$20.00,20.00,$20.00,20.00,y,09/30/2013,1.00
+06/26/2013,1e59fe460340cc55c6bdf281c32f2fd5,,Deposit,,CURRENCY::USD,,,Repeater Fund,Assets:Current Assets:Checking Account:Repeater Fund,Repeater Fund,$40.00,40.00,$40.00,40.00,y,09/30/2013,1.00
+06/26/2013,1e59fe460340cc55c6bdf281c32f2fd5,,Deposit,,CURRENCY::USD,,,,Income:Donations,Donations,$(60.00),(60.00),$(60.00),(60.00),n,,1.00
+06/28/2013,b18bb0651b4d6b8a9440a51cc575ed13,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.02,0.02,$0.02,0.02,y,06/28/2013,1.00
+06/28/2013,b18bb0651b4d6b8a9440a51cc575ed13,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.02),(0.02),$(0.02),(0.02),n,,1.00
+07/31/2013,9436872c5dbc9dc81704e6e63c5a57db,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.03,0.03,$0.03,0.03,y,07/31/2013,1.00
+07/31/2013,9436872c5dbc9dc81704e6e63c5a57db,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.03),(0.03),$(0.03),(0.03),n,,1.00
+08/26/2013,294c146cb7f0fe981f880beb6c48c7f2,,Deposit,,CURRENCY::USD,,,Dues,Assets:Current Assets:Checking Account,Checking Account,$20.00,20.00,$20.00,20.00,y,09/30/2013,1.00
+08/26/2013,294c146cb7f0fe981f880beb6c48c7f2,,Deposit,,CURRENCY::USD,,,Repeater Fund,Assets:Current Assets:Checking Account:Repeater Fund,Repeater Fund,$65.00,65.00,$65.00,65.00,y,09/30/2013,1.00
+08/26/2013,294c146cb7f0fe981f880beb6c48c7f2,,Deposit,,CURRENCY::USD,,,,Income:Donations,Donations,$(85.00),(85.00),$(85.00),(85.00),n,,1.00
+08/30/2013,46d54a192b0dfac410a059afbf12572d,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.03,0.03,$0.03,0.03,y,08/30/2013,1.00
+08/30/2013,46d54a192b0dfac410a059afbf12572d,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.03),(0.03),$(0.03),(0.03),n,,1.00
+09/30/2013,0e9f13581478853009991c715e4b2a87,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.03,0.03,$0.03,0.03,y,09/30/2013,1.00
+09/30/2013,0e9f13581478853009991c715e4b2a87,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.03),(0.03),$(0.03),(0.03),n,,1.00
+10/12/2013,246f6da87dd12dada1b6a9acd1ebee05,,USPS - Olive Branch PO BOX 1842,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$(108.00),(108.00),$(108.00),(108.00),y,10/29/2013,1.00
+10/12/2013,246f6da87dd12dada1b6a9acd1ebee05,,USPS - Olive Branch PO BOX 1842,,CURRENCY::USD,,,,Expenses:Rent,Rent,$108.00,108.00,$108.00,108.00,n,,1.00
+10/15/2013,e3225e4e125df6bb96c42312a969e233,,Deposit,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$13.00,13.00,$13.00,13.00,y,10/29/2013,1.00
+10/15/2013,e3225e4e125df6bb96c42312a969e233,,Deposit,,CURRENCY::USD,,,,Income:Donations,Donations,$(13.00),(13.00),$(13.00),(13.00),n,,1.00
+10/28/2013,3196389e366b53e4410eae42b95254d9,,Deposit,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$37.00,37.00,$37.00,37.00,y,10/29/2013,1.00
+10/28/2013,3196389e366b53e4410eae42b95254d9,,Deposit,,CURRENCY::USD,,,,Income:Donations,Donations,$(37.00),(37.00),$(37.00),(37.00),n,,1.00
+10/31/2013,dd1d644e575580e84dc374063c8b5590,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.03,0.03,$0.03,0.03,y,10/29/2013,1.00
+10/31/2013,dd1d644e575580e84dc374063c8b5590,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.03),(0.03),$(0.03),(0.03),n,,1.00
+11/29/2013,08df3c383dc04a4faedc3f527c7704ae,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.03,0.03,$0.03,0.03,y,11/29/2013,1.00
+11/29/2013,08df3c383dc04a4faedc3f527c7704ae,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.03),(0.03),$(0.03),(0.03),n,,1.00
+12/12/2013,0a30b51141abdf0184fe8c42b93c1cf5,,Deposit,,CURRENCY::USD,,,Membership Dues,Assets:Current Assets:Checking Account,Checking Account,$70.00,70.00,$70.00,70.00,y,12/31/2013,1.00
+12/12/2013,0a30b51141abdf0184fe8c42b93c1cf5,,Deposit,,CURRENCY::USD,,,Repeater Fund,Assets:Current Assets:Checking Account:Repeater Fund,Repeater Fund,$32.00,32.00,$32.00,32.00,y,12/31/2013,1.00
+12/12/2013,0a30b51141abdf0184fe8c42b93c1cf5,,Deposit,,CURRENCY::USD,,,,Income:Donations,Donations,$(102.00),(102.00),$(102.00),(102.00),n,,1.00
+12/31/2013,755713b9e6364363a0d2ed5d3432744e,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.03,0.03,$0.03,0.03,y,12/31/2013,1.00
+12/31/2013,755713b9e6364363a0d2ed5d3432744e,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.03),(0.03),$(0.03),(0.03),n,,1.00
+01/27/2014,7f37e32b839ea5594aef133f7e53ebe5,,Arrow Portables,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$(80.00),(80.00),$(80.00),(80.00),y,01/31/2014,1.00
+01/27/2014,7f37e32b839ea5594aef133f7e53ebe5,,Arrow Portables,,CURRENCY::USD,,,,Expenses:Rent,Rent,$80.00,80.00,$80.00,80.00,n,,1.00
+01/27/2014,ee061a101e68867845ae985279846be2,,Arrow Portables,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$(0.80),(0.80),$(0.80),(0.80),y,01/31/2014,1.00
+01/27/2014,ee061a101e68867845ae985279846be2,,Arrow Portables,,CURRENCY::USD,,,,Expenses:Rent,Rent,$0.80,0.80,$0.80,0.80,n,,1.00
+01/31/2014,0f595fd46d6b497fc70d32449c9d5e62,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.03,0.03,$0.03,0.03,y,01/31/2014,1.00
+01/31/2014,0f595fd46d6b497fc70d32449c9d5e62,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.03),(0.03),$(0.03),(0.03),n,,1.00
+02/07/2014,3fcb9e0c1a2f4704dfe12ad3bf00b347,,Deposit,,CURRENCY::USD,,,Membership Dues,Assets:Current Assets:Checking Account,Checking Account,$220.00,220.00,$220.00,220.00,y,02/28/2014,1.00
+02/07/2014,3fcb9e0c1a2f4704dfe12ad3bf00b347,,Deposit,,CURRENCY::USD,,,Repeater Fund,Assets:Current Assets:Checking Account:Repeater Fund,Repeater Fund,$48.00,48.00,$48.00,48.00,y,02/28/2014,1.00
+02/07/2014,3fcb9e0c1a2f4704dfe12ad3bf00b347,,Deposit,,CURRENCY::USD,,,,Income:Donations,Donations,$(268.00),(268.00),$(268.00),(268.00),n,,1.00
+02/24/2014,04035c709a3b09f874540f53b35ced4e,,USPS - Olive Branch PO BOX 1842,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$(49.00),(49.00),$(49.00),(49.00),y,02/28/2014,1.00
+02/24/2014,04035c709a3b09f874540f53b35ced4e,,USPS - Olive Branch PO BOX 1842,,CURRENCY::USD,,,,Expenses:Rent,Rent,$49.00,49.00,$49.00,49.00,n,,1.00
+02/28/2014,62017cf52897809ab336adf9acd33a95,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.03,0.03,$0.03,0.03,y,02/28/2014,1.00
+02/28/2014,62017cf52897809ab336adf9acd33a95,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.03),(0.03),$(0.03),(0.03),n,,1.00
+03/14/2014,36d6a0f5fa5e7ce2a136d45116f8658b,,Deposit,,CURRENCY::USD,,,Membership Dues,Assets:Current Assets:Checking Account,Checking Account,$80.00,80.00,$80.00,80.00,y,03/31/2014,1.00
+03/14/2014,36d6a0f5fa5e7ce2a136d45116f8658b,,Deposit,,CURRENCY::USD,,,Repeater Fund,Assets:Current Assets:Checking Account:Repeater Fund,Repeater Fund,$12.00,12.00,$12.00,12.00,y,03/31/2014,1.00
+03/14/2014,36d6a0f5fa5e7ce2a136d45116f8658b,,Deposit,,CURRENCY::USD,,,,Income:Donations,Donations,$(92.00),(92.00),$(92.00),(92.00),n,,1.00
+03/14/2014,bf8113d9ceb0c4ceafb88afc152f6796,,Deposit,,CURRENCY::USD,,,Membership Dues,Assets:Current Assets:Checking Account,Checking Account,$100.00,100.00,$100.00,100.00,y,03/31/2014,1.00
+03/14/2014,bf8113d9ceb0c4ceafb88afc152f6796,,Deposit,,CURRENCY::USD,,,,Income:Donations,Donations,$(100.00),(100.00),$(100.00),(100.00),n,,1.00
+03/26/2014,748e3e6c5bd80332a5a1e323010f8fb4,,Deposit,,CURRENCY::USD,,,Membership Dues,Assets:Current Assets:Checking Account,Checking Account,$60.00,60.00,$60.00,60.00,y,03/31/2014,1.00
+03/26/2014,748e3e6c5bd80332a5a1e323010f8fb4,,Deposit,,CURRENCY::USD,,,Repeater Fund,Assets:Current Assets:Checking Account:Repeater Fund,Repeater Fund,$138.00,138.00,$138.00,138.00,y,03/31/2014,1.00
+03/26/2014,748e3e6c5bd80332a5a1e323010f8fb4,,Deposit,,CURRENCY::USD,,,,Income:Donations,Donations,$(198.00),(198.00),$(198.00),(198.00),n,,1.00
+03/31/2014,2a7c49211652bdf5f48040383171e2a7,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.04,0.04,$0.04,0.04,y,03/31/2014,1.00
+03/31/2014,2a7c49211652bdf5f48040383171e2a7,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.04),(0.04),$(0.04),(0.04),n,,1.00
+04/30/2014,3b63dd1f29be04f54a16fb2037352f94,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.04,0.04,$0.04,0.04,y,04/30/2014,1.00
+04/30/2014,3b63dd1f29be04f54a16fb2037352f94,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.04),(0.04),$(0.04),(0.04),n,,1.00
+05/02/2014,bfb4ad2596dc6be0cd654f871b78b338,,Deposit,,CURRENCY::USD,,,Membership Dues,Assets:Current Assets:Checking Account,Checking Account,$75.00,75.00,$75.00,75.00,y,05/31/2014,1.00
+05/02/2014,bfb4ad2596dc6be0cd654f871b78b338,,Deposit,,CURRENCY::USD,,,,Income:Donations,Donations,$(75.00),(75.00),$(75.00),(75.00),n,,1.00
+05/30/2014,62c926507e6632098f16f9c7726a8df8,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.05,0.05,$0.05,0.05,y,05/31/2014,1.00
+05/30/2014,62c926507e6632098f16f9c7726a8df8,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.05),(0.05),$(0.05),(0.05),n,,1.00
+06/18/2014,03bb8b6849d41ebb732749baab522f79,,Deposit,,CURRENCY::USD,,,Membership Dues,Assets:Current Assets:Checking Account,Checking Account,$60.00,60.00,$60.00,60.00,y,06/30/2014,1.00
+06/18/2014,03bb8b6849d41ebb732749baab522f79,,Deposit,,CURRENCY::USD,,,,Income:Donations,Donations,$(60.00),(60.00),$(60.00),(60.00),n,,1.00
+06/18/2014,097912182e4b2d7e376f0be265d5b70f,,USPS - Olive Branch PO BOX 1842,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$(30.90),(30.90),$(30.90),(30.90),y,06/30/2014,1.00
+06/18/2014,097912182e4b2d7e376f0be265d5b70f,,USPS - Olive Branch PO BOX 1842,,CURRENCY::USD,,,,Expenses:Rent,Rent,$30.90,30.90,$30.90,30.90,n,,1.00
+06/30/2014,798299a1e24b5b0e14ce5406f153d183,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.05,0.05,$0.05,0.05,y,06/30/2014,1.00
+06/30/2014,798299a1e24b5b0e14ce5406f153d183,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.05),(0.05),$(0.05),(0.05),n,,1.00
+06/30/2014,5430bf8618e6d226ff4cb05178c69f2e,1004,Arrow Portables,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$(80.00),(80.00),$(80.00),(80.00),y,06/30/2014,1.00
+06/30/2014,5430bf8618e6d226ff4cb05178c69f2e,1004,Arrow Portables,,CURRENCY::USD,,,,Expenses:Rent,Rent,$80.00,80.00,$80.00,80.00,n,,1.00
+07/02/2014,68fd53ebaaff07a0296fcb0a91d46a4d,,Deposit,,CURRENCY::USD,,,Membership Dues,Assets:Current Assets:Checking Account,Checking Account,$350.00,350.00,$350.00,350.00,y,07/31/2014,1.00
+07/02/2014,68fd53ebaaff07a0296fcb0a91d46a4d,,Deposit,,CURRENCY::USD,,,,Income:Donations,Donations,$(350.00),(350.00),$(350.00),(350.00),n,,1.00
+07/07/2014,20be3c33525311071442cd76f724abab,,ARRL,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$(359.36),(359.36),$(359.36),(359.36),y,07/31/2014,1.00
+07/07/2014,20be3c33525311071442cd76f724abab,,ARRL,,CURRENCY::USD,,,,Expenses:Insurance,Insurance,$359.36,359.36,$359.36,359.36,n,,1.00
+07/18/2014,6d6f52bd14ad0015eff6e64d3ac8f91d,,Hayes Companies,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$(110.00),(110.00),$(110.00),(110.00),y,07/31/2014,1.00
+07/18/2014,6d6f52bd14ad0015eff6e64d3ac8f91d,,Hayes Companies,,CURRENCY::USD,,,,Expenses:Insurance:Liability Insurance,Liability Insurance,$110.00,110.00,$110.00,110.00,n,,1.00
+07/31/2014,582e008693d6497306ed81809d97eac0,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.05,0.05,$0.05,0.05,y,07/31/2014,1.00
+07/31/2014,582e008693d6497306ed81809d97eac0,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.05),(0.05),$(0.05),(0.05),n,,1.00
+08/29/2014,018bc9f82a1d85bd7d2a9ea14bc90171,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.04,0.04,$0.04,0.04,y,08/31/2014,1.00
+08/29/2014,018bc9f82a1d85bd7d2a9ea14bc90171,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.04),(0.04),$(0.04),(0.04),n,,1.00
+09/12/2014,6ecab5d3201c7d2c16454710d935f024,,Deposit,,CURRENCY::USD,,,Membership Dues,Assets:Current Assets:Checking Account,Checking Account,$20.00,20.00,$20.00,20.00,y,09/30/2014,1.00
+09/12/2014,6ecab5d3201c7d2c16454710d935f024,,Deposit,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account:Repeater Fund,Repeater Fund,$109.00,109.00,$109.00,109.00,y,09/30/2014,1.00
+09/12/2014,6ecab5d3201c7d2c16454710d935f024,,Deposit,,CURRENCY::USD,,,,Income:Donations,Donations,$(109.00),(109.00),$(109.00),(109.00),n,,1.00
+09/12/2014,6ecab5d3201c7d2c16454710d935f024,,Deposit,,CURRENCY::USD,,,,Income:Dues,Dues,$(20.00),(20.00),$(20.00),(20.00),n,,1.00
+09/30/2014,d428b2a7fb65494991b961764326d4bb,,USPS - Olive Branch PO BOX 1842,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$(92.00),(92.00),$(92.00),(92.00),y,09/30/2014,1.00
+09/30/2014,d428b2a7fb65494991b961764326d4bb,,USPS - Olive Branch PO BOX 1842,,CURRENCY::USD,,,,Expenses:Rent,Rent,$92.00,92.00,$92.00,92.00,n,,1.00
+09/30/2014,cede10e657ee8342a9563dc5b3498dea,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.04,0.04,$0.04,0.04,y,09/30/2014,1.00
+09/30/2014,cede10e657ee8342a9563dc5b3498dea,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.04),(0.04),$(0.04),(0.04),n,,1.00
+10/31/2014,cc7366ad659ea4cf464f03cab3fab58c,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.04,0.04,$0.04,0.04,y,10/31/2014,1.00
+10/31/2014,cc7366ad659ea4cf464f03cab3fab58c,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.04),(0.04),$(0.04),(0.04),n,,1.00
+11/30/2014,312ce012ff20236cfe1f08fcbafaa67b,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.04,0.04,$0.04,0.04,y,11/30/2014,1.00
+11/30/2014,312ce012ff20236cfe1f08fcbafaa67b,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.04),(0.04),$(0.04),(0.04),n,,1.00
+12/16/2014,afb9934ffddabe2eb1e73c0ec26eb43f,,Deposit,,CURRENCY::USD,,,Membership Dues,Assets:Current Assets:Checking Account,Checking Account,$160.00,160.00,$160.00,160.00,y,12/31/2014,1.00
+12/16/2014,afb9934ffddabe2eb1e73c0ec26eb43f,,Deposit,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account:Repeater Fund,Repeater Fund,$47.00,47.00,$47.00,47.00,y,12/31/2014,1.00
+12/16/2014,afb9934ffddabe2eb1e73c0ec26eb43f,,Deposit,,CURRENCY::USD,,,,Imbalance-USD,Imbalance-USD,$0.00,0.00,$0.00,0.00,n,,0.00
+12/16/2014,afb9934ffddabe2eb1e73c0ec26eb43f,,Deposit,,CURRENCY::USD,,,,Income:Donations,Donations,$(47.00),(47.00),$(47.00),(47.00),n,,1.00
+12/16/2014,afb9934ffddabe2eb1e73c0ec26eb43f,,Deposit,,CURRENCY::USD,,,,Income:Dues,Dues,$(160.00),(160.00),$(160.00),(160.00),n,,1.00
+12/31/2014,a0eedfe07d9893ce8cb58ea9764d61e1,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.05,0.05,$0.05,0.05,y,12/31/2014,1.00
+12/31/2014,a0eedfe07d9893ce8cb58ea9764d61e1,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.05),(0.05),$(0.05),(0.05),n,,1.00
+01/31/2015,b77bfef48ff0846111202db356cc8d97,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.05,0.05,$0.05,0.05,y,01/31/2015,1.00
+01/31/2015,b77bfef48ff0846111202db356cc8d97,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.05),(0.05),$(0.05),(0.05),n,,1.00
+02/28/2015,02a66300afce8c45a73e377373aad63a,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.05,0.05,$0.05,0.05,y,02/28/2015,1.00
+02/28/2015,02a66300afce8c45a73e377373aad63a,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.05),(0.05),$(0.05),(0.05),n,,1.00
+03/18/2015,a16f03974d00c667883c81b678415485,,Deposit,,CURRENCY::USD,,,Membership Dues,Assets:Current Assets:Checking Account,Checking Account,$200.00,200.00,$200.00,200.00,y,03/31/2015,1.00
+03/18/2015,a16f03974d00c667883c81b678415485,,Deposit,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account:Repeater Fund,Repeater Fund,$22.00,22.00,$22.00,22.00,y,03/31/2015,1.00
+03/18/2015,a16f03974d00c667883c81b678415485,,Deposit,,CURRENCY::USD,,,,Imbalance-USD,Imbalance-USD,$0.00,0.00,$0.00,0.00,n,,0.00
+03/18/2015,a16f03974d00c667883c81b678415485,,Deposit,,CURRENCY::USD,,,,Income:Donations,Donations,$(22.00),(22.00),$(22.00),(22.00),n,,1.00
+03/18/2015,a16f03974d00c667883c81b678415485,,Deposit,,CURRENCY::USD,,,,Income:Dues,Dues,$(200.00),(200.00),$(200.00),(200.00),n,,1.00
+03/20/2015,ab55e1323b654e41e14a97ca29cadf6c,,Deposit,,CURRENCY::USD,,,Membership Dues,Assets:Current Assets:Checking Account,Checking Account,$225.00,225.00,$225.00,225.00,y,03/31/2015,1.00
+03/20/2015,ab55e1323b654e41e14a97ca29cadf6c,,Deposit,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account:Repeater Fund,Repeater Fund,$11.40,11.40,$11.40,11.40,y,03/31/2015,1.00
+03/20/2015,ab55e1323b654e41e14a97ca29cadf6c,,Deposit,,CURRENCY::USD,,,,Imbalance-USD,Imbalance-USD,$0.00,0.00,$0.00,0.00,n,,0.00
+03/20/2015,ab55e1323b654e41e14a97ca29cadf6c,,Deposit,,CURRENCY::USD,,,,Income:Donations,Donations,$(11.40),(11.40),$(11.40),(11.40),n,,1.00
+03/20/2015,ab55e1323b654e41e14a97ca29cadf6c,,Deposit,,CURRENCY::USD,,,,Income:Dues,Dues,$(225.00),(225.00),$(225.00),(225.00),n,,1.00
+03/31/2015,ac0e21d7de14afd1de717979486f5154,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.06,0.06,$0.06,0.06,y,03/31/2015,1.00
+03/31/2015,ac0e21d7de14afd1de717979486f5154,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.06),(0.06),$(0.06),(0.06),n,,1.00
+04/30/2015,cbe243a6acd6099ab04de790031827c6,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.06,0.06,$0.06,0.06,y,04/30/2015,1.00
+04/30/2015,cbe243a6acd6099ab04de790031827c6,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.06),(0.06),$(0.06),(0.06),n,,1.00
+05/29/2015,49f5e444ad0f835a478abe1744f796cb,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.06,0.06,$0.06,0.06,y,05/31/2015,1.00
+05/29/2015,49f5e444ad0f835a478abe1744f796cb,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.06),(0.06),$(0.06),(0.06),n,,1.00
+05/29/2015,94f7fd6f3dcc155f08f6ac98826cfc8b,,Amazon Smile ,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$5.00,5.00,$5.00,5.00,y,05/31/2015,1.00
+05/29/2015,94f7fd6f3dcc155f08f6ac98826cfc8b,,Amazon Smile ,,CURRENCY::USD,,,,Income:Donations,Donations,$(5.00),(5.00),$(5.00),(5.00),n,,1.00
+06/11/2015,39dafcb79566834b64ca2986d66067e7,,RF Parts,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$(76.25),(76.25),$(76.25),(76.25),y,06/30/2015,1.00
+06/11/2015,39dafcb79566834b64ca2986d66067e7,,RF Parts,,CURRENCY::USD,,,,Expenses:Repairs:Equipment Repairs,Equipment Repairs,$76.25,76.25,$76.25,76.25,n,,1.00
+06/22/2015,11c8ed32ebe89e3a975cc3475b49210f,,Donation for Yaesu Fushion repeater purchase,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$100.00,100.00,$100.00,100.00,y,06/30/2015,1.00
+06/22/2015,11c8ed32ebe89e3a975cc3475b49210f,,Donation for Yaesu Fushion repeater purchase,,CURRENCY::USD,,,,Income:Donations,Donations,$(100.00),(100.00),$(100.00),(100.00),n,,1.00
+06/29/2015,b9fbeac20dffbfb662f4c3f85de00a73,,Arrow Portables,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$(80.00),(80.00),$(80.00),(80.00),y,06/30/2015,1.00
+06/29/2015,b9fbeac20dffbfb662f4c3f85de00a73,,Arrow Portables,,CURRENCY::USD,,,,Expenses:Rent,Rent,$80.00,80.00,$80.00,80.00,n,,1.00
+06/30/2015,d4c916f3077d6140bc380d3a9c357b50,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.06,0.06,$0.06,0.06,y,06/30/2015,1.00
+06/30/2015,d4c916f3077d6140bc380d3a9c357b50,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.06),(0.06),$(0.06),(0.06),n,,1.00
+07/31/2015,1a9a2061856034784b2a268855e4f39e,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.06,0.06,$0.06,0.06,y,07/31/2015,1.00
+07/31/2015,1a9a2061856034784b2a268855e4f39e,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.06),(0.06),$(0.06),(0.06),n,,1.00
+08/31/2015,217d86f7bc12923c59a908662aa7d745,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.06,0.06,$0.06,0.06,y,08/31/2015,1.00
+08/31/2015,217d86f7bc12923c59a908662aa7d745,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.06),(0.06),$(0.06),(0.06),n,,1.00
+09/30/2015,776461ce90781dee66a1acb0871e09b8,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.05,0.05,$0.05,0.05,y,09/30/2015,1.00
+09/30/2015,776461ce90781dee66a1acb0871e09b8,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.05),(0.05),$(0.05),(0.05),n,,1.00
+09/30/2015,d6d386a5c6e4bc4d037cda5e709b3fea,1007,USPS - Olive Branch PO BOX 1842,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$(98.00),(98.00),$(98.00),(98.00),y,09/30/2015,1.00
+09/30/2015,d6d386a5c6e4bc4d037cda5e709b3fea,1007,USPS - Olive Branch PO BOX 1842,,CURRENCY::USD,,,,Expenses:Rent,Rent,$98.00,98.00,$98.00,98.00,n,,1.00
+10/02/2015,09f923673a96c7a6aa13c74f7d86bfb9,,Deposit,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$13.00,13.00,$13.00,13.00,y,10/31/2015,1.00
+10/02/2015,09f923673a96c7a6aa13c74f7d86bfb9,,Deposit,,CURRENCY::USD,,,,Income:Other Income,Other Income,$(13.00),(13.00),$(13.00),(13.00),n,,1.00
+10/30/2015,927308bc90ab0fb3e570be2b062a420a,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.05,0.05,$0.05,0.05,y,10/31/2015,1.00
+10/30/2015,927308bc90ab0fb3e570be2b062a420a,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.05),(0.05),$(0.05),(0.05),n,,1.00
+11/30/2015,222e918d3a527595d1b960062cad02a8,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.05,0.05,$0.05,0.05,y,11/30/2015,1.00
+11/30/2015,222e918d3a527595d1b960062cad02a8,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.05),(0.05),$(0.05),(0.05),n,,1.00
+11/30/2015,509c708becd193fdb4b95fe197b931b9,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.05,0.05,$0.05,0.05,y,12/31/2015,1.00
+11/30/2015,509c708becd193fdb4b95fe197b931b9,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.05),(0.05),$(0.05),(0.05),n,,1.00
+12/11/2015,8c7eb8cc3e535a4aadca3d482ec2a25f,,Deposit,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$187.00,187.00,$187.00,187.00,y,12/31/2015,1.00
+12/11/2015,8c7eb8cc3e535a4aadca3d482ec2a25f,,Deposit,,CURRENCY::USD,,,,Income:Donations,Donations,$(187.00),(187.00),$(187.00),(187.00),n,,1.00
+01/19/2016,51a87e1aee4416a91b8721dcab86c47a,1008,Dennis Woffard,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$(125.00),(125.00),$(125.00),(125.00),y,01/31/2016,1.00
+01/19/2016,51a87e1aee4416a91b8721dcab86c47a,1008,Dennis Woffard,,CURRENCY::USD,,,,Expenses:Equipment,Equipment,$125.00,125.00,$125.00,125.00,n,,1.00
+01/29/2016,971d81de157e4b9c93a336dda69200a3,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.05,0.05,$0.05,0.05,y,01/31/2016,1.00
+01/29/2016,971d81de157e4b9c93a336dda69200a3,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.05),(0.05),$(0.05),(0.05),n,,1.00
+02/16/2016,5bff9ed69c489eca242839e18cda5d99,,Gigaparts,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$(198.72),(198.72),$(198.72),(198.72),y,02/29/2016,1.00
+02/16/2016,5bff9ed69c489eca242839e18cda5d99,,Gigaparts,,CURRENCY::USD,,,,Expenses:Equipment,Equipment,$198.72,198.72,$198.72,198.72,n,,1.00
+02/29/2016,9b30307eeb181fbbbdf8d1b6583390c4,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.04,0.04,$0.04,0.04,y,02/29/2016,1.00
+02/29/2016,9b30307eeb181fbbbdf8d1b6583390c4,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.04),(0.04),$(0.04),(0.04),n,,1.00
+03/31/2016,51924a6515a782df63a51cc0c6da1f74,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.04,0.04,$0.04,0.04,y,03/31/2016,1.00
+03/31/2016,51924a6515a782df63a51cc0c6da1f74,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.04),(0.04),$(0.04),(0.04),n,,1.00
+04/14/2016,dc82ec7d894c8157b28f90795b6f9780,,Deposit,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$382.00,382.00,$382.00,382.00,y,04/30/2016,1.00
+04/14/2016,dc82ec7d894c8157b28f90795b6f9780,,Deposit,,CURRENCY::USD,,,,Income:Donations,Donations,$(382.00),(382.00),$(382.00),(382.00),n,,1.00
+04/29/2016,85c9f070894d2d598ad0c08653103744,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.05,0.05,$0.05,0.05,y,04/30/2016,1.00
+04/29/2016,85c9f070894d2d598ad0c08653103744,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.05),(0.05),$(0.05),(0.05),n,,1.00
+05/12/2016,fe2cc7d1e98f0a690da128671881ddb7,,Amazon Smile ,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$6.04,6.04,$6.04,6.04,y,05/31/2016,1.00
+05/12/2016,fe2cc7d1e98f0a690da128671881ddb7,,Amazon Smile ,,CURRENCY::USD,,,,Income:Donations,Donations,$(6.04),(6.04),$(6.04),(6.04),n,,1.00
+05/31/2016,95bc3fa69aa0d4b87768107b2e2efc01,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.06,0.06,$0.06,0.06,y,05/31/2016,1.00
+05/31/2016,95bc3fa69aa0d4b87768107b2e2efc01,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.06),(0.06),$(0.06),(0.06),n,,1.00
+06/10/2016,5210c8386af117562668dd74fd02fbf7,,Paypal Deposit,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$300.00,300.00,$300.00,300.00,y,06/30/2016,1.00
+06/10/2016,5210c8386af117562668dd74fd02fbf7,,Paypal Deposit,,CURRENCY::USD,,,,Income:Donations,Donations,$(300.00),(300.00),$(300.00),(300.00),n,,1.00
+06/21/2016,6612bc388d638d002c764ee812269fc3,1010,Arrow Portables,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$(80.00),(80.00),$(80.00),(80.00),y,06/30/2016,1.00
+06/21/2016,6612bc388d638d002c764ee812269fc3,1010,Arrow Portables,,CURRENCY::USD,,,,Expenses:Rent,Rent,$80.00,80.00,$80.00,80.00,n,,1.00
+06/24/2016,c5983006978122ddb91e89b1e16a883e,,Deposit,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$50.00,50.00,$50.00,50.00,y,06/30/2016,1.00
+06/24/2016,c5983006978122ddb91e89b1e16a883e,,Deposit,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account:Repeater Fund,Repeater Fund,$74.00,74.00,$74.00,74.00,y,06/30/2016,1.00
+06/24/2016,c5983006978122ddb91e89b1e16a883e,,Deposit,,CURRENCY::USD,,,,Income:Donations,Donations,$(74.00),(74.00),$(74.00),(74.00),n,,1.00
+06/24/2016,c5983006978122ddb91e89b1e16a883e,,Deposit,,CURRENCY::USD,,,,Income:Dues,Dues,$(50.00),(50.00),$(50.00),(50.00),n,,1.00
+06/30/2016,8a963b6aed686cafd505206f33a9f260,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.06,0.06,$0.06,0.06,y,06/30/2016,1.00
+06/30/2016,8a963b6aed686cafd505206f33a9f260,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.06),(0.06),$(0.06),(0.06),n,,1.00
+07/29/2016,28f4d35a68d6fa3c415b846838f9d672,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.07,0.07,$0.07,0.07,y,06/30/2016,1.00
+07/29/2016,28f4d35a68d6fa3c415b846838f9d672,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.07),(0.07),$(0.07),(0.07),n,,1.00
+08/15/2016,160aa15f09a3a95567a10f3a2b14c91b,,Amazon Smile ,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$5.91,5.91,$5.91,5.91,y,06/30/2016,1.00
+08/15/2016,160aa15f09a3a95567a10f3a2b14c91b,,Amazon Smile ,,CURRENCY::USD,,,,Income:Donations,Donations,$(5.91),(5.91),$(5.91),(5.91),n,,1.00
+08/31/2016,00dc3893a50048006a508102563070a2,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.07,0.07,$0.07,0.07,y,06/30/2016,1.00
+08/31/2016,00dc3893a50048006a508102563070a2,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.07),(0.07),$(0.07),(0.07),n,,1.00
+09/20/2016,95fa695ddb7c7eafdf10e5807cd09c6f,1011,USPS - Olive Branch PO BOX 1842,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$(102.00),(102.00),$(102.00),(102.00),y,09/30/2016,1.00
+09/20/2016,95fa695ddb7c7eafdf10e5807cd09c6f,1011,USPS - Olive Branch PO BOX 1842,,CURRENCY::USD,,,,Expenses:Rent,Rent,$102.00,102.00,$102.00,102.00,n,,1.00
+09/30/2016,cf1b6ffafe15603195aaf2c9d3e206f2,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.06,0.06,$0.06,0.06,y,09/30/2016,1.00
+09/30/2016,cf1b6ffafe15603195aaf2c9d3e206f2,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.06),(0.06),$(0.06),(0.06),n,,1.00
+10/31/2016,2ce9686dd60465f246a0dd49d2f22e7f,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.06,0.06,$0.06,0.06,y,10/31/2016,1.00
+10/31/2016,2ce9686dd60465f246a0dd49d2f22e7f,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.06),(0.06),$(0.06),(0.06),n,,1.00
+11/07/2016,89d023862f7ab2dbe8f53fba35dd6508,,Amazon Smile ,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$6.63,6.63,$6.63,6.63,y,11/30/2016,1.00
+11/07/2016,89d023862f7ab2dbe8f53fba35dd6508,,Amazon Smile ,,CURRENCY::USD,,,,Income:Donations,Donations,$(6.63),(6.63),$(6.63),(6.63),n,,1.00
+11/30/2016,b52428944752d56b634484d1939e530c,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.06,0.06,$0.06,0.06,y,11/30/2016,1.00
+11/30/2016,b52428944752d56b634484d1939e530c,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.06),(0.06),$(0.06),(0.06),n,,1.00
+12/21/2016,76d38021be1af3dd6a0eceab377b80de,,Deposit,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$25.00,25.00,$25.00,25.00,y,12/31/2016,1.00
+12/21/2016,76d38021be1af3dd6a0eceab377b80de,,Deposit,,CURRENCY::USD,,,,Income:Dues,Dues,$(25.00),(25.00),$(25.00),(25.00),n,,1.00
+12/23/2016,35aff5f692656b93aca0b232ef10a211,1012,Dennis Woffard,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$(300.00),(300.00),$(300.00),(300.00),y,12/31/2016,1.00
+12/23/2016,35aff5f692656b93aca0b232ef10a211,1012,Dennis Woffard,,CURRENCY::USD,,,,Expenses:Insurance:Liability Insurance,Liability Insurance,$300.00,300.00,$300.00,300.00,n,,1.00
+12/30/2016,9669bc2382fd1655e20809256f427dc9,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.06,0.06,$0.06,0.06,y,12/31/2016,1.00
+12/30/2016,9669bc2382fd1655e20809256f427dc9,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.06),(0.06),$(0.06),(0.06),n,,1.00
+01/31/2017,93c70d269b438e120c7ed44e56e983bf,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.06,0.06,$0.06,0.06,y,01/31/2017,1.00
+01/31/2017,93c70d269b438e120c7ed44e56e983bf,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.06),(0.06),$(0.06),(0.06),n,,1.00
+02/06/2017,d7bd450a82f3c8d42359a40e3b9830c8,,Amazon Smile ,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$7.54,7.54,$7.54,7.54,y,02/28/2017,1.00
+02/06/2017,d7bd450a82f3c8d42359a40e3b9830c8,,Amazon Smile ,,CURRENCY::USD,,,,Income:Donations,Donations,$(7.54),(7.54),$(7.54),(7.54),n,,1.00
+02/21/2017,fe6a6a277a240e3fbe6503ef2211ae8c,,Paypal Deposit,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$500.00,500.00,$500.00,500.00,y,02/28/2017,1.00
+02/21/2017,fe6a6a277a240e3fbe6503ef2211ae8c,,Paypal Deposit,,CURRENCY::USD,,,,Income:Donations,Donations,$(500.00),(500.00),$(500.00),(500.00),n,,1.00
+02/21/2017,ba47aa86748405bbab3b3958c93f319d,,Deposit,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$175.00,175.00,$175.00,175.00,y,02/28/2017,1.00
+02/21/2017,ba47aa86748405bbab3b3958c93f319d,,Deposit,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account:Repeater Fund,Repeater Fund,$51.25,51.25,$51.25,51.25,y,02/28/2017,1.00
+02/21/2017,ba47aa86748405bbab3b3958c93f319d,,Deposit,,CURRENCY::USD,,,,Income:Dues,Dues,$(226.25),(226.25),$(226.25),(226.25),n,,1.00
+02/21/2017,d14561c1ad710a9fbc759318e796803e,,Deposit,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$50.00,50.00,$50.00,50.00,y,02/28/2017,1.00
+02/21/2017,d14561c1ad710a9fbc759318e796803e,,Deposit,,CURRENCY::USD,,,,Income:Dues,Dues,$(50.00),(50.00),$(50.00),(50.00),n,,1.00
+02/28/2017,59f32e3cdf34a105aaef40b92165f9f0,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.06,0.06,$0.06,0.06,y,02/28/2017,1.00
+02/28/2017,59f32e3cdf34a105aaef40b92165f9f0,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.06),(0.06),$(0.06),(0.06),n,,1.00
+03/31/2017,80551e8811d7a01f5f6d9b6f4aaf0e6e,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.08,0.08,$0.08,0.08,y,03/31/2017,1.00
+03/31/2017,80551e8811d7a01f5f6d9b6f4aaf0e6e,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.08),(0.08),$(0.08),(0.08),n,,1.00
+04/28/2017,5e264253ef418363dbc4902484d437b3,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.08,0.08,$0.08,0.08,y,04/28/2017,1.00
+04/28/2017,5e264253ef418363dbc4902484d437b3,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.08),(0.08),$(0.08),(0.08),n,,1.00
+05/11/2017,cab5ae31a756216f1245912bf427376b,,Amazon Smile ,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$6.91,6.91,$6.91,6.91,y,05/31/2017,1.00
+05/11/2017,cab5ae31a756216f1245912bf427376b,,Amazon Smile ,,CURRENCY::USD,,,,Income:Donations,Donations,$(6.91),(6.91),$(6.91),(6.91),n,,1.00
+05/16/2017,b4898b0e29565937a14dea85899289ad,,Dennis Woffard,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$(569.74),(569.74),$(569.74),(569.74),y,06/30/2017,1.00
+05/16/2017,b4898b0e29565937a14dea85899289ad,,Dennis Woffard,,CURRENCY::USD,,,,Expenses:Equipment,Equipment,$569.74,569.74,$569.74,569.74,n,,1.00
+05/31/2017,d0ee6c38fc77c7c83cb698ce5b01b921,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.08,0.08,$0.08,0.08,y,05/31/2017,1.00
+05/31/2017,d0ee6c38fc77c7c83cb698ce5b01b921,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.08),(0.08),$(0.08),(0.08),n,,1.00
+06/30/2017,67b62cd4c5bf10ed3b84dc3edf67cc56,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.06,0.06,$0.06,0.06,y,06/30/2017,1.00
+06/30/2017,67b62cd4c5bf10ed3b84dc3edf67cc56,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.06),(0.06),$(0.06),(0.06),n,,1.00
+07/31/2017,cb53fe02950491f5d86581dc95c56ced,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.06,0.06,$0.06,0.06,y,07/31/2017,1.00
+07/31/2017,cb53fe02950491f5d86581dc95c56ced,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.06),(0.06),$(0.06),(0.06),n,,1.00
+08/17/2017,c9538c3f86dce64c4c95106630cd8224,,Amazon Smile ,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$7.28,7.28,$7.28,7.28,y,08/31/2017,1.00
+08/17/2017,c9538c3f86dce64c4c95106630cd8224,,Amazon Smile ,,CURRENCY::USD,,,,Income:Other Income,Other Income,$(7.28),(7.28),$(7.28),(7.28),n,,1.00
+08/31/2017,8609825fa3da63b14aa5b5fab04c6b0c,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.06,0.06,$0.06,0.06,y,08/31/2017,1.00
+08/31/2017,8609825fa3da63b14aa5b5fab04c6b0c,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.06),(0.06),$(0.06),(0.06),n,,1.00
+09/19/2017,4e5d1dd359ea8dadaf1f76765bf8d9b8,,Deposit,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$99.00,99.00,$99.00,99.00,y,09/30/2017,1.00
+09/19/2017,4e5d1dd359ea8dadaf1f76765bf8d9b8,,Deposit,,CURRENCY::USD,,,,Income:Donations,Donations,$(99.00),(99.00),$(99.00),(99.00),n,,1.00
+09/19/2017,6072e1fac0db5d2533ec2b2c9269db8b,,Deposit,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$25.00,25.00,$25.00,25.00,y,09/30/2017,1.00
+09/19/2017,6072e1fac0db5d2533ec2b2c9269db8b,,Deposit,,CURRENCY::USD,,,,Income:Dues,Dues,$(25.00),(25.00),$(25.00),(25.00),n,,1.00
+09/22/2017,c3994fef61071d46d132597daaa63a7f,1015,USPS - Olive Branch PO BOX 1842,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$(112.00),(112.00),$(112.00),(112.00),y,09/30/2017,1.00
+09/22/2017,c3994fef61071d46d132597daaa63a7f,1015,USPS - Olive Branch PO BOX 1842,,CURRENCY::USD,,,,Expenses:Rent,Rent,$112.00,112.00,$112.00,112.00,n,,1.00
+09/29/2017,fb6d50ce3fa301cd0d9d8cde7cb57ec9,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.06,0.06,$0.06,0.06,y,09/30/2017,1.00
+09/29/2017,fb6d50ce3fa301cd0d9d8cde7cb57ec9,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.06),(0.06),$(0.06),(0.06),n,,1.00
+10/31/2017,e0860b7b00b0dc6e11fa5b87235cc7f7,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.06,0.06,$0.06,0.06,y,10/31/2017,1.00
+10/31/2017,e0860b7b00b0dc6e11fa5b87235cc7f7,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.06),(0.06),$(0.06),(0.06),n,,1.00
+11/02/2017,48231dfb6841a47666eade659a3d69ae,,Deposit,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$18.85,18.85,$18.85,18.85,y,11/30/2017,1.00
+11/02/2017,48231dfb6841a47666eade659a3d69ae,,Deposit,,CURRENCY::USD,,,,Income:Donations,Donations,$(18.85),(18.85),$(18.85),(18.85),n,,1.00
+11/22/2017,737629a75a4a233b553e8cba855ca661,1016,Liability Insurance c/o Dennis Woffard,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$(300.00),(300.00),$(300.00),(300.00),y,11/30/2017,1.00
+11/22/2017,737629a75a4a233b553e8cba855ca661,1016,Liability Insurance c/o Dennis Woffard,,CURRENCY::USD,,,,Expenses:Insurance:Liability Insurance,Liability Insurance,$300.00,300.00,$300.00,300.00,n,,1.00
+11/24/2017,658fe738b8653bbd497069baf2b0edd1,1014,Olive Branch City Park rental c/o Jim Harris,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$(120.00),(120.00),$(120.00),(120.00),y,11/30/2017,1.00
+11/24/2017,658fe738b8653bbd497069baf2b0edd1,1014,Olive Branch City Park rental c/o Jim Harris,,CURRENCY::USD,,,,Expenses:Rent,Rent,$120.00,120.00,$120.00,120.00,n,,1.00
+11/30/2017,4511e8ea2a998c73619361b96955999a,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.06,0.06,$0.06,0.06,y,11/30/2017,1.00
+11/30/2017,4511e8ea2a998c73619361b96955999a,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.06),(0.06),$(0.06),(0.06),n,,1.00
+12/18/2017,16fe13c9f1618ad8e8a5604b738e3f56,,Deposit,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$25.00,25.00,$25.00,25.00,y,12/31/2017,1.00
+12/18/2017,16fe13c9f1618ad8e8a5604b738e3f56,,Deposit,,CURRENCY::USD,,,,Income:Donations,Donations,$(25.00),(25.00),$(25.00),(25.00),n,,1.00
+12/29/2017,d6748515494cb260a9638161197af86c,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.05,0.05,$0.05,0.05,y,12/31/2017,1.00
+12/29/2017,d6748515494cb260a9638161197af86c,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.05),(0.05),$(0.05),(0.05),n,,1.00
+01/31/2018,31807fd7040d4bc083b753bf44ea7828,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.05,0.05,$0.05,0.05,y,01/31/2018,1.00
+01/31/2018,31807fd7040d4bc083b753bf44ea7828,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.05),(0.05),$(0.05),(0.05),n,,1.00
+02/12/2018,c22282b683037bd21864f249cf304e40,,Amazon Smile ,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$11.17,11.17,$11.17,11.17,y,02/28/2018,1.00
+02/12/2018,c22282b683037bd21864f249cf304e40,,Amazon Smile ,,CURRENCY::USD,,,,Income:Other Income,Other Income,$(11.17),(11.17),$(11.17),(11.17),n,,1.00
+02/28/2018,6a121f75664e6abf03351e4c9605255b,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.05,0.05,$0.05,0.05,y,02/28/2018,1.00
+02/28/2018,6a121f75664e6abf03351e4c9605255b,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.05),(0.05),$(0.05),(0.05),n,,1.00
+03/23/2018,6b9085c78b7c4530238f09dae6dccc1a,,Deposit,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$245.00,245.00,$245.00,245.00,y,03/31/2018,1.00
+03/23/2018,6b9085c78b7c4530238f09dae6dccc1a,,Deposit,,CURRENCY::USD,,,,Income:Donations,Donations,$(245.00),(245.00),$(245.00),(245.00),n,,1.00
+03/31/2018,eafe58d54ee087dc0a9938adf6942a52,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.06,0.06,$0.06,0.06,y,03/31/2018,1.00
+03/31/2018,eafe58d54ee087dc0a9938adf6942a52,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.06),(0.06),$(0.06),(0.06),n,,1.00
+04/17/2018,6cb637e85ddcf2859abce96230b95115,,Transfer from Paypal,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$409.92,409.92,$409.92,409.92,y,04/30/2018,1.00
+04/17/2018,6cb637e85ddcf2859abce96230b95115,,Transfer from Paypal,,CURRENCY::USD,,,,Income:Donations,Donations,$(409.92),(409.92),$(409.92),(409.92),n,,1.00
+04/30/2018,47c67d40578213e10ec45b240da946c5,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.06,0.06,$0.06,0.06,y,04/30/2018,1.00
+04/30/2018,47c67d40578213e10ec45b240da946c5,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.06),(0.06),$(0.06),(0.06),n,,1.00
+05/18/2018,f6dba6dee70a478cb802f89030e9003f,,Amazon Smile ,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$9.26,9.26,$9.26,9.26,y,05/31/2018,1.00
+05/18/2018,f6dba6dee70a478cb802f89030e9003f,,Amazon Smile ,,CURRENCY::USD,,,,Income:Other Income,Other Income,$(9.26),(9.26),$(9.26),(9.26),n,,1.00
+05/21/2018,a10c0137f65d45f5a386d1ff597e83ad,,Paypal Payment,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$(245.00),(245.00),$(245.00),(245.00),y,05/31/2018,1.00
+05/21/2018,a10c0137f65d45f5a386d1ff597e83ad,,Paypal Payment,,CURRENCY::USD,,,,Expenses:Charity,Charity,$245.00,245.00,$245.00,245.00,n,,1.00
+05/31/2018,c8a498405b0a4489a8ff700082df294f,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.07,0.07,$0.07,0.07,y,05/31/2018,1.00
+05/31/2018,c8a498405b0a4489a8ff700082df294f,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.07),(0.07),$(0.07),(0.07),n,,1.00
+06/30/2018,639df11499314e59ba5303a6bf8c96ca,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.06,0.06,$0.06,0.06,y,06/30/2018,1.00
+06/30/2018,639df11499314e59ba5303a6bf8c96ca,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.06),(0.06),$(0.06),(0.06),n,,1.00
+07/03/2018,25799e205c384d8abd9d6d915a4125ff,1018,Arrow Portables,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$(80.00),(80.00),$(80.00),(80.00),y,07/31/2018,1.00
+07/03/2018,25799e205c384d8abd9d6d915a4125ff,1018,Arrow Portables,,CURRENCY::USD,,,,Expenses:Rent,Rent,$80.00,80.00,$80.00,80.00,n,,1.00
+07/31/2018,2a87fd6e83254c02957a8a09bd42f5d5,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.06,0.06,$0.06,0.06,y,07/31/2018,1.00
+07/31/2018,2a87fd6e83254c02957a8a09bd42f5d5,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.06),(0.06),$(0.06),(0.06),n,,1.00
+08/13/2018,7c725af8392a44ba8fa977ec24e7c09b,,Amazon Smile ,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$5.26,5.26,$5.26,5.26,y,08/31/2018,1.00
+08/13/2018,7c725af8392a44ba8fa977ec24e7c09b,,Amazon Smile ,,CURRENCY::USD,,,,Income:Other Income,Other Income,$(5.26),(5.26),$(5.26),(5.26),n,,1.00
+08/31/2018,4fb14fe57dcc460c89f919a5e4285ceb,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.11,0.11,$0.11,0.11,y,08/31/2018,1.00
+08/31/2018,4fb14fe57dcc460c89f919a5e4285ceb,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.11),(0.11),$(0.11),(0.11),n,,1.00
+09/06/2018,a524774680d74baa88c92973622c6f04,,Deposit,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$30.00,30.00,$30.00,30.00,y,09/30/2018,1.00
+09/06/2018,a524774680d74baa88c92973622c6f04,,Deposit,,CURRENCY::USD,,,,Income:Donations,Donations,$(30.00),(30.00),$(30.00),(30.00),n,,1.00
+09/28/2018,35aa06486f904ba38313a4a433a86b21,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.10,0.10,$0.10,0.10,y,09/30/2018,1.00
+09/28/2018,35aa06486f904ba38313a4a433a86b21,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.10),(0.10),$(0.10),(0.10),n,,1.00
+10/18/2018,80c245e5389a4047980f280cd3f10743,1020,Glen Popiel - Day in the Park Corkey's reimbursement,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$(305.05),(305.05),$(305.05),(305.05),y,10/31/2018,1.00
+10/18/2018,80c245e5389a4047980f280cd3f10743,1020,Glen Popiel - Day in the Park Corkey's reimbursement,,CURRENCY::USD,,,,Expenses:Entertainment,Entertainment,$305.05,305.05,$305.05,305.05,n,,1.00
+10/29/2018,22c0b8c001a44a1cb0ae985150b1681e,,Amazon Smile ,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$7.67,7.67,$7.67,7.67,y,10/31/2018,1.00
+10/29/2018,22c0b8c001a44a1cb0ae985150b1681e,,Amazon Smile ,,CURRENCY::USD,,,,Income:Other Income,Other Income,$(7.67),(7.67),$(7.67),(7.67),n,,1.00
+10/31/2018,2dbaba6837e549b4ac4ab2924a93f6ec,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.10,0.10,$0.10,0.10,y,10/31/2018,1.00
+10/31/2018,2dbaba6837e549b4ac4ab2924a93f6ec,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.10),(0.10),$(0.10),(0.10),n,,1.00
+11/30/2018,58fc949924b04a1ba9dbf0f8cd944084,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.09,0.09,$0.09,0.09,y,11/30/2018,1.00
+11/30/2018,58fc949924b04a1ba9dbf0f8cd944084,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.09),(0.09),$(0.09),(0.09),n,,1.00
+12/19/2018,6f1b61cc8bc24def9db589aacb22ffb8,1021,Dennis Woffard,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$(442.00),(442.00),$(442.00),(442.00),y,12/31/2018,1.00
+12/19/2018,6f1b61cc8bc24def9db589aacb22ffb8,1021,Dennis Woffard,,CURRENCY::USD,,,,Expenses:Insurance:Liability Insurance,Liability Insurance,$300.00,300.00,$300.00,300.00,n,,1.00
+12/19/2018,6f1b61cc8bc24def9db589aacb22ffb8,1021,Dennis Woffard,,CURRENCY::USD,,,,Expenses:Postage and Delivery,Postage and Delivery,$142.00,142.00,$142.00,142.00,n,,1.00
+12/31/2018,a6292c9f74504405b17b7aeae0b9c6e3,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.09,0.09,$0.09,0.09,y,12/31/2018,1.00
+12/31/2018,a6292c9f74504405b17b7aeae0b9c6e3,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.09),(0.09),$(0.09),(0.09),n,,1.00
+01/30/2019,d59b050c713b4bd7b5e4b2c5d74401d3,,Deposit,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$60.00,60.00,$60.00,60.00,y,01/31/2019,1.00
+01/30/2019,d59b050c713b4bd7b5e4b2c5d74401d3,,Deposit,,CURRENCY::USD,,,,Income:Donations,Donations,$(60.00),(60.00),$(60.00),(60.00),n,,1.00
+01/31/2019,5204f77762a84baca3cad3dda59def03,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.08,0.08,$0.08,0.08,y,01/31/2019,1.00
+01/31/2019,5204f77762a84baca3cad3dda59def03,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.08),(0.08),$(0.08),(0.08),n,,1.00
+02/15/2019,be20383e802a4ac7b305f1791df1982b,,Amazon Smile ,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$16.34,16.34,$16.34,16.34,y,02/28/2019,1.00
+02/15/2019,be20383e802a4ac7b305f1791df1982b,,Amazon Smile ,,CURRENCY::USD,,,,Income:Other Income,Other Income,$(16.34),(16.34),$(16.34),(16.34),n,,1.00
+02/18/2019,4e30f88588a341e4b7c971a60d77ec84,,Paypal Deposit,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$239.70,239.70,$239.70,239.70,y,02/28/2019,1.00
+02/18/2019,4e30f88588a341e4b7c971a60d77ec84,,Paypal Deposit,,CURRENCY::USD,,,,Income:Donations,Donations,$(239.70),(239.70),$(239.70),(239.70),n,,1.00
+02/28/2019,3116fbf8bbec4edba41344099c991b10,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.07,0.07,$0.07,0.07,y,02/28/2019,1.00
+02/28/2019,3116fbf8bbec4edba41344099c991b10,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.07),(0.07),$(0.07),(0.07),n,,1.00
+03/19/2019,693a7524018347c1b48fafcbec857bc3,,Deposit,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$200.00,200.00,$200.00,200.00,y,03/31/2019,1.00
+03/19/2019,693a7524018347c1b48fafcbec857bc3,,Deposit,,CURRENCY::USD,,,,Income:Donations,Donations,$(200.00),(200.00),$(200.00),(200.00),n,,1.00
+03/29/2019,d2e794572e394ac49bc56bc45c4c94c2,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.09,0.09,$0.09,0.09,y,03/31/2019,1.00
+03/29/2019,d2e794572e394ac49bc56bc45c4c94c2,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.09),(0.09),$(0.09),(0.09),n,,1.00
+04/30/2019,c0761c66786b4a28a3aec498a92bb1b7,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.09,0.09,$0.09,0.09,y,04/30/2019,1.00
+04/30/2019,c0761c66786b4a28a3aec498a92bb1b7,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.09),(0.09),$(0.09),(0.09),n,,1.00
+05/09/2019,8d9911c56e994d119fc2dbf41a194579,,Amazon Smile ,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$10.24,10.24,$10.24,10.24,y,05/31/2019,1.00
+05/09/2019,8d9911c56e994d119fc2dbf41a194579,,Amazon Smile ,,CURRENCY::USD,,,,Income:Other Income,Other Income,$(10.24),(10.24),$(10.24),(10.24),n,,1.00
+05/24/2019,e9c70e53aeeb4d65ada9976e17843141,1023,Glen Popiel - Projector,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$(50.00),(50.00),$(50.00),(50.00),y,05/31/2019,1.00
+05/24/2019,e9c70e53aeeb4d65ada9976e17843141,1023,Glen Popiel - Projector,,CURRENCY::USD,,,,Expenses:Equipment,Equipment,$50.00,50.00,$50.00,50.00,n,,1.00
+05/31/2019,00a5f137b1044c9a9087a9d955d67cbf,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.10,0.10,$0.10,0.10,y,05/31/2019,1.00
+05/31/2019,00a5f137b1044c9a9087a9d955d67cbf,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.10),(0.10),$(0.10),(0.10),n,,1.00
+06/07/2019,309d9064878b455b84c70c1b13b65ede,,Paypal Deposit,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$105.59,105.59,$105.59,105.59,y,06/30/2019,1.00
+06/07/2019,309d9064878b455b84c70c1b13b65ede,,Paypal Deposit,,CURRENCY::USD,,,,Income:Donations,Donations,$(105.59),(105.59),$(105.59),(105.59),n,,1.00
+06/10/2019,65ca7fe0c72c4b19beaadaa23fc461ba,,Deposit,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$87.00,87.00,$87.00,87.00,y,06/30/2019,1.00
+06/10/2019,65ca7fe0c72c4b19beaadaa23fc461ba,,Deposit,,CURRENCY::USD,,,,Income:Donations,Donations,$(87.00),(87.00),$(87.00),(87.00),n,,1.00
+06/19/2019,60b6f2b8d4d54336b5a2ee81db5f66a4,1024,Jim Story,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$(100.00),(100.00),$(100.00),(100.00),y,06/30/2019,1.00
+06/19/2019,60b6f2b8d4d54336b5a2ee81db5f66a4,1024,Jim Story,,CURRENCY::USD,,,,Expenses:Gifts,Gifts,$100.00,100.00,$100.00,100.00,n,,1.00
+06/28/2019,932bf459749d4ea1869846818a338fed,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.10,0.10,$0.10,0.10,y,06/30/2019,1.00
+06/28/2019,932bf459749d4ea1869846818a338fed,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.10),(0.10),$(0.10),(0.10),n,,1.00
+07/15/2019,c5ac0f316683498f83d18b2aa900c271,,Deposit (Membership?),,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$25.00,25.00,$25.00,25.00,y,07/31/2019,1.00
+07/15/2019,c5ac0f316683498f83d18b2aa900c271,,Deposit (Membership?),,CURRENCY::USD,,,,Income:Dues,Dues,$(25.00),(25.00),$(25.00),(25.00),n,,1.00
+07/31/2019,07ed33f7ad24470992669bd7c46791b8,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.10,0.10,$0.10,0.10,y,07/31/2019,1.00
+07/31/2019,07ed33f7ad24470992669bd7c46791b8,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.10),(0.10),$(0.10),(0.10),n,,1.00
+08/09/2019,f881b0e476604321852f86a746db10f5,,Amazon Smile ,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$6.66,6.66,$6.66,6.66,y,08/31/2019,1.00
+08/09/2019,f881b0e476604321852f86a746db10f5,,Amazon Smile ,,CURRENCY::USD,,,,Income:Other Income,Other Income,$(6.66),(6.66),$(6.66),(6.66),n,,1.00
+08/30/2019,cac0b29286ea45d9b58c6eddd8df4fba,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.10,0.10,$0.10,0.10,y,08/31/2019,1.00
+08/30/2019,cac0b29286ea45d9b58c6eddd8df4fba,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.10),(0.10),$(0.10),(0.10),n,,1.00
+09/30/2019,2b9a716acbc14c5b8cbf7e72cd91f318,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.10,0.10,$0.10,0.10,y,09/30/2019,1.00
+09/30/2019,2b9a716acbc14c5b8cbf7e72cd91f318,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.10),(0.10),$(0.10),(0.10),n,,1.00
+10/05/2019,7ff5547a5046464099fa6ba1e487d42a,1026,Richard Shaw (PO Box Renewal),,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$(134.00),(134.00),$(134.00),(134.00),y,10/31/2019,1.00
+10/05/2019,7ff5547a5046464099fa6ba1e487d42a,1026,Richard Shaw (PO Box Renewal),,CURRENCY::USD,,,,Expenses:Postage and Delivery,Postage and Delivery,$134.00,134.00,$134.00,134.00,n,,1.00
+10/31/2019,017a9847f871424d81afe68f93819caa,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.10,0.10,$0.10,0.10,y,10/31/2019,1.00
+10/31/2019,017a9847f871424d81afe68f93819caa,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.10),(0.10),$(0.10),(0.10),n,,1.00
+11/12/2019,c06285e1fe1b4997a44da2da641ce706,,Amazon Smile ,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$6.92,6.92,$6.92,6.92,y,11/30/2019,1.00
+11/12/2019,c06285e1fe1b4997a44da2da641ce706,,Amazon Smile ,,CURRENCY::USD,,,,Income:Other Income,Other Income,$(6.92),(6.92),$(6.92),(6.92),n,,1.00
+11/29/2019,fe804d2e39cd43d6ad2c0a3283d60dcf,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.08,0.08,$0.08,0.08,y,11/30/2019,1.00
+11/29/2019,fe804d2e39cd43d6ad2c0a3283d60dcf,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.08),(0.08),$(0.08),(0.08),n,,1.00
+12/31/2019,c766adab0694464c952f4a505b6d6288,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.06,0.06,$0.06,0.06,y,12/31/2019,1.00
+12/31/2019,c766adab0694464c952f4a505b6d6288,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.06),(0.06),$(0.06),(0.06),n,,1.00
+01/22/2020,7c14f316092047fa8f25db113b5aa7d8,1028,Dennis Woffard,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$(300.00),(300.00),$(300.00),(300.00),y,01/31/2020,1.00
+01/22/2020,7c14f316092047fa8f25db113b5aa7d8,1028,Dennis Woffard,,CURRENCY::USD,,,,Expenses:Insurance:Liability Insurance,Liability Insurance,$300.00,300.00,$300.00,300.00,n,,1.00
+01/31/2020,118d1f534e1c4f49994aac32f064406a,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.06,0.06,$0.06,0.06,y,01/31/2020,1.00
+01/31/2020,118d1f534e1c4f49994aac32f064406a,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.06),(0.06),$(0.06),(0.06),n,,1.00
+02/20/2020,14017ad9cdfd47b89dc0078538e1ed95,,Amazon Smile ,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$20.24,20.24,$20.24,20.24,y,02/29/2020,1.00
+02/20/2020,14017ad9cdfd47b89dc0078538e1ed95,,Amazon Smile ,,CURRENCY::USD,,,,Income:Donations,Donations,$(20.24),(20.24),$(20.24),(20.24),n,,1.00
+02/28/2020,9d80d94710cd439a853344d2b8922153,,Deposit,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$358.15,358.15,$358.15,358.15,y,02/29/2020,1.00
+02/28/2020,9d80d94710cd439a853344d2b8922153,,Deposit,,CURRENCY::USD,,,,Income:Donations,Donations,$(358.15),(358.15),$(358.15),(358.15),n,,1.00
+02/28/2020,40e40f3fdcdc4575832aea56857f10f5,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.05,0.05,$0.05,0.05,y,02/29/2020,1.00
+02/28/2020,40e40f3fdcdc4575832aea56857f10f5,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.05),(0.05),$(0.05),(0.05),n,,1.00
+03/11/2020,c57afbdd9d2943a78e443579db3fa894,,Paypal Deposit,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$321.32,321.32,$321.32,321.32,y,03/31/2020,1.00
+03/11/2020,c57afbdd9d2943a78e443579db3fa894,,Paypal Deposit,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account:Repeater Fund,Repeater Fund,$485.20,485.20,$485.20,485.20,y,03/31/2020,1.00
+03/11/2020,c57afbdd9d2943a78e443579db3fa894,,Paypal Deposit,,CURRENCY::USD,,,,Income:Donations,Donations,$(806.52),(806.52),$(806.52),(806.52),n,,1.00
+03/31/2020,d7929fcf56ed491aa9d8b6ed3ef58568,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.09,0.09,$0.09,0.09,y,03/31/2020,1.00
+03/31/2020,d7929fcf56ed491aa9d8b6ed3ef58568,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.09),(0.09),$(0.09),(0.09),n,,1.00
+04/30/2020,1b7ed96d59bb4cc0b4d77921ff3efec8,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.10,0.10,$0.10,0.10,y,04/30/2020,1.00
+04/30/2020,1b7ed96d59bb4cc0b4d77921ff3efec8,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.10),(0.10),$(0.10),(0.10),n,,1.00
+05/20/2020,9b14d481216342d99f52a8ef6d740c0d,,Amazon Smile ,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$7.03,7.03,$7.03,7.03,y,05/31/2020,1.00
+05/20/2020,9b14d481216342d99f52a8ef6d740c0d,,Amazon Smile ,,CURRENCY::USD,,,,Income:Donations,Donations,$(7.03),(7.03),$(7.03),(7.03),n,,1.00
+05/29/2020,c0f873c8f5884ee59c1966910c9010ce,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.10,0.10,$0.10,0.10,y,05/31/2020,1.00
+05/29/2020,c0f873c8f5884ee59c1966910c9010ce,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.10),(0.10),$(0.10),(0.10),n,,1.00
+06/16/2020,482e580d56cc4df9bf1c432e9aa87ab0,,Paypal Deposit,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$23.97,23.97,$23.97,23.97,y,06/30/2020,1.00
+06/16/2020,482e580d56cc4df9bf1c432e9aa87ab0,,Paypal Deposit,,CURRENCY::USD,,,,Income:Dues,Dues,$(23.97),(23.97),$(23.97),(23.97),n,,1.00
+06/29/2020,bc9e0d1b2a4f469a9e5b4573c1a8127f,1029,Arrow Portables,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$(80.00),(80.00),$(80.00),(80.00),y,06/30/2020,1.00
+06/29/2020,bc9e0d1b2a4f469a9e5b4573c1a8127f,1029,Arrow Portables,,CURRENCY::USD,,,,Expenses:Rent,Rent,$80.00,80.00,$80.00,80.00,n,,1.00
+06/30/2020,317b409b1e8d401e807b6599b1a86542,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.10,0.10,$0.10,0.10,y,06/30/2020,1.00
+06/30/2020,317b409b1e8d401e807b6599b1a86542,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.10),(0.10),$(0.10),(0.10),n,,1.00
+07/31/2020,a078fec6bd1a4440801f15851e71736d,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.10,0.10,$0.10,0.10,y,07/31/2020,1.00
+07/31/2020,a078fec6bd1a4440801f15851e71736d,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.10),(0.10),$(0.10),(0.10),n,,1.00
+08/12/2020,2dd6a6bcd16745f49404c23604158192,,Amazon Smile ,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$14.63,14.63,$14.63,14.63,y,08/31/2020,1.00
+08/12/2020,2dd6a6bcd16745f49404c23604158192,,Amazon Smile ,,CURRENCY::USD,,,,Income:Donations,Donations,$(14.63),(14.63),$(14.63),(14.63),n,,1.00
+08/31/2020,eaaf15a7a735433eae17638fc96608ee,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.10,0.10,$0.10,0.10,y,08/31/2020,1.00
+08/31/2020,eaaf15a7a735433eae17638fc96608ee,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.10),(0.10),$(0.10),(0.10),n,,1.00
+09/30/2020,ed07dfacb5c34290b3632051c6007a83,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.09,0.09,$0.09,0.09,y,09/30/2020,1.00
+09/30/2020,ed07dfacb5c34290b3632051c6007a83,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.09),(0.09),$(0.09),(0.09),n,,1.00
+10/30/2020,8bb16fe3104146c9b274be34ba6cdae0,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.10,0.10,$0.10,0.10,y,10/31/2020,1.00
+10/30/2020,8bb16fe3104146c9b274be34ba6cdae0,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.10),(0.10),$(0.10),(0.10),n,,1.00
+11/12/2020,23f44a73ce4241d591673eee74ce70e1,,Amazon Smile ,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$34.13,34.13,$34.13,34.13,y,11/30/2020,1.00
+11/12/2020,23f44a73ce4241d591673eee74ce70e1,,Amazon Smile ,,CURRENCY::USD,,,,Income:Donations,Donations,$(34.13),(34.13),$(34.13),(34.13),n,,1.00
+11/30/2020,5a8ee53be8554f26a98721b494cf32bd,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.10,0.10,$0.10,0.10,y,11/30/2020,1.00
+11/30/2020,5a8ee53be8554f26a98721b494cf32bd,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.10),(0.10),$(0.10),(0.10),n,,1.00
+12/15/2020,fbe6430eadb6449eadf23bc80602a1b1,,Paypal Deposit,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$143.82,143.82,$143.82,143.82,y,12/31/2020,1.00
+12/15/2020,fbe6430eadb6449eadf23bc80602a1b1,,Paypal Deposit,,CURRENCY::USD,,,,Income:Dues,Dues,$(143.82),(143.82),$(143.82),(143.82),n,,1.00
+12/18/2020,aa8383a8b131430283799235d1beede9,,Deposit,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$25.00,25.00,$25.00,25.00,y,12/31/2020,1.00
+12/18/2020,aa8383a8b131430283799235d1beede9,,Deposit,,CURRENCY::USD,,,,Income:Dues,Dues,$(25.00),(25.00),$(25.00),(25.00),n,,1.00
+12/31/2020,25be3457fff6403daf57ee7e79234f81,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.10,0.10,$0.10,0.10,y,12/31/2020,1.00
+12/31/2020,25be3457fff6403daf57ee7e79234f81,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.10),(0.10),$(0.10),(0.10),n,,1.00
+12/31/2020,86c07f8f610a4aa6aedb13ca6bd39b8c,5001,Dennis Woffard,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$(300.00),(300.00),$(300.00),(300.00),y,12/31/2020,1.00
+12/31/2020,86c07f8f610a4aa6aedb13ca6bd39b8c,5001,Dennis Woffard,,CURRENCY::USD,,,,Expenses:Insurance:Liability Insurance,Liability Insurance,$300.00,300.00,$300.00,300.00,n,,1.00
+01/19/2021,27a2d6a05b0647979cc9b7efa35858df,,Paypal Deposit,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$71.91,71.91,$71.91,71.91,y,01/31/2021,1.00
+01/19/2021,27a2d6a05b0647979cc9b7efa35858df,,Paypal Deposit,,CURRENCY::USD,,,,Income:Dues,Dues,$(71.91),(71.91),$(71.91),(71.91),n,,1.00
+01/29/2021,b479ab6f4f69401abce9c19ea3ff8042,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.10,0.10,$0.10,0.10,y,01/31/2021,1.00
+01/29/2021,b479ab6f4f69401abce9c19ea3ff8042,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.10),(0.10),$(0.10),(0.10),n,,1.00
+02/19/2021,fec3634c8462467c8262198e732be6af,,Paypal Deposit,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$249.41,249.41,$249.41,249.41,y,02/28/2021,1.00
+02/19/2021,fec3634c8462467c8262198e732be6af,,Paypal Deposit,,CURRENCY::USD,,,,Income:Dues,Dues,$(249.41),(249.41),$(249.41),(249.41),n,,1.00
+02/22/2021,8813d2bd9a05465f99f33a04a7e6a36f,,Amazon Smile ,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$17.05,17.05,$17.05,17.05,y,02/28/2021,1.00
+02/22/2021,8813d2bd9a05465f99f33a04a7e6a36f,,Amazon Smile ,,CURRENCY::USD,,,,Income:Donations,Donations,$(17.05),(17.05),$(17.05),(17.05),n,,1.00
+02/26/2021,80c70bdae5d84f898646a250e3469714,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.08,0.08,$0.08,0.08,y,02/28/2021,1.00
+02/26/2021,80c70bdae5d84f898646a250e3469714,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.08),(0.08),$(0.08),(0.08),n,,1.00
+03/31/2021,e5619b8872f24b2ba5cf8a62126f7209,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.02,0.02,$0.02,0.02,y,03/31/2021,1.00
+03/31/2021,e5619b8872f24b2ba5cf8a62126f7209,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.02),(0.02),$(0.02),(0.02),n,,1.00
+04/21/2021,41d63a3ca7974f24a54e9f6c101be793,,Paypal Deposit,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$71.91,71.91,$71.91,71.91,y,04/30/2021,1.00
+04/21/2021,41d63a3ca7974f24a54e9f6c101be793,,Paypal Deposit,,CURRENCY::USD,,,,Income:Dues,Dues,$(71.91),(71.91),$(71.91),(71.91),n,,1.00
+04/21/2021,a8112eadf9974b62b00ebc0337c0d4c8,,Deposit,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$106.81,106.81,$106.81,106.81,y,04/30/2021,1.00
+04/21/2021,a8112eadf9974b62b00ebc0337c0d4c8,,Deposit,,CURRENCY::USD,,,,Income:Dues,Dues,$(106.81),(106.81),$(106.81),(106.81),n,,1.00
+04/30/2021,d7dd7c9a1601407cb55591510693bda7,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.02,0.02,$0.02,0.02,y,04/30/2021,1.00
+04/30/2021,d7dd7c9a1601407cb55591510693bda7,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.02),(0.02),$(0.02),(0.02),n,,1.00
+05/24/2021,1788b2d417ac4790a856c4f6eacf107a,,Amazon Smile ,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$13.63,13.63,$13.63,13.63,y,05/31/2021,1.00
+05/24/2021,1788b2d417ac4790a856c4f6eacf107a,,Amazon Smile ,,CURRENCY::USD,,,,Income:Donations,Donations,$(13.63),(13.63),$(13.63),(13.63),n,,1.00
+05/28/2021,202131397541467ba3c9b0b12e30dd18,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.02,0.02,$0.02,0.02,y,05/31/2021,1.00
+05/28/2021,202131397541467ba3c9b0b12e30dd18,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.02),(0.02),$(0.02),(0.02),n,,1.00
+06/30/2021,3fa5a43f85f44343a89556e9d76f6629,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.02,0.02,$0.02,0.02,y,06/30/2021,1.00
+06/30/2021,3fa5a43f85f44343a89556e9d76f6629,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.02),(0.02),$(0.02),(0.02),n,,1.00
+07/13/2021,7a75878fb49b4d80a5a3a23d2795d28d,5002,Dennis Woffard,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$(276.14),(276.14),$(276.14),(276.14),y,07/31/2021,1.00
+07/13/2021,7a75878fb49b4d80a5a3a23d2795d28d,5002,Dennis Woffard,,CURRENCY::USD,,,,Expenses:Reimbursement,Reimbursement,$276.14,276.14,$276.14,276.14,n,,1.00
+07/30/2021,c663306e6ac74a9f9c37d14a616049e4,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.02,0.02,$0.02,0.02,y,07/31/2021,1.00
+07/30/2021,c663306e6ac74a9f9c37d14a616049e4,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.02),(0.02),$(0.02),(0.02),n,,1.00
+08/10/2021,c28faac7dae7439797b609df4ba2a8e4,,Deposit,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$195.81,195.81,$195.81,195.81,y,08/31/2021,1.00
+08/10/2021,c28faac7dae7439797b609df4ba2a8e4,,Deposit,,CURRENCY::USD,,,,Income:Donations,Donations,$(195.81),(195.81),$(195.81),(195.81),n,,1.00
+08/16/2021,4e06b7eee8264fd6947056791e8335d1,,Amazon Smile ,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$21.85,21.85,$21.85,21.85,y,08/31/2021,1.00
+08/16/2021,4e06b7eee8264fd6947056791e8335d1,,Amazon Smile ,,CURRENCY::USD,,,,Income:Donations,Donations,$(21.85),(21.85),$(21.85),(21.85),n,,1.00
+08/31/2021,6b936ecb87ab46919446c9c004d5f64d,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.02,0.02,$0.02,0.02,y,08/31/2021,1.00
+08/31/2021,6b936ecb87ab46919446c9c004d5f64d,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.02),(0.02),$(0.02),(0.02),n,,1.00
+09/23/2021,05bdfa7ed20346cbaaf1c5e6a3a43262,,Donation - Tom Butas,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$320.43,320.43,$320.43,320.43,y,09/30/2021,1.00
+09/23/2021,05bdfa7ed20346cbaaf1c5e6a3a43262,,Donation - Tom Butas,,CURRENCY::USD,,,,Income:Donations,Donations,$(320.43),(320.43),$(320.43),(320.43),n,,1.00
+09/30/2021,8066bcac5243402daf9ee2ab3bc139e3,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.02,0.02,$0.02,0.02,y,09/30/2021,1.00
+09/30/2021,8066bcac5243402daf9ee2ab3bc139e3,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.02),(0.02),$(0.02),(0.02),n,,1.00
+10/29/2021,fa628304725b46ccb250a4f3a4df3214,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.03,0.03,$0.03,0.03,y,10/31/2021,1.00
+10/29/2021,fa628304725b46ccb250a4f3a4df3214,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.03),(0.03),$(0.03),(0.03),n,,1.00
+11/19/2021,c886df507b2345889ea3fec646b32c1c,1030,Dennis Woffard,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$(513.00),(513.00),$(513.00),(513.00),y,11/30/2021,1.00
+11/19/2021,c886df507b2345889ea3fec646b32c1c,1030,Dennis Woffard,,CURRENCY::USD,,,,Expenses:Reimbursement,Reimbursement,$513.00,513.00,$513.00,513.00,n,,1.00
+11/22/2021,dff1cf0960d743be812f03e4d7037070,,Amazon Smile ,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$7.55,7.55,$7.55,7.55,y,11/30/2021,1.00
+11/22/2021,dff1cf0960d743be812f03e4d7037070,,Amazon Smile ,,CURRENCY::USD,,,,Income:Donations,Donations,$(7.55),(7.55),$(7.55),(7.55),n,,1.00
+11/30/2021,998703225c9b4579a16df6235b379c8c,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.02,0.02,$0.02,0.02,y,11/30/2021,1.00
+11/30/2021,998703225c9b4579a16df6235b379c8c,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.02),(0.02),$(0.02),(0.02),n,,1.00
+12/31/2021,23d570e603774bbf920af9d76894b570,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.02,0.02,$0.02,0.02,y,12/31/2021,1.00
+12/31/2021,23d570e603774bbf920af9d76894b570,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.02),(0.02),$(0.02),(0.02),n,,1.00
+01/19/2022,18234df2468b4e03a4b6abdb0cd1d0a2,,Paypal Deposit,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$390.61,390.61,$390.61,390.61,y,01/31/2022,1.00
+01/19/2022,18234df2468b4e03a4b6abdb0cd1d0a2,,Paypal Deposit,,CURRENCY::USD,,,,Income:Dues,Dues,$(390.61),(390.61),$(390.61),(390.61),n,,1.00
+01/31/2022,88013a1ac57a49f58c4de8e20e2d9575,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.02,0.02,$0.02,0.02,y,01/31/2022,1.00
+01/31/2022,88013a1ac57a49f58c4de8e20e2d9575,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.02),(0.02),$(0.02),(0.02),n,,1.00
+02/16/2022,648abe0f616c463b86cef6048889fb5a,,Paypal Deposit,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$127.85,127.85,$127.85,127.85,y,02/28/2022,1.00
+02/16/2022,648abe0f616c463b86cef6048889fb5a,,Paypal Deposit,,CURRENCY::USD,,,,Income:Dues,Dues,$(127.85),(127.85),$(127.85),(127.85),n,,1.00
+02/18/2022,d161e81011db41e7984019b2c91c02be,1031,Jim Story,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$(116.00),(116.00),$(116.00),(116.00),y,02/28/2022,1.00
+02/18/2022,d161e81011db41e7984019b2c91c02be,1031,Jim Story,,CURRENCY::USD,,,,Expenses:Subscriptions,Subscriptions,$116.00,116.00,$116.00,116.00,n,,1.00
+02/28/2022,e7981f01430f43fe9dbf059f23c3faf7,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.02,0.02,$0.02,0.02,y,02/28/2022,1.00
+02/28/2022,e7981f01430f43fe9dbf059f23c3faf7,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.02),(0.02),$(0.02),(0.02),n,,1.00
+03/02/2022,38973bbcfc06414b9f4e2c1a34338332,,Amazon Smile ,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$12.26,12.26,$12.26,12.26,y,03/31/2022,1.00
+03/02/2022,38973bbcfc06414b9f4e2c1a34338332,,Amazon Smile ,,CURRENCY::USD,,,,Income:Donations,Donations,$(12.26),(12.26),$(12.26),(12.26),n,,1.00
+03/03/2022,8209408747024105bc885a03d964a38a,,Deposit,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$50.00,50.00,$50.00,50.00,y,03/31/2022,1.00
+03/03/2022,8209408747024105bc885a03d964a38a,,Deposit,,CURRENCY::USD,,,,Income:Dues,Dues,$(50.00),(50.00),$(50.00),(50.00),n,,1.00
+03/16/2022,3c18adbea22848d481be9dec4dccec8f,,Deposit,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$100.00,100.00,$100.00,100.00,y,03/31/2022,1.00
+03/16/2022,3c18adbea22848d481be9dec4dccec8f,,Deposit,,CURRENCY::USD,,,,Income:Dues,Dues,$(25.00),(25.00),$(25.00),(25.00),n,,1.00
+03/16/2022,3c18adbea22848d481be9dec4dccec8f,,Deposit,,CURRENCY::USD,,,,Income:Donations,Donations,$(75.00),(75.00),$(75.00),(75.00),n,,1.00
+03/31/2022,0a3875bb9117499b9b30cae905692fa2,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.03,0.03,$0.03,0.03,y,03/31/2022,1.00
+03/31/2022,0a3875bb9117499b9b30cae905692fa2,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.03),(0.03),$(0.03),(0.03),n,,1.00
+04/29/2022,8811587955e7405b951f25496c6816af,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.03,0.03,$0.03,0.03,y,04/30/2022,1.00
+04/29/2022,8811587955e7405b951f25496c6816af,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.03),(0.03),$(0.03),(0.03),n,,1.00
+05/19/2022,666e74ae1eae4cdbb0d8380885be0208,,Deposit,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$25.00,25.00,$25.00,25.00,y,05/31/2022,1.00
+05/19/2022,666e74ae1eae4cdbb0d8380885be0208,,Deposit,,CURRENCY::USD,,,,Income:Dues,Dues,$(25.00),(25.00),$(25.00),(25.00),n,,1.00
+05/27/2022,e0ab1622565241799b4316accb0061b5,,Amazon Smile ,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$11.21,11.21,$11.21,11.21,y,05/31/2022,1.00
+05/27/2022,e0ab1622565241799b4316accb0061b5,,Amazon Smile ,,CURRENCY::USD,,,,Income:Other Income,Other Income,$(11.21),(11.21),$(11.21),(11.21),n,,1.00
+05/31/2022,08c5438f6837420293c406956af4a017,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.03,0.03,$0.03,0.03,y,05/31/2022,1.00
+05/31/2022,08c5438f6837420293c406956af4a017,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.03),(0.03),$(0.03),(0.03),n,,1.00
+06/21/2022,a4dbef8855964703922dd42dd4afd7c2,,Membership petty cash to checking,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$230.00,230.00,$230.00,230.00,y,06/30/2022,1.00
+06/21/2022,a4dbef8855964703922dd42dd4afd7c2,,Membership petty cash to checking,,CURRENCY::USD,,,,Assets:Current Assets:Petty Cash,Petty Cash,$(230.00),(230.00),$(230.00),(230.00),n,,1.00
+06/30/2022,ad4199a6773e4eb0bc38f767ae05d534,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.03,0.03,$0.03,0.03,y,06/30/2022,1.00
+06/30/2022,ad4199a6773e4eb0bc38f767ae05d534,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.03),(0.03),$(0.03),(0.03),n,,1.00
+07/19/2022,217798d0bb834440b3f890f2839b57d8,,Dennis Woffard,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$(441.73),(441.73),$(441.73),(441.73),y,08/31/2022,1.00
+07/19/2022,217798d0bb834440b3f890f2839b57d8,,Dennis Woffard,,CURRENCY::USD,,,,Expenses:Reimbursement,Reimbursement,$441.73,441.73,$441.73,441.73,n,,1.00
+07/29/2022,590b8d3a6030448aa3d693863031a9a7,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.03,0.03,$0.03,0.03,y,07/31/2022,1.00
+07/29/2022,590b8d3a6030448aa3d693863031a9a7,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.03),(0.03),$(0.03),(0.03),n,,1.00
+08/01/2022,3fabb8638a78480b9ae820aea0a44380,,Dennis Woffard Refund for Field Day expenses,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$163.12,163.12,$163.12,163.12,y,08/31/2022,1.00
+08/01/2022,3fabb8638a78480b9ae820aea0a44380,,Dennis Woffard Refund for Field Day expenses,,CURRENCY::USD,,,,Income:Other Income,Other Income,$(163.12),(163.12),$(163.12),(163.12),n,,1.00
+08/17/2022,34e9a2a3c2904aaf943a3c5a94403fb1,,Paypal Deposit,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$23.64,23.64,$23.64,23.64,y,08/31/2022,1.00
+08/17/2022,34e9a2a3c2904aaf943a3c5a94403fb1,,Paypal Deposit,,CURRENCY::USD,,,,Income:Dues,Dues,$(23.64),(23.64),$(23.64),(23.64),n,,1.00
+08/31/2022,b56d9c5b5fd048748ffb1d1a6474901e,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.08,0.08,$0.08,0.08,y,08/31/2022,1.00
+08/31/2022,b56d9c5b5fd048748ffb1d1a6474901e,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.08),(0.08),$(0.08),(0.08),n,,1.00
+09/01/2022,6cd14e91d4fe4103be7b27c7d565ee34,,Amazon Smile ,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$15.36,15.36,$15.36,15.36,y,09/30/2022,1.00
+09/01/2022,6cd14e91d4fe4103be7b27c7d565ee34,,Amazon Smile ,,CURRENCY::USD,,,,Income:Other Income,Other Income,$(15.36),(15.36),$(15.36),(15.36),n,,1.00
+09/02/2022,968e90539ff547b198c49a468a3a870c,5004,Malcom Keown - MS QSO Party Sponsorship,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$(25.00),(25.00),$(25.00),(25.00),y,09/30/2022,1.00
+09/02/2022,968e90539ff547b198c49a468a3a870c,5004,Malcom Keown - MS QSO Party Sponsorship,,CURRENCY::USD,,,,Expenses:Charity,Charity,$25.00,25.00,$25.00,25.00,n,,1.00
+09/30/2022,1f6846b01bcb4fdf868f4182111e995c,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.13,0.13,$0.13,0.13,y,09/30/2022,1.00
+09/30/2022,1f6846b01bcb4fdf868f4182111e995c,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.13),(0.13),$(0.13),(0.13),n,,1.00
+10/31/2022,5704ba1ae31045d39071b6b0f27adf9f,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.39,0.39,$0.39,0.39,y,10/31/2022,1.00
+10/31/2022,5704ba1ae31045d39071b6b0f27adf9f,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.39),(0.39),$(0.39),(0.39),n,,1.00
+11/21/2022,d0bce2eae08d4b0ca0e5466666cd55fc,,Amazon Smile ,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$14.26,14.26,$14.26,14.26,y,11/30/2022,1.00
+11/21/2022,d0bce2eae08d4b0ca0e5466666cd55fc,,Amazon Smile ,,CURRENCY::USD,,,,Income:Other Income,Other Income,$(14.26),(14.26),$(14.26),(14.26),n,,1.00
+11/22/2022,a68b8d702f714a89a7b4197a42289a80,5005,Dennis Woffard - PO Box Renewal,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$(247.00),(247.00),$(247.00),(247.00),y,12/31/2022,1.00
+11/22/2022,a68b8d702f714a89a7b4197a42289a80,5005,Dennis Woffard - PO Box Renewal,,CURRENCY::USD,,,,Expenses:Reimbursement,Reimbursement,$247.00,247.00,$247.00,247.00,n,,1.00
+11/30/2022,73e9689190814676be50dbd8814ad064,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.38,0.38,$0.38,0.38,y,11/30/2022,1.00
+11/30/2022,73e9689190814676be50dbd8814ad064,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.38),(0.38),$(0.38),(0.38),n,,1.00
+12/07/2022,e74ee9dc27694b83bd0f0071d470d154,,Liability Insurance,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$(300.00),(300.00),$(300.00),(300.00),y,12/31/2022,1.00
+12/07/2022,e74ee9dc27694b83bd0f0071d470d154,,Liability Insurance,,CURRENCY::USD,,,,Expenses:Insurance:Liability Insurance,Liability Insurance,$300.00,300.00,$300.00,300.00,n,,1.00
+12/14/2022,c95720ff5f7b4452a724b07279494583,,Membership,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$25.00,25.00,$25.00,25.00,y,12/31/2022,1.00
+12/14/2022,c95720ff5f7b4452a724b07279494583,,Membership,,CURRENCY::USD,,,,Income:Dues,Dues,$(25.00),(25.00),$(25.00),(25.00),n,,1.00
+12/20/2022,6a1b74b92fe54870ba07c2a701049fa1,,Paypal Deposit,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$279.34,279.34,$279.34,279.34,y,12/31/2022,1.00
+12/20/2022,6a1b74b92fe54870ba07c2a701049fa1,,Paypal Deposit,,CURRENCY::USD,,,,Income:Dues,Dues,$(279.34),(279.34),$(279.34),(279.34),n,,1.00
+12/30/2022,bcbc0295923940608b7e3b0dc774c0a1,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.35,0.35,$0.35,0.35,y,12/31/2022,1.00
+12/30/2022,bcbc0295923940608b7e3b0dc774c0a1,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.35),(0.35),$(0.35),(0.35),n,,1.00
+01/18/2023,53e5ce969844403a93e496fa4424dbc0,,Paypal Deposit,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$166.70,166.70,$166.70,166.70,y,01/31/2023,1.00
+01/18/2023,53e5ce969844403a93e496fa4424dbc0,,Paypal Deposit,,CURRENCY::USD,,,,Income:Dues,Dues,$(166.70),(166.70),$(166.70),(166.70),n,,1.00
+01/31/2023,15e47c76fb60496e9e916445bc0bb517,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.43,0.43,$0.43,0.43,y,01/31/2023,1.00
+01/31/2023,15e47c76fb60496e9e916445bc0bb517,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.43),(0.43),$(0.43),(0.43),n,,1.00
+02/10/2023,6106cbbc078e4ca1a6e95565915525ce,,Amazon Smile ,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$12.37,12.37,$12.37,12.37,y,02/28/2023,1.00
+02/10/2023,6106cbbc078e4ca1a6e95565915525ce,,Amazon Smile ,,CURRENCY::USD,,,,Income:Other Income,Other Income,$(12.37),(12.37),$(12.37),(12.37),n,,1.00
+02/28/2023,b066f31a0c9a44629f0ddab616b6dbad,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.46,0.46,$0.46,0.46,y,02/28/2023,1.00
+02/28/2023,b066f31a0c9a44629f0ddab616b6dbad,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.46),(0.46),$(0.46),(0.46),n,,1.00
+03/13/2023,8a3471d1cef44fffb72ef1cdb0d9d37f,,Deposit,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$25.00,25.00,$25.00,25.00,y,03/31/2023,1.00
+03/13/2023,8a3471d1cef44fffb72ef1cdb0d9d37f,,Deposit,,CURRENCY::USD,,,,Income:Dues,Dues,$(25.00),(25.00),$(25.00),(25.00),n,,1.00
+03/22/2023,0c543a44d5d0435394ade13a152acc11,,Paypal Deposit,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$94.56,94.56,$94.56,94.56,y,03/31/2023,1.00
+03/22/2023,0c543a44d5d0435394ade13a152acc11,,Paypal Deposit,,CURRENCY::USD,,,,Income:Dues,Dues,$(94.56),(94.56),$(94.56),(94.56),n,,1.00
+03/31/2023,16cbe74baac2465ba889246a47aa5f8a,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.52,0.52,$0.52,0.52,y,03/31/2023,1.00
+03/31/2023,16cbe74baac2465ba889246a47aa5f8a,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.52),(0.52),$(0.52),(0.52),n,,1.00
+04/14/2023,6ed095da55ba48a9be00256d5a8844a1,,Zoom,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$(160.39),(160.39),$(160.39),(160.39),y,04/30/2023,1.00
+04/14/2023,6ed095da55ba48a9be00256d5a8844a1,,Zoom,,CURRENCY::USD,,,,Expenses:Licenses and Permits,Licenses and Permits,$160.39,160.39,$160.39,160.39,n,,1.00
+04/21/2023,6bc930f60ba044919abfeb9b33d3eaa6,,Deposit,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$125.00,125.00,$125.00,125.00,y,04/30/2023,1.00
+04/21/2023,6bc930f60ba044919abfeb9b33d3eaa6,,Deposit,,CURRENCY::USD,,,,Income:Dues,Dues,$(125.00),(125.00),$(125.00),(125.00),n,,1.00
+04/28/2023,41600d80fac944ad9beb24ecd867493a,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.55,0.55,$0.55,0.55,y,04/30/2023,1.00
+04/28/2023,41600d80fac944ad9beb24ecd867493a,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.55),(0.55),$(0.55),(0.55),n,,1.00
+05/03/2023,b593f66354644209adbea474dc12fc6a,,Amazon Smile ,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$5.00,5.00,$5.00,5.00,y,05/31/2023,1.00
+05/03/2023,b593f66354644209adbea474dc12fc6a,,Amazon Smile ,,CURRENCY::USD,,,,Income:Other Income,Other Income,$(5.00),(5.00),$(5.00),(5.00),n,,1.00
+05/19/2023,a79e086e9ec14a3687891fae47af5da5,,Amazon Smile ,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$19.94,19.94,$19.94,19.94,y,05/31/2023,1.00
+05/19/2023,a79e086e9ec14a3687891fae47af5da5,,Amazon Smile ,,CURRENCY::USD,,,,Income:Other Income,Other Income,$(19.94),(19.94),$(19.94),(19.94),n,,1.00
+05/24/2023,dfff20a0d42544a4b910fac294a0e0d6,,Dues,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$145.00,145.00,$145.00,145.00,y,05/31/2023,1.00
+05/24/2023,dfff20a0d42544a4b910fac294a0e0d6,,Dues,,CURRENCY::USD,,,,Income:Dues,Dues,$(145.00),(145.00),$(145.00),(145.00),n,,1.00
+05/31/2023,b85a815d9f2b4a71a308e386c55c9814,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.88,0.88,$0.88,0.88,y,05/31/2023,1.00
+05/31/2023,b85a815d9f2b4a71a308e386c55c9814,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.88),(0.88),$(0.88),(0.88),n,,1.00
+06/20/2023,f1c367ed775143dc8dba8d6bd61a6aa6,1032,Bobby Stroud,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$(96.00),(96.00),$(96.00),(96.00),y,07/31/2023,1.00
+06/20/2023,f1c367ed775143dc8dba8d6bd61a6aa6,1032,Bobby Stroud,,CURRENCY::USD,,,,Expenses:Reimbursement,Reimbursement,$96.00,96.00,$96.00,96.00,n,,1.00
+06/30/2023,ebb683680abe40b7bf96444048b3b918,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.88,0.88,$0.88,0.88,y,06/30/2023,1.00
+06/30/2023,ebb683680abe40b7bf96444048b3b918,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.88),(0.88),$(0.88),(0.88),n,,1.00
+07/31/2023,d75b05bf9e23472696cb5b50313895ed,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.79,0.79,$0.79,0.79,y,07/31/2023,1.00
+07/31/2023,d75b05bf9e23472696cb5b50313895ed,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.79),(0.79),$(0.79),(0.79),n,,1.00
+08/31/2023,c1e380ffda7e486b8b056cf4069f2999,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.77,0.77,$0.77,0.77,y,08/31/2023,1.00
+08/31/2023,c1e380ffda7e486b8b056cf4069f2999,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.77),(0.77),$(0.77),(0.77),n,,1.00
+09/21/2023,a93e03897824410695a5b1495bbb1a12,1033,USPS - Olive Branch PO BOX 1842,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$(226.00),(226.00),$(226.00),(226.00),y,09/30/2023,1.00
+09/21/2023,a93e03897824410695a5b1495bbb1a12,1033,USPS - Olive Branch PO BOX 1842,,CURRENCY::USD,,,,Expenses:Rent,Rent,$226.00,226.00,$226.00,226.00,n,,1.00
+09/29/2023,8d59f88371fd4d48a3d678a1a13c771f,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.74,0.74,$0.74,0.74,y,09/30/2023,1.00
+09/29/2023,8d59f88371fd4d48a3d678a1a13c771f,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.74),(0.74),$(0.74),(0.74),n,,1.00
+10/01/2023,5148d20489724eae8b1020664f7c17c9,1034,Richard Shaw (Conference Speaker),,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$(235.39),(235.39),$(235.39),(235.39),y,10/31/2023,1.00
+10/01/2023,5148d20489724eae8b1020664f7c17c9,1034,Richard Shaw (Conference Speaker),,CURRENCY::USD,,,,Expenses:Equipment,Equipment,$235.39,235.39,$235.39,235.39,n,,1.00
+10/18/2023,1e24fa8ade7c4bf5a532254933e5adbd,,Paypal Deposit,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$72.18,72.18,$72.18,72.18,y,10/31/2023,1.00
+10/18/2023,1e24fa8ade7c4bf5a532254933e5adbd,,Paypal Deposit,,CURRENCY::USD,,,,Income:Dues,Dues,$(72.18),(72.18),$(72.18),(72.18),n,,1.00
+10/31/2023,442151bcfbd144b29e9955b7cb7f02a2,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.68,0.68,$0.68,0.68,y,10/31/2023,1.00
+10/31/2023,442151bcfbd144b29e9955b7cb7f02a2,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.68),(0.68),$(0.68),(0.68),n,,1.00
+11/20/2023,eb77a669dcb3425a8ca313d605977216,1035,Chickasaw Council,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$(30.00),(30.00),$(30.00),(30.00),y,11/30/2023,1.00
+11/20/2023,eb77a669dcb3425a8ca313d605977216,1035,Chickasaw Council,,CURRENCY::USD,,,,Expenses:Rent,Rent,$30.00,30.00,$30.00,30.00,n,,1.00
+11/30/2023,0d1bae814b274ffbbd1aea6e5bdcefcb,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.67,0.67,$0.67,0.67,y,11/30/2023,1.00
+11/30/2023,0d1bae814b274ffbbd1aea6e5bdcefcb,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.67),(0.67),$(0.67),(0.67),n,,1.00
+12/05/2023,c70773aa38b046bd9dfce1d79b24d61c,,RSC Insurance (Liability Insurance),,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$(300.00),(300.00),$(300.00),(300.00),y,12/31/2023,1.00
+12/05/2023,c70773aa38b046bd9dfce1d79b24d61c,,RSC Insurance (Liability Insurance),,CURRENCY::USD,,,,Expenses:Insurance:Liability Insurance,Liability Insurance,$300.00,300.00,$300.00,300.00,n,,1.00
+12/29/2023,912f162ed25f4e25a4bd3d9992c73503,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.63,0.63,$0.63,0.63,y,12/31/2023,1.00
+12/29/2023,912f162ed25f4e25a4bd3d9992c73503,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.63),(0.63),$(0.63),(0.63),n,,1.00
+01/24/2024,024ac5c906e04ab397d83474c1e42866,,Paypal Deposit,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$340.61,340.61,$340.61,340.61,y,01/31/2024,1.00
+01/24/2024,024ac5c906e04ab397d83474c1e42866,,Paypal Deposit,,CURRENCY::USD,,,,Income:Dues,Dues,$(340.61),(340.61),$(340.61),(340.61),n,,1.00
+01/31/2024,a6f6c6980958474a987ecafaa71f47b7,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.64,0.64,$0.64,0.64,y,01/31/2024,1.00
+01/31/2024,a6f6c6980958474a987ecafaa71f47b7,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.64),(0.64),$(0.64),(0.64),n,,1.00
+02/06/2024,c826b67571de4b77a3c43f9aad3b7b93,,Deposit,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$310.00,310.00,$310.00,310.00,y,02/29/2024,1.00
+02/06/2024,c826b67571de4b77a3c43f9aad3b7b93,,Deposit,,CURRENCY::USD,,,,Income:Dues,Dues,$(310.00),(310.00),$(310.00),(310.00),n,,1.00
+02/28/2024,3dafd98213bc4ed6bfe94d47ffb901ab,1051,Richard Shaw (New Router),,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$(108.05),(108.05),$(108.05),(108.05),y,02/29/2024,1.00
+02/28/2024,3dafd98213bc4ed6bfe94d47ffb901ab,1051,Richard Shaw (New Router),,CURRENCY::USD,,,,Expenses:Equipment,Equipment,$108.05,108.05,$108.05,108.05,n,,1.00
+02/29/2024,876c6a4f9afc45a5817c8fa8b0f854fd,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.70,0.70,$0.70,0.70,y,02/29/2024,1.00
+02/29/2024,876c6a4f9afc45a5817c8fa8b0f854fd,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.70),(0.70),$(0.70),(0.70),n,,1.00
+03/20/2024,b922239bfd164c1b8b6f7693852fabe9,,Spreadshirt Inc.,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$16.71,16.71,$16.71,16.71,y,03/31/2024,1.00
+03/20/2024,b922239bfd164c1b8b6f7693852fabe9,,Spreadshirt Inc.,,CURRENCY::USD,,,,Income:Sales,Sales,$(16.71),(16.71),$(16.71),(16.71),n,,1.00
+03/29/2024,a5522791d7d348a68d6c93767fab0b93,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.74,0.74,$0.74,0.74,y,03/31/2024,1.00
+03/29/2024,a5522791d7d348a68d6c93767fab0b93,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.74),(0.74),$(0.74),(0.74),n,,1.00
+04/15/2024,7daf446266b34d38bab0487b2d28f44f,,Paypal Zoom,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$(14.09),(14.09),$(14.09),(14.09),y,04/30/2024,1.00
+04/15/2024,7daf446266b34d38bab0487b2d28f44f,,Paypal Zoom,,CURRENCY::USD,,,,Expenses:Online Services,Online Services,$14.09,14.09,$14.09,14.09,n,,1.00
+04/30/2024,8b2521ef24f54ce09b4440c896ef83dc,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.71,0.71,$0.71,0.71,y,04/30/2024,1.00
+04/30/2024,8b2521ef24f54ce09b4440c896ef83dc,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.71),(0.71),$(0.71),(0.71),n,,1.00
+05/03/2024,764552c25384449ba732fa487f98539b,1052,Richard Shaw (Batteries and charger),,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$(229.14),(229.14),$(229.14),(229.14),y,05/31/2024,1.00
+05/03/2024,764552c25384449ba732fa487f98539b,1052,Richard Shaw (Batteries and charger),,CURRENCY::USD,,,,Expenses:Equipment,Equipment,$229.14,229.14,$229.14,229.14,n,,1.00
+05/06/2024,95cb14a5435a4d7bae5f32c19b644fe3,,Paypal Deposit,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$57.78,57.78,$57.78,57.78,y,05/31/2024,1.00
+05/06/2024,95cb14a5435a4d7bae5f32c19b644fe3,,Paypal Deposit,,CURRENCY::USD,,,,Income:Dues,Dues,$(57.78),(57.78),$(57.78),(57.78),n,,1.00
+05/28/2024,f05c6ec635e44c71b653f431bde87a02,,Paypal Deposit,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$47.28,47.28,$47.28,47.28,y,05/31/2024,1.00
+05/28/2024,f05c6ec635e44c71b653f431bde87a02,,Paypal Deposit,,CURRENCY::USD,,,,Income:Dues,Dues,$(47.28),(47.28),$(47.28),(47.28),n,,1.00
+05/31/2024,231637713e2c43b58404f4ed603fbe67,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.70,0.70,$0.70,0.70,y,05/31/2024,1.00
+05/31/2024,231637713e2c43b58404f4ed603fbe67,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.70),(0.70),$(0.70),(0.70),n,,1.00
+06/09/2024,29f5637b13404c7fbe297b4187b46659,1053,Doug Kave,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$(191.50),(191.50),$(191.50),(191.50),y,06/30/2024,1.00
+06/09/2024,29f5637b13404c7fbe297b4187b46659,1053,Doug Kave,,CURRENCY::USD,,,,Expenses:Outside Services,Outside Services,$191.50,191.50,$191.50,191.50,n,,1.00
+06/13/2024,628797d36d9f449881e38fdea3c0a2b4,1055,Jay Greganti,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,"$(1,560.00)",(1560.00),"$(1,560.00)",(1560.00),y,06/30/2024,1.00
+06/13/2024,628797d36d9f449881e38fdea3c0a2b4,1055,Jay Greganti,,CURRENCY::USD,,,,Expenses:Reimbursement,Reimbursement,"$1,560.00",1560.00,"$1,560.00",1560.00,n,,1.00
+06/20/2024,729bdd3ccdf24c45b3d3bb24e92cdefb,,Deposit,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,"$2,315.00",2315.00,"$2,315.00",2315.00,y,06/30/2024,1.00
+06/20/2024,729bdd3ccdf24c45b3d3bb24e92cdefb,,Deposit,,CURRENCY::USD,,,,Income:Other Income,Other Income,"$(2,315.00)",(2315.00),"$(2,315.00)",(2315.00),n,,1.00
+06/24/2024,350fca25201a42928417b75afe3dc010,1056,Jim Story,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,"$(1,500.00)",(1500.00),"$(1,500.00)",(1500.00),y,06/30/2024,1.00
+06/24/2024,350fca25201a42928417b75afe3dc010,1056,Jim Story,,CURRENCY::USD,,,,Expenses:Equipment,Equipment,"$1,500.00",1500.00,"$1,500.00",1500.00,n,,1.00
+06/28/2024,37cf9dc9829e4a1db9f891a6e7e0e4c6,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.70,0.70,$0.70,0.70,y,06/30/2024,1.00
+06/28/2024,37cf9dc9829e4a1db9f891a6e7e0e4c6,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.70),(0.70),$(0.70),(0.70),n,,1.00
+07/11/2024,f8606cfdd39c43558f38bd8430f02ddc,,Deposit,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$245.00,245.00,$245.00,245.00,y,07/31/2024,1.00
+07/11/2024,f8606cfdd39c43558f38bd8430f02ddc,,Deposit,,CURRENCY::USD,,,,Income:Other Income,Other Income,$(245.00),(245.00),$(245.00),(245.00),n,,1.00
+07/24/2024,3ed60ee10b9545a68a79d2eb06c002d7,,Spreadshirt Inc.,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$12.00,12.00,$12.00,12.00,y,07/31/2024,1.00
+07/24/2024,3ed60ee10b9545a68a79d2eb06c002d7,,Spreadshirt Inc.,,CURRENCY::USD,,,,Income:Sales,Sales,$(12.00),(12.00),$(12.00),(12.00),n,,1.00
+07/31/2024,fdd1c25a4e0a4c5c862cd5d96cffb253,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.55,0.55,$0.55,0.55,y,07/31/2024,1.00
+07/31/2024,fdd1c25a4e0a4c5c862cd5d96cffb253,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.55),(0.55),$(0.55),(0.55),n,,1.00
+08/22/2024,60c111cf7612472ba6a9127a816e78e2,,Spreadshirt Inc.,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$12.50,12.50,$12.50,12.50,y,08/31/2024,1.00
+08/22/2024,60c111cf7612472ba6a9127a816e78e2,,Spreadshirt Inc.,,CURRENCY::USD,,,,Income:Sales,Sales,$(12.50),(12.50),$(12.50),(12.50),n,,1.00
+08/30/2024,571dfa508c214121afa952430859cf29,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.57,0.57,$0.57,0.57,y,08/31/2024,1.00
+08/30/2024,571dfa508c214121afa952430859cf29,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.57),(0.57),$(0.57),(0.57),n,,1.00
+09/24/2024,75026fd384734cfea642df18f5ad2d2f,1057,USPS - Olive Branch PO BOX 1842,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$(232.00),(232.00),$(232.00),(232.00),y,09/30/2024,1.00
+09/24/2024,75026fd384734cfea642df18f5ad2d2f,1057,USPS - Olive Branch PO BOX 1842,,CURRENCY::USD,,,,Expenses:Rent,Rent,$232.00,232.00,$232.00,232.00,n,,1.00
+09/30/2024,feeb4822da66482496fbbfc693f70b67,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.54,0.54,$0.54,0.54,y,09/30/2024,1.00
+09/30/2024,feeb4822da66482496fbbfc693f70b67,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.54),(0.54),$(0.54),(0.54),n,,1.00
+10/31/2024,a29a54f93bf0410c8729354d70e4ca8c,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.52,0.52,$0.52,0.52,y,10/31/2024,1.00
+10/31/2024,a29a54f93bf0410c8729354d70e4ca8c,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.52),(0.52),$(0.52),(0.52),n,,1.00
+11/25/2024,5c71b24b827944b28b311ab4d51aa5d7,,Transfer from Paypal,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$70.92,70.92,$70.92,70.92,y,11/30/2024,1.00
+11/25/2024,5c71b24b827944b28b311ab4d51aa5d7,,Transfer from Paypal,,CURRENCY::USD,,,,Income:Donations,Donations,$(70.92),(70.92),$(70.92),(70.92),n,,1.00
+11/29/2024,eeb638d8edf4416b930d385476deff45,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.51,0.51,$0.51,0.51,y,11/30/2024,1.00
+11/29/2024,eeb638d8edf4416b930d385476deff45,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.51),(0.51),$(0.51),(0.51),n,,1.00
+12/20/2024,c1a6e0b85cc845eaae6cc5fdb5c21c01,5008,Richard Shaw - Domain Name Renewal,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$(37.00),(37.00),$(37.00),(37.00),y,12/31/2024,1.00
+12/20/2024,c1a6e0b85cc845eaae6cc5fdb5c21c01,5008,Richard Shaw - Domain Name Renewal,,CURRENCY::USD,,,,Expenses:Online Services,Online Services,$37.00,37.00,$37.00,37.00,n,,1.00
+12/26/2024,e80d53e4dc99456abd19725efcf12642,,Transfer from Paypal,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$198.92,198.92,$198.92,198.92,y,12/31/2024,1.00
+12/26/2024,e80d53e4dc99456abd19725efcf12642,,Transfer from Paypal,,CURRENCY::USD,,,,Income:Donations,Donations,$(198.92),(198.92),$(198.92),(198.92),n,,1.00
+12/31/2024,54af5962f3814cf6b8bef763a086ad65,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.54,0.54,$0.54,0.54,y,12/31/2024,1.00
+12/31/2024,54af5962f3814cf6b8bef763a086ad65,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.54),(0.54),$(0.54),(0.54),n,,1.00
+01/02/2025,4cace567b1344739b9c14230201d514e,,Paypal Payment,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$(5.92),(5.92),$(5.92),(5.92),y,01/31/2025,1.00
+01/02/2025,4cace567b1344739b9c14230201d514e,,Paypal Payment,,CURRENCY::USD,,,,Expenses:Online Services,Online Services,$5.92,5.92,$5.92,5.92,n,,1.00
+01/24/2025,5ac38e9ab3fa4b84920233ecdc32d5cd,1058,Olive Branch City Park rental,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$(60.00),(60.00),$(60.00),(60.00),y,01/31/2025,1.00
+01/24/2025,5ac38e9ab3fa4b84920233ecdc32d5cd,1058,Olive Branch City Park rental,,CURRENCY::USD,,,,Expenses:Rent,Rent,$60.00,60.00,$60.00,60.00,n,,1.00
+01/31/2025,bee3b3104e1246ab9d727b6bf4c6a53a,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.57,0.57,$0.57,0.57,y,01/31/2025,1.00
+01/31/2025,bee3b3104e1246ab9d727b6bf4c6a53a,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.57),(0.57),$(0.57),(0.57),n,,1.00
+02/28/2025,5468050448cb440098ea0f300054bb81,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.50,0.50,$0.50,0.50,y,02/28/2025,1.00
+02/28/2025,5468050448cb440098ea0f300054bb81,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.50),(0.50),$(0.50),(0.50),n,,1.00
+03/18/2025,67e6475791b74008bd3323b78a958950,1059,Robert Stroud,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$(32.00),(32.00),$(32.00),(32.00),y,03/31/2025,1.00
+03/18/2025,67e6475791b74008bd3323b78a958950,1059,Robert Stroud,,CURRENCY::USD,,,,Expenses:Reimbursement,Reimbursement,$32.00,32.00,$32.00,32.00,n,,1.00
+03/31/2025,b0d71c936dcc46c3bd387269aa6af468,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.55,0.55,$0.55,0.55,y,03/31/2025,1.00
+03/31/2025,b0d71c936dcc46c3bd387269aa6af468,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.55),(0.55),$(0.55),(0.55),n,,1.00
+04/30/2025,521b767922454d668e941584d4a3c604,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.53,0.53,$0.53,0.53,y,04/30/2025,1.00
+04/30/2025,521b767922454d668e941584d4a3c604,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.53),(0.53),$(0.53),(0.53),n,,1.00
+05/30/2025,0641e006378e4d47b94938f94a1ca13e,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.55,0.55,$0.55,0.55,y,05/31/2025,1.00
+05/30/2025,0641e006378e4d47b94938f94a1ca13e,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.55),(0.55),$(0.55),(0.55),n,,1.00
+06/30/2025,2fa38cf94ecb4c65af926ea9638c0099,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.53,0.53,$0.53,0.53,y,06/30/2025,1.00
+06/30/2025,2fa38cf94ecb4c65af926ea9638c0099,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.53),(0.53),$(0.53),(0.53),n,,1.00
+07/18/2025,77e4bac2f87f418f85c545f4d994106f,1060,Richard Shaw (Costco Laptops),,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$(888.06),(888.06),$(888.06),(888.06),y,07/31/2025,1.00
+07/18/2025,77e4bac2f87f418f85c545f4d994106f,1060,Richard Shaw (Costco Laptops),,CURRENCY::USD,,,,Expenses:Computer,Computer,$888.06,888.06,$888.06,888.06,n,,1.00
+07/31/2025,3fd1aa5c71614ee8a864ecb98a982991,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.46,0.46,$0.46,0.46,y,07/31/2025,1.00
+07/31/2025,3fd1aa5c71614ee8a864ecb98a982991,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.46),(0.46),$(0.46),(0.46),n,,1.00
+08/29/2025,7f7b8160b1724345bd50a7102c9284c0,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.36,0.36,$0.36,0.36,y,08/31/2025,1.00
+08/29/2025,7f7b8160b1724345bd50a7102c9284c0,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.36),(0.36),$(0.36),(0.36),n,,1.00
+09/30/2025,198d0f45dcc84eb899aa17129124cf95,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.35,0.35,$0.35,0.35,y,09/30/2025,1.00
+09/30/2025,198d0f45dcc84eb899aa17129124cf95,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.35),(0.35),$(0.35),(0.35),n,,1.00
+10/21/2025,bb466f2c83d34fb6bce43aee393b4819,,Deposit,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,"$1,433.00",1433.00,"$1,433.00",1433.00,y,10/31/2025,1.00
+10/21/2025,bb466f2c83d34fb6bce43aee393b4819,,Deposit,,CURRENCY::USD,,,,Income:Other Income,Other Income,"$(1,433.00)",(1433.00),"$(1,433.00)",(1433.00),n,,1.00
+10/21/2025,53460500825441e38c6cc95b5c430bfa,,Deposit,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$66.00,66.00,$66.00,66.00,y,10/31/2025,1.00
+10/21/2025,53460500825441e38c6cc95b5c430bfa,,Deposit,,CURRENCY::USD,,,,Income:Other Income,Other Income,$(66.00),(66.00),$(66.00),(66.00),n,,1.00
+10/31/2025,f8d2e5de8e9841df8329151135e931dc,,Interest,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account,Checking Account,$0.47,0.47,$0.47,0.47,y,10/31/2025,1.00
+10/31/2025,f8d2e5de8e9841df8329151135e931dc,,Interest,,CURRENCY::USD,,,,Income:Interest Income:Checking Interest,Checking Interest,$(0.47),(0.47),$(0.47),(0.47),n,,1.00
+06/25/2013,fb8bfe7c5ef8fd02a28fcc6b4ea38435,,Deposit,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account:Repeater Fund,Repeater Fund,$23.00,23.00,$23.00,23.00,y,09/30/2013,1.00
+06/25/2013,fb8bfe7c5ef8fd02a28fcc6b4ea38435,,Deposit,,CURRENCY::USD,,,,Income:Other Income,Other Income,$0.00,0.00,$0.00,0.00,n,,0.00
+06/25/2013,fb8bfe7c5ef8fd02a28fcc6b4ea38435,,Deposit,,CURRENCY::USD,,,,Income:Donations,Donations,$(23.00),(23.00),$(23.00),(23.00),n,,1.00
+05/14/2014,b955126b0d59406f15c98c1c880405ba,,Deposit,,CURRENCY::USD,,,Membership Dues,Assets:Current Assets:Checking Account:Repeater Fund,Repeater Fund,$60.00,60.00,$60.00,60.00,y,05/31/2014,1.00
+05/14/2014,b955126b0d59406f15c98c1c880405ba,,Deposit,,CURRENCY::USD,,,,Income:Donations,Donations,$(60.00),(60.00),$(60.00),(60.00),n,,1.00
+06/13/2014,bbf0ec17fd4aeb2049028e8091b58133,,Deposit,,CURRENCY::USD,,,Membership Dues,Assets:Current Assets:Checking Account:Repeater Fund,Repeater Fund,$35.00,35.00,$35.00,35.00,y,06/30/2014,1.00
+06/13/2014,bbf0ec17fd4aeb2049028e8091b58133,,Deposit,,CURRENCY::USD,,,,Income:Donations,Donations,$(35.00),(35.00),$(35.00),(35.00),n,,1.00
+08/15/2014,57729c386facdce0700766ecd7af6037,,Deposit,,CURRENCY::USD,,,Membership Dues,Assets:Current Assets:Checking Account:Repeater Fund,Repeater Fund,$30.00,30.00,$30.00,30.00,y,08/31/2014,1.00
+08/15/2014,57729c386facdce0700766ecd7af6037,,Deposit,,CURRENCY::USD,,,,Income:Donations,Donations,$(30.00),(30.00),$(30.00),(30.00),n,,1.00
+10/31/2014,9c824a076fa583c5ce98d1c9819a8350,,Deposit,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account:Repeater Fund,Repeater Fund,$25.00,25.00,$25.00,25.00,y,10/31/2014,1.00
+10/31/2014,9c824a076fa583c5ce98d1c9819a8350,,Deposit,,CURRENCY::USD,,,,Income:Donations,Donations,$(25.00),(25.00),$(25.00),(25.00),n,,1.00
+09/04/2015,130b3264edc555f0ea5c9bd3d82aaa4c,,Deposit,,CURRENCY::USD,,,Membership Dues,Assets:Current Assets:Checking Account:Repeater Fund,Repeater Fund,$52.00,52.00,$52.00,52.00,y,09/30/2015,1.00
+09/04/2015,130b3264edc555f0ea5c9bd3d82aaa4c,,Deposit,,CURRENCY::USD,,,,Income:Donations,Donations,$(52.00),(52.00),$(52.00),(52.00),n,,1.00
+09/17/2015,6fb6cd104e458d1140d6da92fc7952a7,,Yaesu DR-1X Repeater,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account:Repeater Fund,Repeater Fund,$(500.00),(500.00),$(500.00),(500.00),y,09/30/2015,1.00
+09/17/2015,6fb6cd104e458d1140d6da92fc7952a7,,Yaesu DR-1X Repeater,,CURRENCY::USD,,,,Expenses:Equipment,Equipment,$500.00,500.00,$500.00,500.00,n,,1.00
+05/19/2016,c6db1b7b84aec6313f3b3440df4324fc,,Deposit,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account:Repeater Fund,Repeater Fund,$159.00,159.00,$159.00,159.00,y,05/31/2016,1.00
+05/19/2016,c6db1b7b84aec6313f3b3440df4324fc,,Deposit,,CURRENCY::USD,,,,Income:Donations,Donations,$(159.00),(159.00),$(159.00),(159.00),n,,1.00
+11/19/2019,b0e4e19d19ff49c7a6a4103d3e60a933,1027,Dennis Woffard,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account:Repeater Fund,Repeater Fund,"$(1,100.00)",(1100.00),"$(1,100.00)",(1100.00),y,11/30/2019,1.00
+11/19/2019,b0e4e19d19ff49c7a6a4103d3e60a933,1027,Dennis Woffard,,CURRENCY::USD,,,,Expenses:Equipment,Equipment,"$1,100.00",1100.00,"$1,100.00",1100.00,n,,1.00
+11/25/2019,69a39408a32a4b60bed123ea9f042b69,,Deposit,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account:Repeater Fund,Repeater Fund,$316.00,316.00,$316.00,316.00,y,11/30/2019,1.00
+11/25/2019,69a39408a32a4b60bed123ea9f042b69,,Deposit,,CURRENCY::USD,,,,Income:Donations,Donations,$(316.00),(316.00),$(316.00),(316.00),n,,1.00
+01/17/2023,1bd568234965415f8369a9d442f318e4,,CAF America,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account:Repeater Fund,Repeater Fund,"$1,000.00",1000.00,"$1,000.00",1000.00,y,03/31/2023,1.00
+01/17/2023,1bd568234965415f8369a9d442f318e4,,CAF America,,CURRENCY::USD,,,,Income:Donations,Donations,"$(1,000.00)",(1000.00),"$(1,000.00)",(1000.00),n,,1.00
+06/27/2023,0235e0e950c34c278ca5577e23fa4f27,5006,Bobby Whitaker,,CURRENCY::USD,,,,Assets:Current Assets:Checking Account:Repeater Fund,Repeater Fund,$(550.00),(550.00),$(550.00),(550.00),y,07/31/2023,1.00
+06/27/2023,0235e0e950c34c278ca5577e23fa4f27,5006,Bobby Whitaker,,CURRENCY::USD,,,,Expenses:Reimbursement,Reimbursement,$550.00,550.00,$550.00,550.00,n,,1.00
+05/11/2021,e80180ff3c4e465b81b401162f46d657,,Rpeater Fund Donation,,CURRENCY::USD,,,,Assets:Current Assets:Petty Cash,Petty Cash,$15.00,15.00,$15.00,15.00,n,,1.00
+05/11/2021,e80180ff3c4e465b81b401162f46d657,,Rpeater Fund Donation,,CURRENCY::USD,,,,Income:Donations,Donations,$(15.00),(15.00),$(15.00),(15.00),n,,1.00
+10/19/2021,1338ef77bf0841c6950a874fc0ee6965,,Membership Dues,,CURRENCY::USD,,,,Assets:Current Assets:Petty Cash,Petty Cash,$25.00,25.00,$25.00,25.00,n,,1.00
+10/19/2021,1338ef77bf0841c6950a874fc0ee6965,,Membership Dues,,CURRENCY::USD,,,,Income:Dues,Dues,$(25.00),(25.00),$(25.00),(25.00),n,,1.00
+01/18/2022,70e436d908a14190aefb08e28e99bc7c,,Membership Dues,,CURRENCY::USD,,,,Assets:Current Assets:Petty Cash,Petty Cash,$80.00,80.00,$80.00,80.00,n,,1.00
+01/18/2022,70e436d908a14190aefb08e28e99bc7c,,Membership Dues,,CURRENCY::USD,,,,Income:Dues,Dues,$(80.00),(80.00),$(80.00),(80.00),n,,1.00
+01/18/2022,9bb9fd3b80da411c875cd8edaa1323e0,,Membership Dues,,CURRENCY::USD,,,,Assets:Current Assets:Petty Cash,Petty Cash,$70.00,70.00,$70.00,70.00,n,,1.00
+01/18/2022,9bb9fd3b80da411c875cd8edaa1323e0,,Membership Dues,,CURRENCY::USD,,,,Income:Dues,Dues,$(70.00),(70.00),$(70.00),(70.00),n,,1.00
+04/19/2022,544a60eb62df4fb59c7f58952cc2fc97,,Membership Dues,,CURRENCY::USD,,,,Assets:Current Assets:Petty Cash,Petty Cash,$40.00,40.00,$40.00,40.00,n,,1.00
+04/19/2022,544a60eb62df4fb59c7f58952cc2fc97,,Membership Dues,,CURRENCY::USD,,,,Income:Dues,Dues,$(40.00),(40.00),$(40.00),(40.00),n,,1.00
+07/19/2015,ea4a96641dc102aacab2d025993707c9,,Stamps,,CURRENCY::USD,,,,Expenses:Postage and Delivery,Postage and Delivery,$46.00,46.00,$46.00,46.00,n,,1.00
+07/19/2015,ea4a96641dc102aacab2d025993707c9,,Stamps,,CURRENCY::USD,,,,Income:Donations,Donations,$(46.00),(46.00),$(46.00),(46.00),n,,1.00
+11/09/2014,c13c458b24c24615f2b0b218471142b2,,Hardline connector for 2m repeater,,CURRENCY::USD,,,,Expenses:Supplies,Supplies,$(12.99),(12.99),$(12.99),(12.99),n,,1.00
+11/09/2014,c13c458b24c24615f2b0b218471142b2,,Hardline connector for 2m repeater,,CURRENCY::USD,,,,Imbalance-USD,Imbalance-USD,$25.98,25.98,$25.98,25.98,n,,1.00
+11/09/2014,c13c458b24c24615f2b0b218471142b2,,Hardline connector for 2m repeater,,CURRENCY::USD,,,,Income:Dues,Dues,$(12.99),(12.99),$(12.99),(12.99),n,,1.00
+12/21/2016,3cebf88fe9a8c0fc66fd710e4663164d,,Deposit,,CURRENCY::USD,,,,Imbalance-USD,Imbalance-USD,$(25.00),(25.00),$(25.00),(25.00),n,,1.00
+12/21/2016,3cebf88fe9a8c0fc66fd710e4663164d,,Deposit,,CURRENCY::USD,,,,Income:Dues,Dues,$25.00,25.00,$25.00,25.00,n,,1.00
+04/29/2022,36809c0f139348359b368c7f49dff81f,,Deposit,,CURRENCY::USD,,,,Imbalance-USD,Imbalance-USD,$(25.00),(25.00),$(25.00),(25.00),n,,1.00
+04/29/2022,36809c0f139348359b368c7f49dff81f,,Deposit,,CURRENCY::USD,,,,Income:Dues,Dues,$25.00,25.00,$25.00,25.00,n,,1.00
+05/19/2022,ff76f0ec3bde4fbeb968c443aac7435b,,Deposit,,CURRENCY::USD,,,,Imbalance-USD,Imbalance-USD,$(25.00),(25.00),$(25.00),(25.00),n,,1.00
+05/19/2022,ff76f0ec3bde4fbeb968c443aac7435b,,Deposit,,CURRENCY::USD,,,,Income:Dues,Dues,$25.00,25.00,$25.00,25.00,n,,1.00

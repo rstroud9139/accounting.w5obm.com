@@ -3,9 +3,9 @@ class TransactionsController extends BaseController
 {
     public function index()
     {
-        global $conn;
         require_once __DIR__ . '/../repositories/TransactionRepository.php';
-        $repo = new TransactionRepository($conn);
+        $db = accounting_db_connection();
+        $repo = new TransactionRepository($db);
         // Filters from GET
         $filters = array();
         if (!empty($_GET['start']) && !empty($_GET['end'])) {
@@ -20,7 +20,7 @@ class TransactionsController extends BaseController
         // Load categories for filter dropdown
         $cats = array();
         try {
-            $r = $conn->query("SELECT id, name FROM acc_transaction_categories ORDER BY name");
+            $r = $db->query("SELECT id, name FROM acc_transaction_categories ORDER BY name");
             if ($r) $cats = $r->fetch_all(MYSQLI_ASSOC);
         } catch (Throwable $e) {
         }
@@ -36,23 +36,23 @@ class TransactionsController extends BaseController
     public function new()
     {
         // Quick entry form for a single-split Income/Expense or Transfer
-        global $conn;
+        $db = accounting_db_connection();
         // Load accounts and categories
         $accounts = [];
         try {
-            $res = $conn->query("SHOW TABLES LIKE 'acc_ledger_accounts'");
+            $res = $db->query("SHOW TABLES LIKE 'acc_ledger_accounts'");
             if ($res && $res->num_rows > 0) {
-                $res2 = $conn->query("SELECT id, name, account_type AS type FROM acc_ledger_accounts WHERE active = 1 ORDER BY account_type, name");
+                $res2 = $db->query("SELECT id, name, account_type AS type FROM acc_ledger_accounts WHERE active = 1 ORDER BY account_type, name");
                 $accounts = $res2 ? $res2->fetch_all(MYSQLI_ASSOC) : [];
             } else {
-                $res2 = $conn->query("SELECT id, name, type FROM acc_chart_of_accounts WHERE IFNULL(is_active,1)=1 ORDER BY type, name");
+                $res2 = $db->query("SELECT id, name, type FROM acc_chart_of_accounts WHERE IFNULL(is_active,1)=1 ORDER BY type, name");
                 $accounts = $res2 ? $res2->fetch_all(MYSQLI_ASSOC) : [];
             }
         } catch (Throwable $e) {
         }
         $cats = [];
         try {
-            $res = $conn->query("SELECT id, name, type FROM acc_transaction_categories WHERE active IS NULL OR active=1 ORDER BY name");
+            $res = $db->query("SELECT id, name, type FROM acc_transaction_categories WHERE active IS NULL OR active=1 ORDER BY name");
             if ($res) {
                 $cats = $res->fetch_all(MYSQLI_ASSOC);
             }
@@ -73,9 +73,8 @@ class TransactionsController extends BaseController
             echo 'Invalid CSRF token';
             return;
         }
-        global $conn;
         require_once __DIR__ . '/../repositories/TransactionRepository.php';
-        $repo = new TransactionRepository($conn);
+        $repo = new TransactionRepository(accounting_db_connection());
         $type = $_POST['type'] ?? 'Expense';
         $date = $_POST['transaction_date'] ?? date('Y-m-d');
         $amount = isset($_POST['amount']) ? (float)$_POST['amount'] : 0.0;
@@ -146,9 +145,8 @@ class TransactionsController extends BaseController
     public function export_csv()
     {
         requirePermission('accounting_view');
-        global $conn;
         require_once __DIR__ . '/../repositories/TransactionRepository.php';
-        $repo = new TransactionRepository($conn);
+        $repo = new TransactionRepository(accounting_db_connection());
         $filters = array();
         if (!empty($_GET['start']) && !empty($_GET['end'])) {
             $filters['start_date'] = $_GET['start'];

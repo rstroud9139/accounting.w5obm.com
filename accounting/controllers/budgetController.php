@@ -18,9 +18,9 @@ if (!function_exists('ensureBudgetTables')) {
             return;
         }
 
-        $conn = accounting_db_connection();
+        $db = accounting_db_connection();
 
-        $conn->query(<<<SQL
+        $db->query(<<<SQL
             CREATE TABLE IF NOT EXISTS acc_budget_plans (
                 id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
                 name VARCHAR(150) NOT NULL,
@@ -37,7 +37,7 @@ if (!function_exists('ensureBudgetTables')) {
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
         SQL);
 
-        $conn->query(<<<SQL
+        $db->query(<<<SQL
             CREATE TABLE IF NOT EXISTS acc_budget_plan_lines (
                 id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
                 budget_id INT UNSIGNED NOT NULL,
@@ -71,7 +71,7 @@ if (!function_exists('fetchBudgets')) {
     function fetchBudgets(array $filters = []): array
     {
         ensureBudgetTables();
-        $conn = accounting_db_connection();
+        $db = accounting_db_connection();
 
         $where = [];
         $params = [];
@@ -120,7 +120,7 @@ if (!function_exists('fetchBudgets')) {
 
         $query = implode("\n", $queryParts);
 
-        $stmt = $conn->prepare($query);
+        $stmt = $db->prepare($query);
         if ($stmt === false) {
             return [];
         }
@@ -145,9 +145,9 @@ if (!function_exists('getBudgetById')) {
     function getBudgetById(int $budgetId): ?array
     {
         ensureBudgetTables();
-        $conn = accounting_db_connection();
+        $db = accounting_db_connection();
 
-        $stmt = $conn->prepare('SELECT * FROM acc_budget_plans WHERE id = ? LIMIT 1');
+        $stmt = $db->prepare('SELECT * FROM acc_budget_plans WHERE id = ? LIMIT 1');
         if (!$stmt) {
             return null;
         }
@@ -169,9 +169,9 @@ if (!function_exists('fetchBudgetLines')) {
     function fetchBudgetLines(int $budgetId): array
     {
         ensureBudgetTables();
-        $conn = accounting_db_connection();
+        $db = accounting_db_connection();
 
-        $stmt = $conn->prepare('SELECT * FROM acc_budget_plan_lines WHERE budget_id = ?');
+        $stmt = $db->prepare('SELECT * FROM acc_budget_plan_lines WHERE budget_id = ?');
         if (!$stmt) {
             return [];
         }
@@ -192,9 +192,9 @@ if (!function_exists('createBudget')) {
     function createBudget(array $data, array $lineItems): ?int
     {
         ensureBudgetTables();
-        $conn = accounting_db_connection();
+        $db = accounting_db_connection();
 
-        $stmt = $conn->prepare('INSERT INTO acc_budget_plans (name, fiscal_year, status, notes, total_annual_amount, created_by)
+        $stmt = $db->prepare('INSERT INTO acc_budget_plans (name, fiscal_year, status, notes, total_annual_amount, created_by)
             VALUES (?, ?, ?, ?, ?, ?)');
         if (!$stmt) {
             return null;
@@ -218,7 +218,7 @@ if (!function_exists('createBudget')) {
             return null;
         }
 
-        $budgetId = $conn->insert_id;
+        $budgetId = $db->insert_id;
         $stmt->close();
 
         saveBudgetLines($budgetId, $lineItems);
@@ -233,9 +233,9 @@ if (!function_exists('updateBudget')) {
     function updateBudget(int $budgetId, array $data, array $lineItems): bool
     {
         ensureBudgetTables();
-        $conn = accounting_db_connection();
+        $db = accounting_db_connection();
 
-        $stmt = $conn->prepare('UPDATE acc_budget_plans SET name = ?, fiscal_year = ?, status = ?, notes = ?, total_annual_amount = ?, updated_by = ?, updated_at = NOW() WHERE id = ?');
+        $stmt = $db->prepare('UPDATE acc_budget_plans SET name = ?, fiscal_year = ?, status = ?, notes = ?, total_annual_amount = ?, updated_by = ?, updated_at = NOW() WHERE id = ?');
         if (!$stmt) {
             return false;
         }
@@ -270,9 +270,9 @@ if (!function_exists('deleteBudget')) {
     function deleteBudget(int $budgetId): bool
     {
         ensureBudgetTables();
-        $conn = accounting_db_connection();
+        $db = accounting_db_connection();
 
-        $stmt = $conn->prepare('DELETE FROM acc_budget_plans WHERE id = ?');
+        $stmt = $db->prepare('DELETE FROM acc_budget_plans WHERE id = ?');
         if (!$stmt) {
             return false;
         }
@@ -291,9 +291,9 @@ if (!function_exists('deleteBudget')) {
 if (!function_exists('saveBudgetLines')) {
     function saveBudgetLines(int $budgetId, array $lineItems): void
     {
-        $conn = accounting_db_connection();
+        $db = accounting_db_connection();
 
-        $deleteStmt = $conn->prepare('DELETE FROM acc_budget_plan_lines WHERE budget_id = ?');
+        $deleteStmt = $db->prepare('DELETE FROM acc_budget_plan_lines WHERE budget_id = ?');
         if ($deleteStmt) {
             $deleteStmt->bind_param('i', $budgetId);
             $deleteStmt->execute();
@@ -304,7 +304,7 @@ if (!function_exists('saveBudgetLines')) {
             return;
         }
 
-        $insertStmt = $conn->prepare('INSERT INTO acc_budget_plan_lines (budget_id, account_id, annual_amount)
+        $insertStmt = $db->prepare('INSERT INTO acc_budget_plan_lines (budget_id, account_id, annual_amount)
             VALUES (?, ?, ?)');
         if (!$insertStmt) {
             return;

@@ -18,7 +18,7 @@ require_once __DIR__ . '/../lib/helpers.php';
  */
 function addAsset($data)
 {
-    $conn = accounting_db_connection();
+    $db = accounting_db_connection();
 
     try {
         // Validate required fields
@@ -89,7 +89,7 @@ function addAsset($data)
  */
 function updateAsset($id, $data)
 {
-    $conn = accounting_db_connection();
+    $db = accounting_db_connection();
 
     try {
         if (!$id || !is_numeric($id)) {
@@ -158,7 +158,7 @@ function updateAsset($id, $data)
  */
 function deleteAsset($id)
 {
-    $conn = accounting_db_connection();
+    $db = accounting_db_connection();
 
     try {
         if (!$id || !is_numeric($id)) {
@@ -206,7 +206,7 @@ function deleteAsset($id)
  */
 function getAssetById($id)
 {
-    $conn = accounting_db_connection();
+    $db = accounting_db_connection();
 
     try {
         if (!$id || !is_numeric($id)) {
@@ -242,7 +242,7 @@ function getAssetById($id)
  */
 function getAllAssets($filters = [])
 {
-    $conn = accounting_db_connection();
+    $db = accounting_db_connection();
 
     try {
         $where_conditions = [];
@@ -332,7 +332,7 @@ function calculateYearsSinceAcquisition($acquisition_date)
  */
 function calculateTotalAssetValue()
 {
-    $conn = accounting_db_connection();
+    $db = accounting_db_connection();
 
     try {
         $result = $conn->query("SELECT COALESCE(SUM(value), 0) AS total FROM acc_assets");

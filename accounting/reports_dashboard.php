@@ -21,6 +21,10 @@ require_once __DIR__ . '/lib/report_filters.php';
 require_once __DIR__ . '/../include/premium_hero.php';
 require_once __DIR__ . '/report_catalog.php';
 
+// Prefer the accounting ledger connection for all acc_* tables, but fall back to the
+// shared auth connection if the dedicated handle is unavailable (e.g. local dev).
+$accountingConn = ($accConn instanceof mysqli) ? $accConn : $conn;
+
 if (!function_exists('accounting_report_type_icon')) {
     function accounting_report_type_icon(string $type): string
     {
@@ -192,9 +196,9 @@ if (!hasPermission($user_id, 'app.accounting') && !isAdmin($user_id)) {
 // Log access
 logActivity($user_id, 'reports_dashboard_access', 'auth_activity_log', null, 'Accessed Reports Dashboard');
 
-accountingEnsureReportGroupingTables($conn);
+accountingEnsureReportGroupingTables($accountingConn);
 $reportCatalog = getReportCatalog();
-accountingEnsureDefaultReportGroups($conn, $reportCatalog, $user_id ?? null);
+accountingEnsureDefaultReportGroups($accountingConn, $reportCatalog, $user_id ?? null);
 $groupingTypeMeta = [
     'monthly' => [
         'label' => 'Monthly Grouping',
@@ -231,10 +235,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['group_action'])) {
     ];
 
     if ($action === 'create_group') {
-        $actionResult = accountingHandleCreateReportGroup($conn, (int)$user_id, $_POST, $reportCatalog);
+        $actionResult = accountingHandleCreateReportGroup($accountingConn, (int)$user_id, $_POST, $reportCatalog);
     } elseif (in_array($action, ['add_reports', 'remove_report'], true)) {
         $groupId = isset($_POST['group_id']) ? (int)$_POST['group_id'] : 0;
-        $groupRow = $groupId > 0 ? accountingGetReportGroupById($conn, $groupId) : null;
+        $groupRow = $groupId > 0 ? accountingGetReportGroupById($accountingConn, $groupId) : null;
         if (!$groupRow) {
             $actionResult = [
                 'success' => false,
@@ -242,10 +246,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['group_action'])) {
             ];
         } elseif ($action === 'add_reports') {
             $selectedKeys = isset($_POST['group_reports']) && is_array($_POST['group_reports']) ? $_POST['group_reports'] : [];
-            $actionResult = accountingAddReportsToGroup($conn, $groupId, $selectedKeys, $reportCatalog, $groupRow['group_type']);
+            $actionResult = accountingAddReportsToGroup($accountingConn, $groupId, $selectedKeys, $reportCatalog, $groupRow['group_type']);
         } else {
             $catalogKey = sanitizeInput($_POST['catalog_key'] ?? '', 'string');
-            $actionResult = accountingRemoveReportFromGroup($conn, $groupId, $catalogKey);
+            $actionResult = accountingRemoveReportFromGroup($accountingConn, $groupId, $catalogKey);
         }
     }
 
@@ -262,7 +266,7 @@ $status = $_GET['status'] ?? null;
 
 // Fetch reports
 $query = "SELECT * FROM acc_reports ORDER BY generated_at DESC";
-$result = $conn->query($query);
+$result = $accountingConn->query($query);
 $reports = [];
 if ($result) {
     while ($row = $result->fetch_assoc()) {
@@ -272,7 +276,7 @@ if ($result) {
 
 // Get report type counts for visualization
 $report_type_query = "SELECT report_type, COUNT(*) as count FROM acc_reports GROUP BY report_type";
-$report_type_result = $conn->query($report_type_query);
+$report_type_result = $accountingConn->query($report_type_query);
 $report_types = [];
 if ($report_type_result) {
     while ($row = $report_type_result->fetch_assoc()) {
@@ -289,7 +293,7 @@ $monthly_report_query = "SELECT DATE_FORMAT(generated_at, '%Y-%m') as month, COU
                         WHERE generated_at >= DATE_SUB(NOW(), INTERVAL 12 MONTH)
                         GROUP BY DATE_FORMAT(generated_at, '%Y-%m')
                         ORDER BY month ASC";
-$monthly_report_result = $conn->query($monthly_report_query);
+$monthly_report_result = $accountingConn->query($monthly_report_query);
 $monthly_reports = [];
 if ($monthly_report_result) {
     while ($row = $monthly_report_result->fetch_assoc()) {
@@ -312,17 +316,17 @@ $recent_reports_count = 0;
 $total_reports_count = 0;
 $avg_reports_per_month = 0;
 
-$recent_result = $conn->query("SELECT COUNT(*) as count FROM acc_reports WHERE generated_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)");
+$recent_result = $accountingConn->query("SELECT COUNT(*) as count FROM acc_reports WHERE generated_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)");
 if ($recent_result) {
     $recent_reports_count = $recent_result->fetch_assoc()['count'] ?? 0;
 }
 
-$total_result = $conn->query("SELECT COUNT(*) as count FROM acc_reports");
+$total_result = $accountingConn->query("SELECT COUNT(*) as count FROM acc_reports");
 if ($total_result) {
     $total_reports_count = $total_result->fetch_assoc()['count'] ?? 0;
 }
 
-$avg_result = $conn->query("SELECT AVG(monthly_count) as avg FROM (SELECT COUNT(*) as monthly_count FROM acc_reports GROUP BY YEAR(generated_at), MONTH(generated_at)) as counts");
+$avg_result = $accountingConn->query("SELECT AVG(monthly_count) as avg FROM (SELECT COUNT(*) as monthly_count FROM acc_reports GROUP BY YEAR(generated_at), MONTH(generated_at)) as counts");
 if ($avg_result) {
     $avg_reports_per_month = $avg_result->fetch_assoc()['avg'] ?? 0;
 }
@@ -412,13 +416,17 @@ $reportHeroActions = [
     [
         'label' => 'Generate Report',
         'url' => 'reports/generate_report.php',
-        'icon' => 'fa-plus-circle'
+        'icon' => 'fa-plus-circle',
+        'external' => true,
+        'data_report_launch' => true,
     ],
     [
         'label' => 'Financial Statements',
         'url' => 'reports/financial_statements.php',
         'icon' => 'fa-file-invoice-dollar',
-        'variant' => 'outline'
+        'variant' => 'outline',
+        'external' => true,
+        'data_report_launch' => true,
     ],
     [
         'label' => 'Back to Accounting',
@@ -516,7 +524,7 @@ $reportCollectionFilters = array_map(static function (array $collection) {
     ];
 }, $reportCollections);
 
-$reportGroups = accountingFetchReportGroups($conn, $reportCatalog);
+$reportGroups = accountingFetchReportGroups($accountingConn, $reportCatalog);
 
 if (isset($_GET['export']) && $_GET['export'] === '1') {
     header('Content-Type: text/csv; charset=utf-8');
@@ -548,209 +556,209 @@ $page_title = "Reports Dashboard - W5OBM";
     <?php include __DIR__ . '/../include/header.php'; ?>
 
     <style>
-    .report-collections-card .card-header {
-        background: linear-gradient(92deg, rgba(13, 110, 253, 0.12), rgba(25, 135, 84, 0.12));
-    }
-
-    .report-group-card {
-        border-radius: 1rem;
-        border: 1px solid #e4e9f2;
-        transition: transform .15s ease, box-shadow .15s ease;
-    }
-
-    .report-group-card:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 1.25rem 2.5rem -1rem rgba(15, 23, 42, 0.25);
-    }
-
-    .report-group-card .card-header {
-        border-bottom: 0;
-        background-color: rgba(248, 249, 250, 0.75);
-    }
-
-    .report-group-card .list-group-item {
-        border: 0;
-        border-top: 1px solid #f1f3f5;
-        padding: 1rem 1.25rem;
-    }
-
-    .report-item-icon {
-        width: 44px;
-        height: 44px;
-        border-radius: 12px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1rem;
-        margin-right: .75rem;
-    }
-
-    .report-item-icon.accent-primary {
-        background-color: rgba(13, 110, 253, 0.1);
-        color: #0d6efd;
-    }
-
-    .report-item-icon.accent-success {
-        background-color: rgba(25, 135, 84, 0.1);
-        color: #198754;
-    }
-
-    .report-item-icon.accent-warning {
-        background-color: rgba(255, 193, 7, 0.2);
-        color: #d39e00;
-    }
-
-    .report-item-icon.accent-info {
-        background-color: rgba(13, 202, 240, 0.15);
-        color: #0dcaf0;
-    }
-
-    .report-item-meta {
-        font-size: .78rem;
-        text-transform: uppercase;
-        letter-spacing: .08em;
-    }
-
-    .report-collection-filter.active {
-        color: #fff;
-        background-color: var(--bs-primary);
-        border-color: var(--bs-primary);
-    }
-
-    .report-collection-hidden {
-        display: none !important;
-    }
-
-    @media (max-width: 991.98px) {
-        .report-group-card .card-header {
-            text-align: center;
+        .report-collections-card .card-header {
+            background: linear-gradient(92deg, rgba(13, 110, 253, 0.12), rgba(25, 135, 84, 0.12));
         }
-    }
 
-    .analytics-placeholder {
-        min-height: 240px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        color: #6c757d;
-        padding: 1.5rem;
-    }
+        .report-group-card {
+            border-radius: 1rem;
+            border: 1px solid #e4e9f2;
+            transition: transform .15s ease, box-shadow .15s ease;
+        }
 
-    .analytics-placeholder i {
-        font-size: 2rem;
-        margin-bottom: .75rem;
-        color: #adb5bd;
-    }
+        .report-group-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 1.25rem 2.5rem -1rem rgba(15, 23, 42, 0.25);
+        }
 
-    .group-builder-step {
-        border: 1px dashed #d9dee9;
-        border-radius: .9rem;
-        padding: 1.25rem;
-        background-color: #fff;
-        height: 100%;
-    }
+        .report-group-card .card-header {
+            border-bottom: 0;
+            background-color: rgba(248, 249, 250, 0.75);
+        }
 
-    .group-builder-list {
-        max-height: 320px;
-        overflow-y: auto;
-        margin-top: 1rem;
-        padding-right: .5rem;
-    }
+        .report-group-card .list-group-item {
+            border: 0;
+            border-top: 1px solid #f1f3f5;
+            padding: 1rem 1.25rem;
+        }
 
-    .group-builder-list.compact {
-        max-height: 220px;
-    }
+        .report-item-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            margin-right: .75rem;
+        }
 
-    .group-builder-item {
-        border: 1px solid #e4e9f2;
-        border-radius: .75rem;
-        padding: .65rem .85rem;
-        display: flex;
-        gap: .75rem;
-        align-items: flex-start;
-        margin-bottom: .5rem;
-        transition: border-color .15s ease, box-shadow .15s ease;
-        cursor: pointer;
-        background-color: #fff;
-    }
+        .report-item-icon.accent-primary {
+            background-color: rgba(13, 110, 253, 0.1);
+            color: #0d6efd;
+        }
 
-    .group-builder-item:hover {
-        border-color: #0d6efd;
-        box-shadow: 0 0.75rem 1.5rem -1rem rgba(13, 110, 253, 0.45);
-    }
+        .report-item-icon.accent-success {
+            background-color: rgba(25, 135, 84, 0.1);
+            color: #198754;
+        }
 
-    .group-builder-item input[type="checkbox"] {
-        margin-top: .4rem;
-    }
+        .report-item-icon.accent-warning {
+            background-color: rgba(255, 193, 7, 0.2);
+            color: #d39e00;
+        }
 
-    .group-builder-item-body strong {
-        display: block;
-        font-size: .95rem;
-    }
+        .report-item-icon.accent-info {
+            background-color: rgba(13, 202, 240, 0.15);
+            color: #0dcaf0;
+        }
 
-    .group-builder-item-body p {
-        margin-bottom: 0;
-        font-size: .82rem;
-        color: #5c6671;
-    }
+        .report-item-meta {
+            font-size: .78rem;
+            text-transform: uppercase;
+            letter-spacing: .08em;
+        }
 
-    .group-builder-item-body small {
-        display: block;
-        color: #6c757d;
-        text-transform: uppercase;
-        letter-spacing: .08em;
-        font-size: .68rem;
-    }
+        .report-collection-filter.active {
+            color: #fff;
+            background-color: var(--bs-primary);
+            border-color: var(--bs-primary);
+        }
 
-    .group-builder-list-panel.d-none {
-        display: none !important;
-    }
+        .report-collection-hidden {
+            display: none !important;
+        }
 
-    .report-group-widget {
-        border-radius: .95rem;
-        border: 1px solid #e4e9f2;
-        background-color: #fff;
-        transition: transform .15s ease, box-shadow .15s ease;
-    }
+        @media (max-width: 991.98px) {
+            .report-group-card .card-header {
+                text-align: center;
+            }
+        }
 
-    .report-group-widget:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 1.35rem 2.7rem -1.35rem rgba(33, 37, 41, 0.4);
-    }
+        .analytics-placeholder {
+            min-height: 240px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #6c757d;
+            padding: 1.5rem;
+        }
 
-    .report-group-widget .group-detail {
-        border-top: 1px solid #f1f3f5;
-        margin-top: 1rem;
-        padding-top: 1rem;
-    }
+        .analytics-placeholder i {
+            font-size: 2rem;
+            margin-bottom: .75rem;
+            color: #adb5bd;
+        }
 
-    .group-widget-badge {
-        font-size: .7rem;
-        text-transform: uppercase;
-        letter-spacing: .08em;
-    }
+        .group-builder-step {
+            border: 1px dashed #d9dee9;
+            border-radius: .9rem;
+            padding: 1.25rem;
+            background-color: #fff;
+            height: 100%;
+        }
 
-    .group-members-list .list-group-item {
-        border: 0;
-        border-top: 1px solid #f1f3f5;
-        padding-left: 0;
-        padding-right: 0;
-    }
+        .group-builder-list {
+            max-height: 320px;
+            overflow-y: auto;
+            margin-top: 1rem;
+            padding-right: .5rem;
+        }
 
-    .group-members-list .list-group-item:first-child {
-        border-top: 0;
-    }
+        .group-builder-list.compact {
+            max-height: 220px;
+        }
 
-    .group-builder-list::-webkit-scrollbar {
-        width: 6px;
-    }
+        .group-builder-item {
+            border: 1px solid #e4e9f2;
+            border-radius: .75rem;
+            padding: .65rem .85rem;
+            display: flex;
+            gap: .75rem;
+            align-items: flex-start;
+            margin-bottom: .5rem;
+            transition: border-color .15s ease, box-shadow .15s ease;
+            cursor: pointer;
+            background-color: #fff;
+        }
 
-    .group-builder-list::-webkit-scrollbar-thumb {
-        background-color: rgba(13, 110, 253, 0.35);
-        border-radius: 12px;
-    }
-</style>
+        .group-builder-item:hover {
+            border-color: #0d6efd;
+            box-shadow: 0 0.75rem 1.5rem -1rem rgba(13, 110, 253, 0.45);
+        }
+
+        .group-builder-item input[type="checkbox"] {
+            margin-top: .4rem;
+        }
+
+        .group-builder-item-body strong {
+            display: block;
+            font-size: .95rem;
+        }
+
+        .group-builder-item-body p {
+            margin-bottom: 0;
+            font-size: .82rem;
+            color: #5c6671;
+        }
+
+        .group-builder-item-body small {
+            display: block;
+            color: #6c757d;
+            text-transform: uppercase;
+            letter-spacing: .08em;
+            font-size: .68rem;
+        }
+
+        .group-builder-list-panel.d-none {
+            display: none !important;
+        }
+
+        .report-group-widget {
+            border-radius: .95rem;
+            border: 1px solid #e4e9f2;
+            background-color: #fff;
+            transition: transform .15s ease, box-shadow .15s ease;
+        }
+
+        .report-group-widget:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 1.35rem 2.7rem -1.35rem rgba(33, 37, 41, 0.4);
+        }
+
+        .report-group-widget .group-detail {
+            border-top: 1px solid #f1f3f5;
+            margin-top: 1rem;
+            padding-top: 1rem;
+        }
+
+        .group-widget-badge {
+            font-size: .7rem;
+            text-transform: uppercase;
+            letter-spacing: .08em;
+        }
+
+        .group-members-list .list-group-item {
+            border: 0;
+            border-top: 1px solid #f1f3f5;
+            padding-left: 0;
+            padding-right: 0;
+        }
+
+        .group-members-list .list-group-item:first-child {
+            border-top: 0;
+        }
+
+        .group-builder-list::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .group-builder-list::-webkit-scrollbar-thumb {
+            background-color: rgba(13, 110, 253, 0.35);
+            border-radius: 12px;
+        }
+    </style>
 </head>
 
 <body class="accounting-app bg-light">
@@ -793,10 +801,10 @@ $page_title = "Reports Dashboard - W5OBM";
                                 <a href="dashboard.php" class="btn btn-outline-light btn-sm me-2">
                                     <i class="fas fa-arrow-left me-1"></i>Back to Accounting
                                 </a>
-                                <a href="/accounting/reports/financial_statements.php" class="btn btn-warning btn-sm me-2">
+                                <a href="/accounting/reports/financial_statements.php" class="btn btn-warning btn-sm me-2" target="_blank" rel="noopener" data-report-launch="true">
                                     <i class="fas fa-file-invoice-dollar me-1"></i>Financial Statements
                                 </a>
-                                <a href="reports/generate_report.php" class="btn btn-primary btn-sm">
+                                <a href="reports/generate_report.php" class="btn btn-primary btn-sm" target="_blank" rel="noopener" data-report-launch="true">
                                     <i class="fas fa-plus-circle me-1"></i>New Report
                                 </a>
                             </div>
@@ -1070,110 +1078,110 @@ $page_title = "Reports Dashboard - W5OBM";
                 </div>
             </div>
         </div>
-            <div class="card shadow-sm border-0 mb-4" id="reportGroupLibrary">
-                <div class="card-header bg-light border-0 d-flex flex-wrap justify-content-between align-items-center">
-                    <div>
-                        <h5 class="mb-0"><i class="fas fa-layer-group me-2 text-primary"></i>Saved Report Groups</h5>
-                        <small class="text-muted">Select a widget to review its members, add additional reports, or remove outdated ones.</small>
-                    </div>
-                    <span class="badge bg-secondary-subtle text-secondary"><i class="fas fa-calendar me-1"></i>Monthly · YTD · Annual</span>
+        <div class="card shadow-sm border-0 mb-4" id="reportGroupLibrary">
+            <div class="card-header bg-light border-0 d-flex flex-wrap justify-content-between align-items-center">
+                <div>
+                    <h5 class="mb-0"><i class="fas fa-layer-group me-2 text-primary"></i>Saved Report Groups</h5>
+                    <small class="text-muted">Select a widget to review its members, add additional reports, or remove outdated ones.</small>
                 </div>
-                <div class="card-body">
-                    <?php if (empty($reportGroups)): ?>
-                        <div class="text-center py-4 text-muted">
-                            <i class="fas fa-object-group fa-2x mb-3"></i>
-                            <p class="mb-1">No custom report groupings yet.</p>
-                            <p class="small mb-0">Use the builder above to define Monthly, YTD, or Annual packets.</p>
-                        </div>
-                    <?php else: ?>
-                        <div class="row g-4">
-                            <?php foreach ($reportGroups as $group): ?>
-                                <?php
-                                    $typeMeta = $groupingTypeMeta[$group['group_type']] ?? ['badge' => strtoupper($group['group_type']), 'icon' => 'fa-object-group'];
-                                    $detailId = 'groupDetail' . (int)$group['id'];
-                                ?>
-                                <div class="col-xl-4 col-lg-6">
-                                    <div class="report-group-widget p-3" data-group-toggle="#<?= htmlspecialchars($detailId) ?>">
-                                        <div class="d-flex justify-content-between align-items-start gap-3">
-                                            <div>
-                                                <span class="group-widget-badge text-muted"><?= htmlspecialchars($typeMeta['badge'] ?? strtoupper($group['group_type'])) ?></span>
-                                                <h5 class="mt-1 mb-1"><?= htmlspecialchars($group['name']) ?></h5>
-                                                <small class="text-muted"><?= htmlspecialchars($group['description'] ?: 'No description provided.') ?></small>
-                                            </div>
-                                            <div class="text-end">
-                                                <span class="badge bg-primary bg-opacity-10 text-primary"><?= number_format($group['item_count']) ?> items</span>
-                                                <div class="text-muted mt-2"><i class="fas <?= htmlspecialchars($typeMeta['icon'] ?? 'fa-object-group') ?>"></i></div>
-                                            </div>
+                <span class="badge bg-secondary-subtle text-secondary"><i class="fas fa-calendar me-1"></i>Monthly · YTD · Annual</span>
+            </div>
+            <div class="card-body">
+                <?php if (empty($reportGroups)): ?>
+                    <div class="text-center py-4 text-muted">
+                        <i class="fas fa-object-group fa-2x mb-3"></i>
+                        <p class="mb-1">No custom report groupings yet.</p>
+                        <p class="small mb-0">Use the builder above to define Monthly, YTD, or Annual packets.</p>
+                    </div>
+                <?php else: ?>
+                    <div class="row g-4">
+                        <?php foreach ($reportGroups as $group): ?>
+                            <?php
+                            $typeMeta = $groupingTypeMeta[$group['group_type']] ?? ['badge' => strtoupper($group['group_type']), 'icon' => 'fa-object-group'];
+                            $detailId = 'groupDetail' . (int)$group['id'];
+                            ?>
+                            <div class="col-xl-4 col-lg-6">
+                                <div class="report-group-widget p-3" data-group-toggle="#<?= htmlspecialchars($detailId) ?>">
+                                    <div class="d-flex justify-content-between align-items-start gap-3">
+                                        <div>
+                                            <span class="group-widget-badge text-muted"><?= htmlspecialchars($typeMeta['badge'] ?? strtoupper($group['group_type'])) ?></span>
+                                            <h5 class="mt-1 mb-1"><?= htmlspecialchars($group['name']) ?></h5>
+                                            <small class="text-muted"><?= htmlspecialchars($group['description'] ?: 'No description provided.') ?></small>
                                         </div>
-                                        <div class="collapse group-detail" id="<?= htmlspecialchars($detailId) ?>">
-                                            <h6 class="fw-semibold mb-2">Current Members</h6>
-                                            <?php if (empty($group['items'])): ?>
-                                                <p class="text-muted small mb-3">No reports have been added yet.</p>
-                                            <?php else: ?>
-                                                <ul class="list-group group-members-list mb-3">
-                                                    <?php foreach ($group['items'] as $item): ?>
-                                                        <?php $catalogEntry = $item['catalog'] ?? null; ?>
-                                                        <li class="list-group-item">
-                                                            <div class="d-flex justify-content-between align-items-start gap-3">
-                                                                <div>
-                                                                    <div class="fw-semibold"><?= htmlspecialchars($catalogEntry['label'] ?? ucwords(str_replace('_', ' ', $item['catalog_key']))) ?></div>
-                                                                    <?php if (!empty($catalogEntry['description'])): ?>
-                                                                        <small class="text-muted d-block"><?= htmlspecialchars($catalogEntry['description']) ?></small>
-                                                                    <?php endif; ?>
-                                                                    <?php if (!empty($catalogEntry['kind']) || !empty($catalogEntry['meta'])): ?>
-                                                                        <small class="text-muted fst-italic">
-                                                                            <?= htmlspecialchars(ucfirst($catalogEntry['kind'] ?? '')) ?><?= (!empty($catalogEntry['kind']) && !empty($catalogEntry['meta'])) ? ' · ' : '' ?><?= htmlspecialchars($catalogEntry['meta'] ?? '') ?>
-                                                                        </small>
-                                                                    <?php endif; ?>
-                                                                </div>
-                                                                <form method="POST" class="ms-auto">
-                                                                    <input type="hidden" name="group_action" value="remove_report">
-                                                                    <input type="hidden" name="group_id" value="<?= (int)$group['id'] ?>">
-                                                                    <input type="hidden" name="catalog_key" value="<?= htmlspecialchars($item['catalog_key']) ?>">
-                                                                    <button type="submit" class="btn btn-outline-danger btn-sm">
-                                                                        <i class="fas fa-trash me-1"></i>Remove
-                                                                    </button>
-                                                                </form>
-                                                            </div>
-                                                        </li>
-                                                    <?php endforeach; ?>
-                                                </ul>
-                                            <?php endif; ?>
-                                            <h6 class="fw-semibold mb-2">Add More Items</h6>
-                                            <?php if (empty($group['eligible_items'])): ?>
-                                                <p class="text-muted small mb-0">All compatible entries are already part of this group.</p>
-                                            <?php else: ?>
-                                                <form method="POST">
-                                                    <input type="hidden" name="group_action" value="add_reports">
-                                                    <input type="hidden" name="group_id" value="<?= (int)$group['id'] ?>">
-                                                    <div class="group-builder-list compact">
-                                                        <?php foreach ($group['eligible_items'] as $item): ?>
-                                                            <?php $eligibleId = 'eligible-' . (int)$group['id'] . '-' . $item['key']; ?>
-                                                            <label class="group-builder-item form-check" for="<?= htmlspecialchars($eligibleId) ?>">
-                                                                <input type="checkbox" class="form-check-input" name="group_reports[]" id="<?= htmlspecialchars($eligibleId) ?>" value="<?= htmlspecialchars($item['key']) ?>">
-                                                                <span class="group-builder-item-body">
-                                                                    <strong><?= htmlspecialchars($item['label']) ?></strong>
-                                                                    <small><?= htmlspecialchars(ucfirst($item['kind'] ?? 'report')) ?><?= !empty($item['meta']) ? ' · ' . htmlspecialchars($item['meta']) : '' ?></small>
-                                                                    <p><?= htmlspecialchars($item['description']) ?></p>
-                                                                </span>
-                                                            </label>
-                                                        <?php endforeach; ?>
-                                                    </div>
-                                                    <div class="text-end mt-3">
-                                                        <button type="submit" class="btn btn-primary btn-sm">
-                                                            <i class="fas fa-plus me-1"></i>Add Selected
-                                                        </button>
-                                                    </div>
-                                                </form>
-                                            <?php endif; ?>
+                                        <div class="text-end">
+                                            <span class="badge bg-primary bg-opacity-10 text-primary"><?= number_format($group['item_count']) ?> items</span>
+                                            <div class="text-muted mt-2"><i class="fas <?= htmlspecialchars($typeMeta['icon'] ?? 'fa-object-group') ?>"></i></div>
                                         </div>
                                     </div>
+                                    <div class="collapse group-detail" id="<?= htmlspecialchars($detailId) ?>">
+                                        <h6 class="fw-semibold mb-2">Current Members</h6>
+                                        <?php if (empty($group['items'])): ?>
+                                            <p class="text-muted small mb-3">No reports have been added yet.</p>
+                                        <?php else: ?>
+                                            <ul class="list-group group-members-list mb-3">
+                                                <?php foreach ($group['items'] as $item): ?>
+                                                    <?php $catalogEntry = $item['catalog'] ?? null; ?>
+                                                    <li class="list-group-item">
+                                                        <div class="d-flex justify-content-between align-items-start gap-3">
+                                                            <div>
+                                                                <div class="fw-semibold"><?= htmlspecialchars($catalogEntry['label'] ?? ucwords(str_replace('_', ' ', $item['catalog_key']))) ?></div>
+                                                                <?php if (!empty($catalogEntry['description'])): ?>
+                                                                    <small class="text-muted d-block"><?= htmlspecialchars($catalogEntry['description']) ?></small>
+                                                                <?php endif; ?>
+                                                                <?php if (!empty($catalogEntry['kind']) || !empty($catalogEntry['meta'])): ?>
+                                                                    <small class="text-muted fst-italic">
+                                                                        <?= htmlspecialchars(ucfirst($catalogEntry['kind'] ?? '')) ?><?= (!empty($catalogEntry['kind']) && !empty($catalogEntry['meta'])) ? ' · ' : '' ?><?= htmlspecialchars($catalogEntry['meta'] ?? '') ?>
+                                                                    </small>
+                                                                <?php endif; ?>
+                                                            </div>
+                                                            <form method="POST" class="ms-auto">
+                                                                <input type="hidden" name="group_action" value="remove_report">
+                                                                <input type="hidden" name="group_id" value="<?= (int)$group['id'] ?>">
+                                                                <input type="hidden" name="catalog_key" value="<?= htmlspecialchars($item['catalog_key']) ?>">
+                                                                <button type="submit" class="btn btn-outline-danger btn-sm">
+                                                                    <i class="fas fa-trash me-1"></i>Remove
+                                                                </button>
+                                                            </form>
+                                                        </div>
+                                                    </li>
+                                                <?php endforeach; ?>
+                                            </ul>
+                                        <?php endif; ?>
+                                        <h6 class="fw-semibold mb-2">Add More Items</h6>
+                                        <?php if (empty($group['eligible_items'])): ?>
+                                            <p class="text-muted small mb-0">All compatible entries are already part of this group.</p>
+                                        <?php else: ?>
+                                            <form method="POST">
+                                                <input type="hidden" name="group_action" value="add_reports">
+                                                <input type="hidden" name="group_id" value="<?= (int)$group['id'] ?>">
+                                                <div class="group-builder-list compact">
+                                                    <?php foreach ($group['eligible_items'] as $item): ?>
+                                                        <?php $eligibleId = 'eligible-' . (int)$group['id'] . '-' . $item['key']; ?>
+                                                        <label class="group-builder-item form-check" for="<?= htmlspecialchars($eligibleId) ?>">
+                                                            <input type="checkbox" class="form-check-input" name="group_reports[]" id="<?= htmlspecialchars($eligibleId) ?>" value="<?= htmlspecialchars($item['key']) ?>">
+                                                            <span class="group-builder-item-body">
+                                                                <strong><?= htmlspecialchars($item['label']) ?></strong>
+                                                                <small><?= htmlspecialchars(ucfirst($item['kind'] ?? 'report')) ?><?= !empty($item['meta']) ? ' · ' . htmlspecialchars($item['meta']) : '' ?></small>
+                                                                <p><?= htmlspecialchars($item['description']) ?></p>
+                                                            </span>
+                                                        </label>
+                                                    <?php endforeach; ?>
+                                                </div>
+                                                <div class="text-end mt-3">
+                                                    <button type="submit" class="btn btn-primary btn-sm">
+                                                        <i class="fas fa-plus me-1"></i>Add Selected
+                                                    </button>
+                                                </div>
+                                            </form>
+                                        <?php endif; ?>
+                                    </div>
                                 </div>
-                            <?php endforeach; ?>
-                        </div>
-                    <?php endif; ?>
-                </div>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
+                <?php endif; ?>
             </div>
+        </div>
 
         <?php if ($reportGroupSummary['type'] !== 'none'): ?>
             <div class="card shadow-sm border-0 mb-4">
@@ -1222,10 +1230,10 @@ $page_title = "Reports Dashboard - W5OBM";
                                                                 <?php endif; ?>
                                                             </div>
                                                             <div class="btn-group btn-group-sm">
-                                                                <a href="<?= htmlspecialchars($report['view_url']) ?>" class="btn btn-outline-primary" title="View">
+                                                                <a href="<?= htmlspecialchars($report['view_url']) ?>" class="btn btn-outline-primary" title="View" target="_blank" rel="noopener" data-report-launch="true">
                                                                     <i class="fas fa-eye"></i>
                                                                 </a>
-                                                                <a href="<?= htmlspecialchars($report['download_url']) ?>" class="btn btn-outline-success" title="Download">
+                                                                <a href="<?= htmlspecialchars($report['download_url']) ?>" class="btn btn-outline-success" title="Download" target="_blank" rel="noopener" data-report-launch="true">
                                                                     <i class="fas fa-download"></i>
                                                                 </a>
                                                             </div>
@@ -1300,7 +1308,7 @@ $page_title = "Reports Dashboard - W5OBM";
                                                         </div>
                                                     </div>
                                                     <div class="text-md-end">
-                                                        <a href="<?= htmlspecialchars($reportItem['url']) ?>" class="btn btn-outline-primary btn-sm">
+                                                        <a href="<?= htmlspecialchars($reportItem['url']) ?>" class="btn btn-outline-primary btn-sm" target="_blank" rel="noopener" data-report-launch="true">
                                                             <i class="fas fa-arrow-up-right-from-square me-1"></i>Open
                                                         </a>
                                                     </div>
@@ -1317,44 +1325,44 @@ $page_title = "Reports Dashboard - W5OBM";
         <?php endif; ?>
 
         <?php if ($hasReportTypeData || $hasMonthlyReportData): ?>
-        <div class="row g-4 mb-4">
-            <div class="col-xl-6">
-                <div class="card shadow border-0 h-100">
-                    <div class="card-header bg-light border-0">
-                        <h5 class="mb-0"><i class="fas fa-chart-pie me-2 text-primary"></i>Report Type Distribution</h5>
+            <div class="row g-4 mb-4">
+                <div class="col-xl-6">
+                    <div class="card shadow border-0 h-100">
+                        <div class="card-header bg-light border-0">
+                            <h5 class="mb-0"><i class="fas fa-chart-pie me-2 text-primary"></i>Report Type Distribution</h5>
+                        </div>
+                        <div class="card-body">
+                            <?php if ($hasReportTypeData): ?>
+                                <canvas id="reportTypeChart" height="280"></canvas>
+                            <?php else: ?>
+                                <div class="analytics-placeholder text-center">
+                                    <i class="fas fa-chart-pie"></i>
+                                    <p class="mb-1 fw-semibold">Report mix insight coming soon</p>
+                                    <small class="text-muted">Generate a few reports to unlock this visualization.</small>
+                                </div>
+                            <?php endif; ?>
+                        </div>
                     </div>
-                    <div class="card-body">
-                        <?php if ($hasReportTypeData): ?>
-                            <canvas id="reportTypeChart" height="280"></canvas>
-                        <?php else: ?>
-                            <div class="analytics-placeholder text-center">
-                                <i class="fas fa-chart-pie"></i>
-                                <p class="mb-1 fw-semibold">Report mix insight coming soon</p>
-                                <small class="text-muted">Generate a few reports to unlock this visualization.</small>
-                            </div>
-                        <?php endif; ?>
+                </div>
+                <div class="col-xl-6">
+                    <div class="card shadow border-0 h-100">
+                        <div class="card-header bg-light border-0">
+                            <h5 class="mb-0"><i class="fas fa-chart-line me-2 text-success"></i>Monthly Generation Trends</h5>
+                        </div>
+                        <div class="card-body">
+                            <?php if ($hasMonthlyReportData): ?>
+                                <canvas id="monthlyReportChart" height="280"></canvas>
+                            <?php else: ?>
+                                <div class="analytics-placeholder text-center">
+                                    <i class="fas fa-wave-square"></i>
+                                    <p class="mb-1 fw-semibold">Trend data not available yet</p>
+                                    <small class="text-muted">Once monthly activity exists we will plot it here.</small>
+                                </div>
+                            <?php endif; ?>
+                        </div>
                     </div>
                 </div>
             </div>
-            <div class="col-xl-6">
-                <div class="card shadow border-0 h-100">
-                    <div class="card-header bg-light border-0">
-                        <h5 class="mb-0"><i class="fas fa-chart-line me-2 text-success"></i>Monthly Generation Trends</h5>
-                    </div>
-                    <div class="card-body">
-                        <?php if ($hasMonthlyReportData): ?>
-                            <canvas id="monthlyReportChart" height="280"></canvas>
-                        <?php else: ?>
-                            <div class="analytics-placeholder text-center">
-                                <i class="fas fa-wave-square"></i>
-                                <p class="mb-1 fw-semibold">Trend data not available yet</p>
-                                <small class="text-muted">Once monthly activity exists we will plot it here.</small>
-                            </div>
-                        <?php endif; ?>
-                    </div>
-                </div>
-            </div>
-        </div>
         <?php endif; ?>
 
         <div class="card shadow mb-4 border-0">
@@ -1367,42 +1375,42 @@ $page_title = "Reports Dashboard - W5OBM";
             <div class="card-body">
                 <div class="row g-3">
                     <div class="col-md-3 col-sm-6">
-                        <a href="reports/income_statement.php?month=<?= date('m') ?>&year=<?= date('Y') ?>" class="btn btn-outline-primary w-100">
+                        <a href="reports/income_statement.php?month=<?= date('m') ?>&year=<?= date('Y') ?>" class="btn btn-outline-primary w-100" target="_blank" rel="noopener" data-report-launch="true">
                             <i class="fas fa-chart-line me-2"></i>Income Statement
                         </a>
                     </div>
                     <div class="col-md-3 col-sm-6">
-                        <a href="reports/expense_report.php?start_date=<?= date('Y-m-01') ?>&end_date=<?= date('Y-m-t') ?>" class="btn btn-outline-danger w-100">
+                        <a href="reports/expense_report.php?start_date=<?= date('Y-m-01') ?>&end_date=<?= date('Y-m-t') ?>" class="btn btn-outline-danger w-100" target="_blank" rel="noopener" data-report-launch="true">
                             <i class="fas fa-file-invoice-dollar me-2"></i>Expense Report
                         </a>
                     </div>
                     <div class="col-md-3 col-sm-6">
-                        <a href="reports/cash_account_report.php?month=<?= date('Y-m') ?>" class="btn btn-outline-info w-100">
+                        <a href="reports/cash_account_report.php?month=<?= date('Y-m') ?>" class="btn btn-outline-info w-100" target="_blank" rel="noopener" data-report-launch="true">
                             <i class="fas fa-money-bill-wave me-2"></i>Cash Account
                         </a>
                     </div>
                     <div class="col-md-3 col-sm-6">
-                        <a href="reports/monthly_income_report.php?month=<?= date('Y-m') ?>" class="btn btn-outline-success w-100">
+                        <a href="reports/monthly_income_report.php?month=<?= date('Y-m') ?>" class="btn btn-outline-success w-100" target="_blank" rel="noopener" data-report-launch="true">
                             <i class="fas fa-dollar-sign me-2"></i>Monthly Income
                         </a>
                     </div>
                     <div class="col-md-3 col-sm-6">
-                        <a href="reports/ytd_income_statement.php?year=<?= date('Y') ?>" class="btn btn-outline-warning w-100">
+                        <a href="reports/ytd_income_statement.php?year=<?= date('Y') ?>" class="btn btn-outline-warning w-100" target="_blank" rel="noopener" data-report-launch="true">
                             <i class="fas fa-calendar-alt me-2"></i>YTD Income
                         </a>
                     </div>
                     <div class="col-md-3 col-sm-6">
-                        <a href="reports/YTD_cash_report.php?year=<?= date('Y') ?>" class="btn btn-outline-secondary w-100">
+                        <a href="reports/YTD_cash_report.php?year=<?= date('Y') ?>" class="btn btn-outline-secondary w-100" target="_blank" rel="noopener" data-report-launch="true">
                             <i class="fas fa-wallet me-2"></i>YTD Cash
                         </a>
                     </div>
                     <div class="col-md-3 col-sm-6">
-                        <a href="reports/physical_assets_report.php" class="btn btn-outline-dark w-100">
+                        <a href="reports/physical_assets_report.php" class="btn btn-outline-dark w-100" target="_blank" rel="noopener" data-report-launch="true">
                             <i class="fas fa-boxes me-2"></i>Physical Assets
                         </a>
                     </div>
                     <div class="col-md-3 col-sm-6">
-                        <a href="reports/generate_report.php" class="btn btn-primary w-100">
+                        <a href="reports/generate_report.php" class="btn btn-primary w-100" target="_blank" rel="noopener" data-report-launch="true">
                             <i class="fas fa-plus-circle me-2"></i>Custom Report
                         </a>
                     </div>
@@ -1411,81 +1419,81 @@ $page_title = "Reports Dashboard - W5OBM";
         </div>
 
         <div class="collapse" id="reportInventoryCollapse">
-        <div class="card shadow border-0">
-            <div class="card-header bg-light border-0 d-flex flex-wrap justify-content-between align-items-center">
-                <div>
-                    <h5 class="mb-0"><i class="fas fa-table me-2 text-primary"></i>Available Reports</h5>
-                    <small class="text-muted">Filtered view updates with the controls above.</small>
-                </div>
-                <div class="d-flex gap-2 mt-2 mt-sm-0">
-                    <a href="reports/generate_report.php" class="btn btn-success btn-sm">
-                        <i class="fas fa-plus-circle me-1"></i>Generate New
-                    </a>
-                </div>
-            </div>
-            <div class="card-body">
-                <?php if (empty($filteredReports)): ?>
-                    <div class="text-center py-5">
-                        <i class="fas fa-file-circle-question fa-3x text-muted mb-3"></i>
-                        <p class="text-muted mb-2">No reports match the filters you selected.</p>
-                        <a href="reports_dashboard.php" class="btn btn-outline-primary btn-sm">Reset Filters</a>
+            <div class="card shadow border-0">
+                <div class="card-header bg-light border-0 d-flex flex-wrap justify-content-between align-items-center">
+                    <div>
+                        <h5 class="mb-0"><i class="fas fa-table me-2 text-primary"></i>Available Reports</h5>
+                        <small class="text-muted">Filtered view updates with the controls above.</small>
                     </div>
-                <?php else: ?>
-                    <div class="table-responsive">
-                        <table id="reportsTable" class="table table-hover align-middle mb-0">
-                            <thead class="table-light">
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Type</th>
-                                    <th>Parameters</th>
-                                    <th>Generated</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php foreach ($filteredReports as $report): ?>
+                    <div class="d-flex gap-2 mt-2 mt-sm-0">
+                        <a href="reports/generate_report.php" class="btn btn-success btn-sm" target="_blank" rel="noopener" data-report-launch="true">
+                            <i class="fas fa-plus-circle me-1"></i>Generate New
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <?php if (empty($filteredReports)): ?>
+                        <div class="text-center py-5">
+                            <i class="fas fa-file-circle-question fa-3x text-muted mb-3"></i>
+                            <p class="text-muted mb-2">No reports match the filters you selected.</p>
+                            <a href="reports_dashboard.php" class="btn btn-outline-primary btn-sm">Reset Filters</a>
+                        </div>
+                    <?php else: ?>
+                        <div class="table-responsive">
+                            <table id="reportsTable" class="table table-hover align-middle mb-0">
+                                <thead class="table-light">
                                     <tr>
-                                        <td><?= htmlspecialchars($report['id']) ?></td>
-                                        <td>
-                                            <span class="badge bg-primary bg-opacity-10 text-primary">
-                                                <?= htmlspecialchars(ucwords(str_replace('_', ' ', $report['report_type'] ?? 'Unknown'))) ?>
-                                            </span>
-                                        </td>
-                                        <td>
-                                            <small class="text-muted">
-                                                <?= htmlspecialchars($report['parameters'] ?? '—') ?>
-                                            </small>
-                                        </td>
-                                        <td>
-                                            <small><?= $report['generated_at'] ? date('M d, Y g:i A', strtotime($report['generated_at'])) : '—' ?></small>
-                                        </td>
-                                        <td>
-                                            <div class="btn-group btn-group-sm" role="group">
-                                                <a href="reports/view_report.php?id=<?= urlencode($report['id']) ?>" class="btn btn-outline-info" title="View">
-                                                    <i class="fas fa-eye"></i>
-                                                </a>
-                                                <a href="reports/download_report.php?id=<?= urlencode($report['id']) ?>" class="btn btn-outline-success" title="Download">
-                                                    <i class="fas fa-download"></i>
-                                                </a>
-                                                <a href="reports/email_report.php?id=<?= urlencode($report['id']) ?>" class="btn btn-outline-primary" title="Email">
-                                                    <i class="fas fa-envelope"></i>
-                                                </a>
-                                                <?php if (isAdmin($user_id)): ?>
-                                                    <a href="reports/delete_report.php?id=<?= urlencode($report['id']) ?>" class="btn btn-outline-danger" title="Delete"
-                                                        onclick="return confirm('Are you sure you want to delete this report?');">
-                                                        <i class="fas fa-trash"></i>
-                                                    </a>
-                                                <?php endif; ?>
-                                            </div>
-                                        </td>
+                                        <th>ID</th>
+                                        <th>Type</th>
+                                        <th>Parameters</th>
+                                        <th>Generated</th>
+                                        <th>Actions</th>
                                     </tr>
-                                <?php endforeach; ?>
-                            </tbody>
-                        </table>
-                    </div>
-                <?php endif; ?>
+                                </thead>
+                                <tbody>
+                                    <?php foreach ($filteredReports as $report): ?>
+                                        <tr>
+                                            <td><?= htmlspecialchars($report['id']) ?></td>
+                                            <td>
+                                                <span class="badge bg-primary bg-opacity-10 text-primary">
+                                                    <?= htmlspecialchars(ucwords(str_replace('_', ' ', $report['report_type'] ?? 'Unknown'))) ?>
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <small class="text-muted">
+                                                    <?= htmlspecialchars($report['parameters'] ?? '—') ?>
+                                                </small>
+                                            </td>
+                                            <td>
+                                                <small><?= $report['generated_at'] ? date('M d, Y g:i A', strtotime($report['generated_at'])) : '—' ?></small>
+                                            </td>
+                                            <td>
+                                                <div class="btn-group btn-group-sm" role="group">
+                                                    <a href="reports/view_report.php?id=<?= urlencode($report['id']) ?>" class="btn btn-outline-info" title="View" target="_blank" rel="noopener" data-report-launch="true">
+                                                        <i class="fas fa-eye"></i>
+                                                    </a>
+                                                    <a href="reports/download_report.php?id=<?= urlencode($report['id']) ?>" class="btn btn-outline-success" title="Download" target="_blank" rel="noopener" data-report-launch="true">
+                                                        <i class="fas fa-download"></i>
+                                                    </a>
+                                                    <a href="reports/email_report.php?id=<?= urlencode($report['id']) ?>" class="btn btn-outline-primary" title="Email" target="_blank" rel="noopener" data-report-launch="true">
+                                                        <i class="fas fa-envelope"></i>
+                                                    </a>
+                                                    <?php if (isAdmin($user_id)): ?>
+                                                        <a href="reports/delete_report.php?id=<?= urlencode($report['id']) ?>" class="btn btn-outline-danger" title="Delete"
+                                                            onclick="return confirm('Are you sure you want to delete this report?');">
+                                                            <i class="fas fa-trash"></i>
+                                                        </a>
+                                                    <?php endif; ?>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                </tbody>
+                            </table>
+                        </div>
+                    <?php endif; ?>
+                </div>
             </div>
-        </div>
         </div>
     </div>
 
@@ -1498,6 +1506,7 @@ $page_title = "Reports Dashboard - W5OBM";
             initReportCollections();
             initReportGroupBuilder();
             initReportGroupWidgets();
+            initReportLaunchHints();
 
             <?php if (!empty($filteredReports)): ?>
                 if (typeof $.fn.DataTable !== 'undefined') {
@@ -1655,8 +1664,40 @@ $page_title = "Reports Dashboard - W5OBM";
                     if (!target) {
                         return;
                     }
-                    const collapse = bootstrap.Collapse.getOrCreateInstance(target, { toggle: false });
+                    const collapse = bootstrap.Collapse.getOrCreateInstance(target, {
+                        toggle: false
+                    });
                     collapse.toggle();
+                });
+            });
+        }
+
+        function initReportLaunchHints() {
+            if (typeof showToast !== 'function') {
+                return;
+            }
+            const launchLinks = document.querySelectorAll('[data-report-launch]');
+            if (!launchLinks.length) {
+                return;
+            }
+            launchLinks.forEach(function(link) {
+                if (link.dataset.reportLaunchBound === 'true') {
+                    return;
+                }
+                link.dataset.reportLaunchBound = 'true';
+                if (!link.getAttribute('aria-label')) {
+                    const text = link.textContent ? link.textContent.trim() : '';
+                    if (text !== '') {
+                        link.setAttribute('aria-label', text + ' (opens in new window)');
+                    }
+                }
+                link.addEventListener('click', function(event) {
+                    if (event.defaultPrevented) {
+                        return;
+                    }
+                    setTimeout(function() {
+                        showToast('info', 'Report Opening', 'Report launched in a new window. Keep this dashboard tab for filters.', 'fas fa-arrow-up-right-from-square');
+                    }, 150);
                 });
             });
         }

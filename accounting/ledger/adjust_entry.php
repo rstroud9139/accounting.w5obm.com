@@ -6,6 +6,8 @@ require_once __DIR__ . '/../lib/helpers.php';
 
 validate_session();
 
+$accountingDb = accounting_db_connection();
+
 $userId = getCurrentUserId();
 if (!hasPermission($userId, 'accounting_manage')) {
     setToastMessage('danger', 'Access Denied', 'You do not have permission to post adjusting entries.');
@@ -132,7 +134,7 @@ if (!$dateValid) {
 $accountsValid = false;
 $accountNames = ['primary' => '', 'offset' => ''];
 
-$acctStmt = $conn->prepare('SELECT id, name FROM acc_ledger_accounts WHERE id IN (?, ?)');
+$acctStmt = $accountingDb->prepare('SELECT id, name FROM acc_ledger_accounts WHERE id IN (?, ?)');
 if ($acctStmt) {
     $acctStmt->bind_param('ii', $accountId, $offsetAccountId);
     if ($acctStmt->execute()) {
@@ -157,14 +159,14 @@ if (!$accountsValid) {
 }
 
 try {
-    $conn->begin_transaction();
+    $accountingDb->begin_transaction();
 
     $refNo = 'ADJ-' . date('YmdHis') . '-' . strtoupper(substr(bin2hex(random_bytes(4)), 0, 4));
     $sourceLabel = 'ledger_adjustment';
 
-    $journalStmt = $conn->prepare('INSERT INTO acc_journals (journal_date, memo, source, ref_no, created_by, posted_at) VALUES (?, ?, ?, ?, ?, NOW())');
+    $journalStmt = $accountingDb->prepare('INSERT INTO acc_journals (journal_date, memo, source, ref_no, created_by, posted_at) VALUES (?, ?, ?, ?, ?, NOW())');
     if (!$journalStmt) {
-        throw new Exception('Failed preparing journal statement: ' . $conn->error);
+        throw new Exception('Failed preparing journal statement: ' . $accountingDb->error);
     }
 
     $journalMemo = $memo;
@@ -173,12 +175,12 @@ try {
         throw new Exception('Failed inserting journal: ' . $journalStmt->error);
     }
 
-    $journalId = $conn->insert_id;
+    $journalId = $accountingDb->insert_id;
     $journalStmt->close();
 
-    $lineStmt = $conn->prepare('INSERT INTO acc_journal_lines (journal_id, account_id, category_id, description, debit, credit, line_order) VALUES (?, ?, NULL, ?, ?, ?, ?)');
+    $lineStmt = $accountingDb->prepare('INSERT INTO acc_journal_lines (journal_id, account_id, category_id, description, debit, credit, line_order) VALUES (?, ?, NULL, ?, ?, ?, ?)');
     if (!$lineStmt) {
-        throw new Exception('Failed preparing journal line statement: ' . $conn->error);
+        throw new Exception('Failed preparing journal line statement: ' . $accountingDb->error);
     }
 
     $lineOneDesc = trim('Adjustment: ' . $memo);
@@ -203,8 +205,8 @@ try {
 
     $lineStmt->close();
 
-    ensureAdjustmentAuditTable($conn);
-    $auditStmt = $conn->prepare('INSERT INTO acc_adjustment_audit (journal_id, primary_account_id, offset_account_id, debit_amount, credit_amount, adjust_reason, entry_reference, entry_source, entry_memo, created_by, ip_address) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
+    ensureAdjustmentAuditTable($accountingDb);
+    $auditStmt = $accountingDb->prepare('INSERT INTO acc_adjustment_audit (journal_id, primary_account_id, offset_account_id, debit_amount, credit_amount, adjust_reason, entry_reference, entry_source, entry_memo, created_by, ip_address) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
     if ($auditStmt) {
         $ipAddress = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
         $auditStmt->bind_param(
@@ -229,7 +231,7 @@ try {
         logError('Failed preparing adjustment audit insert: ' . $conn->error, 'accounting');
     }
 
-    $conn->commit();
+    $accountingDb->commit();
 
     logActivity(
         $userId,
@@ -247,7 +249,7 @@ try {
 
     setToastMessage('success', 'Adjustment Posted', 'The adjusting journal entry has been recorded.');
 } catch (Throwable $e) {
-    $conn->rollback();
+    $accountingDb->rollback();
     logError('Adjustment failed: ' . $e->getMessage(), 'accounting');
     setToastMessage('danger', 'Adjustment Failed', 'We were unable to post that adjustment. Please try again.');
 }

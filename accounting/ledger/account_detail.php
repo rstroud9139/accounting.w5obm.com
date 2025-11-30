@@ -30,11 +30,12 @@ if (!$account_id) {
     exit();
 }
 
+$accountingDb = accounting_db_connection();
+
 // Fetch account details (using existing helper from controller if available)
-function fetch_account($id)
+function fetch_account($id, mysqli $db)
 {
-    global $conn;
-    $stmt = $conn->prepare("SELECT a.*, \n        (SELECT COUNT(*) FROM acc_transactions t WHERE t.account_id = a.id) AS transaction_count,\n        (SELECT COALESCE(SUM(CASE WHEN type='Income' THEN amount ELSE -amount END),0) FROM acc_transactions t WHERE t.account_id = a.id) AS account_balance\n        FROM acc_ledger_accounts a WHERE a.id = ?");
+    $stmt = $db->prepare("SELECT a.*, \n        (SELECT COUNT(*) FROM acc_transactions t WHERE t.account_id = a.id) AS transaction_count,\n        (SELECT COALESCE(SUM(CASE WHEN type='Income' THEN amount ELSE -amount END),0) FROM acc_transactions t WHERE t.account_id = a.id) AS account_balance\n        FROM acc_ledger_accounts a WHERE a.id = ?");
     $stmt->bind_param('i', $id);
     $stmt->execute();
     $row = $stmt->get_result()->fetch_assoc();
@@ -42,7 +43,7 @@ function fetch_account($id)
     return $row;
 }
 
-$account = fetch_account($account_id);
+$account = fetch_account($account_id, $accountingDb);
 if (!$account) {
     setToastMessage('danger', 'Not Found', 'Account not found.', 'club-logo');
     header('Location: /accounting/ledger/');
@@ -206,7 +207,7 @@ include __DIR__ . '/../../include/header.php';
                 </div>
                 <h5 class="mb-3">Recent Transactions</h5>
                 <?php
-                $stmt = $conn->prepare("SELECT id, description, amount, type, transaction_date FROM acc_transactions WHERE account_id = ? ORDER BY transaction_date DESC LIMIT 10");
+                $stmt = $accountingDb->prepare("SELECT id, description, amount, type, transaction_date FROM acc_transactions WHERE account_id = ? ORDER BY transaction_date DESC LIMIT 10");
                 $stmt->bind_param('i', $account_id);
                 $stmt->execute();
                 $res = $stmt->get_result();

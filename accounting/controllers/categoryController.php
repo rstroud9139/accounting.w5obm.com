@@ -19,7 +19,7 @@ require_once __DIR__ . '/../lib/helpers.php';
  */
 function addCategory($data)
 {
-    $conn = accounting_db_connection();
+    $db = accounting_db_connection();
 
     try {
         // Validate required fields
@@ -37,7 +37,7 @@ function addCategory($data)
         }
 
         // Check if category name already exists for this type
-        $stmt = $conn->prepare("SELECT id FROM acc_transaction_categories WHERE name = ? AND type = ?");
+        $stmt = $db->prepare("SELECT id FROM acc_transaction_categories WHERE name = ? AND type = ?");
         $stmt->bind_param('ss', $data['name'], $data['type']);
         $stmt->execute();
         if ($stmt->get_result()->num_rows > 0) {
@@ -66,7 +66,7 @@ function addCategory($data)
         );
 
         if ($stmt->execute()) {
-            $category_id = $conn->insert_id;
+            $category_id = $db->insert_id;
             $stmt->close();
 
             // Log activity
@@ -96,7 +96,7 @@ function addCategory($data)
  */
 function updateCategory($id, $data)
 {
-    $conn = accounting_db_connection();
+    $db = accounting_db_connection();
 
     try {
         // Validate ID
@@ -112,7 +112,7 @@ function updateCategory($id, $data)
 
         // Check if name already exists (excluding current category)
         if (!empty($data['name'])) {
-            $stmt = $conn->prepare("SELECT id FROM acc_transaction_categories WHERE name = ? AND type = ? AND id != ?");
+            $stmt = $db->prepare("SELECT id FROM acc_transaction_categories WHERE name = ? AND type = ? AND id != ?");
             $stmt->bind_param('ssi', $data['name'], $data['type'], $id);
             $stmt->execute();
             if ($stmt->get_result()->num_rows > 0) {
@@ -173,7 +173,7 @@ function updateCategory($id, $data)
  */
 function deleteCategory($id, $reassign_to_id = null)
 {
-    $conn = accounting_db_connection();
+    $db = accounting_db_connection();
 
     try {
         // Validate ID
@@ -188,7 +188,7 @@ function deleteCategory($id, $reassign_to_id = null)
         }
 
         // Check if category has transactions
-        $stmt = $conn->prepare("SELECT COUNT(*) as count FROM acc_transactions WHERE category_id = ?");
+        $stmt = $db->prepare("SELECT COUNT(*) as count FROM acc_transactions WHERE category_id = ?");
         $stmt->bind_param('i', $id);
         $stmt->execute();
         $result = $stmt->get_result()->fetch_assoc();
@@ -213,7 +213,7 @@ function deleteCategory($id, $reassign_to_id = null)
             }
 
             // Reassign transactions
-            $stmt = $conn->prepare("UPDATE acc_transactions SET category_id = ? WHERE category_id = ?");
+            $stmt = $db->prepare("UPDATE acc_transactions SET category_id = ? WHERE category_id = ?");
             $stmt->bind_param('ii', $reassign_to_id, $id);
             if (!$stmt->execute()) {
                 $stmt->close();
@@ -232,7 +232,7 @@ function deleteCategory($id, $reassign_to_id = null)
         }
 
         // Check for child categories
-        $stmt = $conn->prepare("SELECT COUNT(*) as count FROM acc_transaction_categories WHERE parent_category_id = ?");
+        $stmt = $db->prepare("SELECT COUNT(*) as count FROM acc_transaction_categories WHERE parent_category_id = ?");
         $stmt->bind_param('i', $id);
         $stmt->execute();
         $result = $stmt->get_result()->fetch_assoc();
@@ -244,7 +244,7 @@ function deleteCategory($id, $reassign_to_id = null)
         }
 
         // Delete the category
-        $stmt = $conn->prepare("DELETE FROM acc_transaction_categories WHERE id = ?");
+        $stmt = $db->prepare("DELETE FROM acc_transaction_categories WHERE id = ?");
         $stmt->bind_param('i', $id);
 
         if ($stmt->execute()) {
@@ -276,14 +276,14 @@ function deleteCategory($id, $reassign_to_id = null)
  */
 function getCategoryById($id)
 {
-    $conn = accounting_db_connection();
+    $db = accounting_db_connection();
 
     try {
         if (!$id || !is_numeric($id)) {
             return false;
         }
 
-        $stmt = $conn->prepare("
+        $stmt = $db->prepare("
             SELECT c.*, 
                    p.name AS parent_category_name,
                    cu.username AS created_by_username,
@@ -316,7 +316,7 @@ function getCategoryById($id)
  */
 function getAllCategories($filters = [], $options = [])
 {
-    $conn = accounting_db_connection();
+    $db = accounting_db_connection();
 
     try {
         $where_conditions = [];
@@ -384,7 +384,7 @@ function getAllCategories($filters = [], $options = [])
             }
         }
 
-        $stmt = $conn->prepare($query);
+        $stmt = $db->prepare($query);
 
         if (!empty($params)) {
             $stmt->bind_param($types, ...$params);

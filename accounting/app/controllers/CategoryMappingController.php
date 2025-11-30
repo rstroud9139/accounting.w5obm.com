@@ -3,9 +3,9 @@ class CategoryMappingController extends BaseController
 {
     private function getCategories()
     {
-        global $conn;
+        $db = accounting_db_connection();
         try {
-            $res = $conn->query("SELECT id, name FROM acc_transaction_categories ORDER BY name");
+            $res = $db->query("SELECT id, name FROM acc_transaction_categories ORDER BY name");
             return $res ? $res->fetch_all(MYSQLI_ASSOC) : array();
         } catch (Throwable $e) {
             return array();
@@ -14,16 +14,16 @@ class CategoryMappingController extends BaseController
 
     private function getAccounts()
     {
-        global $conn;
+        $db = accounting_db_connection();
         try {
-            $res = $conn->query("SHOW TABLES LIKE 'acc_ledger_accounts'");
+            $res = $db->query("SHOW TABLES LIKE 'acc_ledger_accounts'");
             if ($res && $res->num_rows > 0) {
-                $res2 = $conn->query("SELECT id, name, type FROM acc_ledger_accounts ORDER BY type, name");
+                $res2 = $db->query("SELECT id, name, type FROM acc_ledger_accounts ORDER BY type, name");
                 return $res2 ? $res2->fetch_all(MYSQLI_ASSOC) : array();
             }
-            $res = $conn->query("SHOW TABLES LIKE 'acc_chart_of_accounts'");
+            $res = $db->query("SHOW TABLES LIKE 'acc_chart_of_accounts'");
             if ($res && $res->num_rows > 0) {
-                $res2 = $conn->query("SELECT id, name, type FROM acc_chart_of_accounts ORDER BY type, name");
+                $res2 = $db->query("SELECT id, name, type FROM acc_chart_of_accounts ORDER BY type, name");
                 return $res2 ? $res2->fetch_all(MYSQLI_ASSOC) : array();
             }
         } catch (Throwable $e) {
@@ -34,8 +34,8 @@ class CategoryMappingController extends BaseController
     public function index()
     {
         require_once __DIR__ . '/../services/MappingService.php';
-        global $conn;
-        $svc = new MappingService($conn);
+        $db = accounting_db_connection();
+        $svc = new MappingService($db);
         $this->render('mapping/index', array(
             'page_title' => 'Category → Default Offset Account',
             'categories' => $this->getCategories(),
@@ -62,8 +62,8 @@ class CategoryMappingController extends BaseController
             }
         }
         require_once __DIR__ . '/../services/MappingService.php';
-        global $conn;
-        $svc = new MappingService($conn);
+        $db = accounting_db_connection();
+        $svc = new MappingService($db);
         $ok = $svc->saveMap($map);
         $this->render('mapping/index', array(
             'page_title' => 'Category → Default Offset Account',
@@ -89,8 +89,8 @@ class CategoryMappingController extends BaseController
             return;
         }
         require_once __DIR__ . '/../services/MappingService.php';
-        global $conn;
-        $svc = new MappingService($conn);
+        $db = accounting_db_connection();
+        $svc = new MappingService($db);
         // Merge with existing map
         $current = $svc->getMap();
         foreach ($pairs as $catId => $acctId) {
@@ -110,21 +110,21 @@ class CategoryMappingController extends BaseController
             $categories = array();
             $accounts = array();
             try {
-                $res = $conn->query("SELECT id, name FROM acc_transaction_categories ORDER BY name");
+                $res = $db->query("SELECT id, name FROM acc_transaction_categories ORDER BY name");
                 if ($res) {
                     $categories = $res->fetch_all(MYSQLI_ASSOC);
                 }
             } catch (Throwable $e) {
             }
             try {
-                $res = $conn->query("SHOW TABLES LIKE 'acc_ledger_accounts'");
+                $res = $db->query("SHOW TABLES LIKE 'acc_ledger_accounts'");
                 if ($res && $res->num_rows > 0) {
-                    $res2 = $conn->query("SELECT id, name, type FROM acc_ledger_accounts ORDER BY type, name");
+                    $res2 = $db->query("SELECT id, name, type FROM acc_ledger_accounts ORDER BY type, name");
                     $accounts = $res2 ? $res2->fetch_all(MYSQLI_ASSOC) : array();
                 } else {
-                    $res = $conn->query("SHOW TABLES LIKE 'acc_chart_of_accounts'");
+                    $res = $db->query("SHOW TABLES LIKE 'acc_chart_of_accounts'");
                     if ($res && $res->num_rows > 0) {
-                        $res2 = $conn->query("SELECT id, name, type FROM acc_chart_of_accounts ORDER BY type, name");
+                        $res2 = $db->query("SELECT id, name, type FROM acc_chart_of_accounts ORDER BY type, name");
                         $accounts = $res2 ? $res2->fetch_all(MYSQLI_ASSOC) : array();
                     }
                 }

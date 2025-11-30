@@ -341,163 +341,133 @@ $incomeHeroConfig = [
         </div>
 
         <?php if ($report_data): ?>
-            <!-- Income Statement -->
-            <div class="card shadow" id="incomeStatement">
-                <div class="card-header bg-light text-center">
-                    <h3 class="mb-1">W5OBM Amateur Radio Club</h3>
-                    <h4 class="mb-1">Income Statement</h4>
-                    <h5 class="mb-0 text-muted">
-                        For the Month Ended <?= htmlspecialchars($report_data['period']['display']) ?>
-                    </h5>
-                </div>
-                <div class="card-body">
-                    <!-- Revenue Section -->
-                    <div class="mb-4">
-                        <h5 class="text-success border-bottom pb-2 mb-3">
-                            <strong>REVENUE</strong>
-                        </h5>
-
-                        <?php if (!empty($report_data['income']['categories'])): ?>
-                            <?php foreach ($report_data['income']['categories'] as $category): ?>
-                                <div class="row mb-2">
-                                    <div class="col-8">
-                                        <span class="ms-3"><?= htmlspecialchars($category['name']) ?></span>
-                                    </div>
-                                    <div class="col-4 text-end">
-                                        $<?= number_format($category['total'], 2) ?>
-                                    </div>
-                                </div>
-                            <?php endforeach; ?>
-
-                            <div class="row border-top pt-2 mt-3">
-                                <div class="col-8">
-                                    <strong>Total Revenue</strong>
-                                </div>
-                                <div class="col-4 text-end">
-                                    <strong>$<?= number_format($report_data['income']['total'], 2) ?></strong>
-                                </div>
-                            </div>
-                        <?php else: ?>
-                            <div class="row mb-2">
-                                <div class="col-12 text-center text-muted">
-                                    No revenue recorded for this period
-                                </div>
-                            </div>
-                            <div class="row border-top pt-2 mt-3">
-                                <div class="col-8">
-                                    <strong>Total Revenue</strong>
-                                </div>
-                                <div class="col-4 text-end">
-                                    <strong>$0.00</strong>
-                                </div>
-                            </div>
-                        <?php endif; ?>
-                    </div>
-
-                    <!-- Expenses Section -->
-                    <div class="mb-4">
-                        <h5 class="text-danger border-bottom pb-2 mb-3">
-                            <strong>EXPENSES</strong>
-                        </h5>
-
-                        <?php if (!empty($report_data['expenses']['categories'])): ?>
-                            <?php foreach ($report_data['expenses']['categories'] as $category): ?>
-                                <div class="row mb-2">
-                                    <div class="col-8">
-                                        <span class="ms-3"><?= htmlspecialchars($category['name']) ?></span>
-                                    </div>
-                                    <div class="col-4 text-end">
-                                        $<?= number_format($category['total'], 2) ?>
-                                    </div>
-                                </div>
-                            <?php endforeach; ?>
-
-                            <div class="row border-top pt-2 mt-3">
-                                <div class="col-8">
-                                    <strong>Total Expenses</strong>
-                                </div>
-                                <div class="col-4 text-end">
-                                    <strong>$<?= number_format($report_data['expenses']['total'], 2) ?></strong>
-                                </div>
-                            </div>
-                        <?php else: ?>
-                            <div class="row mb-2">
-                                <div class="col-12 text-center text-muted">
-                                    No expenses recorded for this period
-                                </div>
-                            </div>
-                            <div class="row border-top pt-2 mt-3">
-                                <div class="col-8">
-                                    <strong>Total Expenses</strong>
-                                </div>
-                                <div class="col-4 text-end">
-                                    <strong>$0.00</strong>
-                                </div>
-                            </div>
-                        <?php endif; ?>
-                    </div>
-
-                    <!-- Net Income Section -->
-                    <div class="border-top border-bottom py-3">
-                        <div class="row">
-                            <div class="col-8">
-                                <h4 class="mb-0"><strong>NET INCOME</strong></h4>
-                            </div>
-                            <div class="col-4 text-end">
-                                <h4 class="mb-0 text-<?= $report_data['net_income'] >= 0 ? 'success' : 'danger' ?>">
-                                    <strong>$<?= number_format($report_data['net_income'], 2) ?></strong>
-                                </h4>
+            <?php $statementLogo = accounting_logo_src_for(__DIR__); ?>
+            <div class="statement-wrapper" id="incomeStatement">
+                <div class="card shadow statement-card">
+                    <div class="card-body">
+                        <div class="statement-header text-center">
+                            <img src="<?= htmlspecialchars($statementLogo); ?>" alt="W5OBM Logo" class="statement-logo">
+                            <div>
+                                <h3 class="mb-1">Olive Branch Amateur Radio Club</h3>
+                                <h4 class="mb-1">Income Statement · <?= htmlspecialchars($report_data['period']['display']) ?></h4>
+                                <p class="text-muted mb-0">Prepared for the <?= htmlspecialchars($report_period_display); ?> period</p>
                             </div>
                         </div>
-                    </div>
 
-                    <!-- Financial Analysis -->
-                    <?php if ($report_data['income']['total'] > 0): ?>
-                        <div class="mt-4">
-                            <h6 class="text-info mb-3">
-                                <i class="fas fa-chart-line me-2"></i>Financial Analysis
-                            </h6>
+                        <?php
+                        $statementSections = [
+                            'income' => [
+                                'heading' => 'REVENUE',
+                                'subsection' => 'Income Categories',
+                                'total_label' => 'Total Revenue',
+                                'empty' => 'No revenue recorded for this period',
+                            ],
+                            'expenses' => [
+                                'heading' => 'EXPENSES',
+                                'subsection' => 'Expense Categories',
+                                'total_label' => 'Total Expenses',
+                                'empty' => 'No expenses recorded for this period',
+                            ],
+                        ];
+                        ?>
+
+                        <?php foreach ($statementSections as $sectionKey => $sectionMeta): ?>
+                            <?php $categories = $report_data[$sectionKey]['categories'] ?? []; ?>
+                            <div class="statement-section">
+                                <div class="statement-row statement-heading-row">
+                                    <div class="statement-label heading"><?= $sectionMeta['heading'] ?></div>
+                                    <div class="statement-amount heading-label">Current Activity</div>
+                                    <div class="statement-amount heading-label">Totals / Subtotals</div>
+                                </div>
+
+                                <div class="statement-row statement-subsection-row">
+                                    <div class="statement-label subsection"><?= $sectionMeta['subsection'] ?></div>
+                                    <div class="statement-amount current"></div>
+                                    <div class="statement-amount total"></div>
+                                </div>
+
+                                <?php if (!empty($categories)): ?>
+                                    <?php foreach ($categories as $category): ?>
+                                        <div class="statement-row statement-category-row">
+                                            <div class="statement-label category"><?= htmlspecialchars($category['name']) ?></div>
+                                            <div class="statement-amount current">$<?= number_format((float)$category['total'], 2) ?></div>
+                                            <div class="statement-amount total"></div>
+                                        </div>
+                                    <?php endforeach; ?>
+                                <?php else: ?>
+                                    <div class="statement-row statement-category-row text-muted fst-italic">
+                                        <div class="statement-label category"><?= $sectionMeta['empty'] ?></div>
+                                        <div class="statement-amount current">—</div>
+                                        <div class="statement-amount total">—</div>
+                                    </div>
+                                <?php endif; ?>
+
+                                <div class="statement-row statement-subtotal-row">
+                                    <div class="statement-label subsection"><?= $sectionMeta['total_label'] ?></div>
+                                    <div class="statement-amount current"></div>
+                                    <div class="statement-amount total">
+                                        <strong>$<?= number_format((float)($report_data[$sectionKey]['total'] ?? 0), 2) ?></strong>
+                                    </div>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
+
+                        <div class="statement-row statement-heading-row statement-net-row">
+                            <div class="statement-label heading">NET INCOME</div>
+                            <div class="statement-amount heading-label"></div>
+                            <div class="statement-amount total text-<?= $report_data['net_income'] >= 0 ? 'success' : 'danger' ?>">
+                                <strong>$<?= number_format((float)$report_data['net_income'], 2) ?></strong>
+                            </div>
+                        </div>
+
+                        <!-- Financial Analysis -->
+                        <?php if ($report_data['income']['total'] > 0): ?>
+                            <div class="mt-4">
+                                <h6 class="text-info mb-3">
+                                    <i class="fas fa-chart-line me-2"></i>Financial Analysis
+                                </h6>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <small class="text-muted">Expense Ratio:</small><br>
+                                        <strong>
+                                            <?= number_format(($report_data['expenses']['total'] / $report_data['income']['total']) * 100, 1) ?>%
+                                        </strong>
+                                        <div class="progress mt-1" style="height: 6px;">
+                                            <div class="progress-bar bg-danger"
+                                                style="width: <?= min(100, ($report_data['expenses']['total'] / $report_data['income']['total']) * 100) ?>%">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <small class="text-muted">Net Margin:</small><br>
+                                        <strong class="text-<?= $report_data['net_income'] >= 0 ? 'success' : 'danger' ?>">
+                                            <?= number_format(($report_data['net_income'] / $report_data['income']['total']) * 100, 1) ?>%
+                                        </strong>
+                                        <div class="progress mt-1" style="height: 6px;">
+                                            <div class="progress-bar bg-<?= $report_data['net_income'] >= 0 ? 'success' : 'danger' ?>"
+                                                style="width: <?= min(100, abs(($report_data['net_income'] / $report_data['income']['total']) * 100)) ?>%">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        <?php endif; ?>
+
+                        <!-- Report Footer -->
+                        <div class="mt-4 pt-3 border-top">
                             <div class="row">
                                 <div class="col-md-6">
-                                    <small class="text-muted">Expense Ratio:</small><br>
-                                    <strong>
-                                        <?= number_format(($report_data['expenses']['total'] / $report_data['income']['total']) * 100, 1) ?>%
-                                    </strong>
-                                    <div class="progress mt-1" style="height: 6px;">
-                                        <div class="progress-bar bg-danger"
-                                            style="width: <?= min(100, ($report_data['expenses']['total'] / $report_data['income']['total']) * 100) ?>%">
-                                        </div>
-                                    </div>
+                                    <small class="text-muted">
+                                        Report generated on: <?= date('F j, Y g:i A') ?><br>
+                                        Generated by: <?= function_exists('getCurrentUsername') ? htmlspecialchars(getCurrentUsername()) : htmlspecialchars((string)$user_id) ?>
+                                    </small>
                                 </div>
-                                <div class="col-md-6">
-                                    <small class="text-muted">Net Margin:</small><br>
-                                    <strong class="text-<?= $report_data['net_income'] >= 0 ? 'success' : 'danger' ?>">
-                                        <?= number_format(($report_data['net_income'] / $report_data['income']['total']) * 100, 1) ?>%
-                                    </strong>
-                                    <div class="progress mt-1" style="height: 6px;">
-                                        <div class="progress-bar bg-<?= $report_data['net_income'] >= 0 ? 'success' : 'danger' ?>"
-                                            style="width: <?= min(100, abs(($report_data['net_income'] / $report_data['income']['total']) * 100)) ?>%">
-                                        </div>
-                                    </div>
+                                <div class="col-md-6 text-end">
+                                    <small class="text-muted">
+                                        W5OBM Amateur Radio Club<br>
+                                        Financial Management System
+                                    </small>
                                 </div>
-                            </div>
-                        </div>
-                    <?php endif; ?>
-
-                    <!-- Report Footer -->
-                    <div class="mt-4 pt-3 border-top">
-                        <div class="row">
-                            <div class="col-md-6">
-                                <small class="text-muted">
-                                    Report generated on: <?= date('F j, Y g:i A') ?><br>
-                                    Generated by: <?= function_exists('getCurrentUsername') ? htmlspecialchars(getCurrentUsername()) : htmlspecialchars((string)$user_id) ?>
-                                </small>
-                            </div>
-                            <div class="col-md-6 text-end">
-                                <small class="text-muted">
-                                    W5OBM Amateur Radio Club<br>
-                                    Financial Management System
-                                </small>
                             </div>
                         </div>
                     </div>
@@ -509,6 +479,96 @@ $incomeHeroConfig = [
     <?php include __DIR__ . '/../../include/footer.php'; ?>
 
     <style>
+        .statement-wrapper {
+            max-width: 960px;
+            margin: 0 auto 2rem;
+        }
+
+        .statement-card {
+            border-radius: 1.25rem;
+        }
+
+        .statement-card .card-body {
+            padding: 2.5rem;
+        }
+
+        .statement-header {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .statement-logo {
+            max-width: 80px;
+            height: auto;
+        }
+
+        .statement-section {
+            margin-top: 1.75rem;
+        }
+
+        .statement-section:first-of-type {
+            margin-top: 0;
+        }
+
+        .statement-row {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.35rem 0;
+        }
+
+        .statement-label {
+            flex: 1 1 auto;
+            font-size: 0.95rem;
+        }
+
+        .statement-label.heading {
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .statement-label.subsection {
+            font-weight: 600;
+            padding-left: 3rem;
+        }
+
+        .statement-label.category {
+            padding-left: 4.5rem;
+        }
+
+        .statement-amount {
+            width: 180px;
+            text-align: right;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .statement-amount.heading-label {
+            font-size: 0.78rem;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: #6c757d;
+        }
+
+        .statement-row.statement-subtotal-row {
+            border-top: 1px solid #e4e7ec;
+            margin-top: 0.35rem;
+            padding-top: 0.6rem;
+        }
+
+        .statement-row.statement-heading-row+.statement-row.statement-subsection-row {
+            margin-top: 0.35rem;
+        }
+
+        .statement-row.statement-net-row {
+            border-top: 2px solid #212529;
+            margin-top: 2rem;
+            padding-top: 0.75rem;
+        }
+
         @media print {
             .page-container {
                 max-width: 100% !important;
@@ -522,9 +582,14 @@ $incomeHeroConfig = [
                 display: none !important;
             }
 
-            .card {
+            .card,
+            .statement-card {
                 border: none !important;
                 box-shadow: none !important;
+            }
+
+            .statement-card .card-body {
+                padding: 1.25rem !important;
             }
 
             .card-header {
@@ -535,6 +600,10 @@ $incomeHeroConfig = [
 
             #incomeStatement {
                 page-break-inside: avoid;
+            }
+
+            .statement-amount.heading-label {
+                color: #000 !important;
             }
 
             .border-bottom {

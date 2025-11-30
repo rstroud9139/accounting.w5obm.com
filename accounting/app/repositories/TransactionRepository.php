@@ -2,11 +2,11 @@
 
 class TransactionRepository
 {
-    private $conn;
+    private mysqli $conn;
 
-    public function __construct($conn)
+    public function __construct(?mysqli $conn = null)
     {
-        $this->conn = $conn;
+        $this->conn = $conn ?? accounting_db_connection();
     }
 
     public function getRecent($limit = 200)

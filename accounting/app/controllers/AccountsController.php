@@ -3,9 +3,9 @@ class AccountsController extends BaseController
 {
     public function index()
     {
-        global $conn;
         require_once __DIR__ . '/../repositories/AccountRepository.php';
-        $repo = new AccountRepository($conn);
+        $db = accounting_db_connection();
+        $repo = new AccountRepository($db);
         $accounts = $repo->getAll();
 
         $this->render('accounts/index', [
@@ -17,18 +17,18 @@ class AccountsController extends BaseController
     public function register()
     {
         requirePermission('accounting_view');
-        global $conn;
+        $db = accounting_db_connection();
         $account_id = isset($_GET['account_id']) ? (int)$_GET['account_id'] : 0;
         $start = isset($_GET['start']) ? $_GET['start'] : '';
         $end = isset($_GET['end']) ? $_GET['end'] : '';
         require_once __DIR__ . '/../repositories/JournalRepository.php';
-        $jr = new JournalRepository($conn);
+        $jr = new JournalRepository($db);
         $lines = [];
         if ($account_id) {
             $lines = $jr->getRegisterLines($account_id, $start ?: null, $end ?: null);
         }
         require_once __DIR__ . '/../repositories/AccountRepository.php';
-        $repo = new AccountRepository($conn);
+        $repo = new AccountRepository($db);
         $accounts = $repo->getAll();
         $this->render('accounts/register', [
             'page_title' => 'Account Register',
@@ -43,7 +43,7 @@ class AccountsController extends BaseController
     public function register_export_csv()
     {
         requirePermission('accounting_view');
-        global $conn;
+        $db = accounting_db_connection();
         $account_id = isset($_GET['account_id']) ? (int)$_GET['account_id'] : 0;
         $start = isset($_GET['start']) ? $_GET['start'] : null;
         $end = isset($_GET['end']) ? $_GET['end'] : null;
@@ -53,12 +53,12 @@ class AccountsController extends BaseController
             return;
         }
         require_once __DIR__ . '/../repositories/JournalRepository.php';
-        $jr = new JournalRepository($conn);
+        $jr = new JournalRepository($db);
         $lines = $jr->getRegisterLines($account_id, $start, $end);
         // Fetch account name for header
         $account_name = '#' . $account_id;
         try {
-            $res = $conn->prepare("SELECT name FROM acc_ledger_accounts WHERE id = ? LIMIT 1");
+            $res = $db->prepare("SELECT name FROM acc_ledger_accounts WHERE id = ? LIMIT 1");
             if ($res) {
                 $res->bind_param('i', $account_id);
                 $res->execute();

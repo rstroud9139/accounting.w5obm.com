@@ -359,6 +359,7 @@ if (!function_exists('renderPremiumHero')) {
                 $variant = strtolower((string)($action['variant'] ?? 'solid'));
                 $icon = $action['icon'] ?? '';
                 $target = !empty($action['external']) ? ' target="_blank" rel="noopener"' : '';
+                $launchAttr = !empty($action['data_report_launch']) ? ' data-report-launch="true"' : '';
                 switch ($variant) {
                     case 'outline':
                     case 'outline-light':
@@ -382,7 +383,7 @@ if (!function_exists('renderPremiumHero')) {
                         $btnClass = 'btn btn-light text-dark fw-semibold';
                         break;
                 }
-                echo '<a class="' . $btnClass . '" href="' . $url . '"' . $target . '>';
+                echo '<a class="' . $btnClass . '" href="' . $url . '"' . $target . $launchAttr . '>';
                 if ($icon) {
                     echo '<i class="fas ' . htmlspecialchars($icon, ENT_QUOTES, 'UTF-8') . ' me-2"></i>';
                 }

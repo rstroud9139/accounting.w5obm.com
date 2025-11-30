@@ -3,9 +3,9 @@ class ImportController extends BaseController
 {
     private function getCategories()
     {
-        global $conn;
+        $db = accounting_db_connection();
         try {
-            $res = $conn->query("SELECT id, name FROM acc_transaction_categories ORDER BY name");
+            $res = $db->query("SELECT id, name FROM acc_transaction_categories ORDER BY name");
             return $res ? $res->fetch_all(MYSQLI_ASSOC) : array();
         } catch (Throwable $e) {
             return array();
@@ -15,18 +15,18 @@ class ImportController extends BaseController
     private function getAccounts()
     {
         // Try to load accounts from either acc_chart_of_accounts or acc_ledger_accounts
-        global $conn;
+        $db = accounting_db_connection();
         try {
             // Prefer acc_ledger_accounts if present
-            $res = $conn->query("SHOW TABLES LIKE 'acc_ledger_accounts'");
+            $res = $db->query("SHOW TABLES LIKE 'acc_ledger_accounts'");
             if ($res && $res->num_rows > 0) {
-                $res2 = $conn->query("SELECT id, name, type FROM acc_ledger_accounts ORDER BY type, name");
+                $res2 = $db->query("SELECT id, name, type FROM acc_ledger_accounts ORDER BY type, name");
                 return $res2 ? $res2->fetch_all(MYSQLI_ASSOC) : array();
             }
             // Fallback to chart of accounts
-            $res = $conn->query("SHOW TABLES LIKE 'acc_chart_of_accounts'");
+            $res = $db->query("SHOW TABLES LIKE 'acc_chart_of_accounts'");
             if ($res && $res->num_rows > 0) {
-                $res2 = $conn->query("SELECT id, name, type FROM acc_chart_of_accounts ORDER BY type, name");
+                $res2 = $db->query("SELECT id, name, type FROM acc_chart_of_accounts ORDER BY type, name");
                 return $res2 ? $res2->fetch_all(MYSQLI_ASSOC) : array();
             }
         } catch (Throwable $e) {
@@ -52,6 +52,7 @@ class ImportController extends BaseController
             echo 'Invalid CSRF token';
             return;
         }
+        $db = accounting_db_connection();
         $type = $_POST['import_type'] ?? 'auto';
         $default_income_cat = isset($_POST['default_income_cat']) ? (int)$_POST['default_income_cat'] : 0;
         $default_expense_cat = isset($_POST['default_expense_cat']) ? (int)$_POST['default_expense_cat'] : 0;
@@ -91,9 +92,8 @@ class ImportController extends BaseController
         $dupFlags = array();
         $dupCount = 0;
         try {
-            global $conn;
-            $conn->query("CREATE TABLE IF NOT EXISTS acc_transactions (id INT AUTO_INCREMENT PRIMARY KEY) ENGINE=InnoDB");
-            $stmt = $conn->prepare('SELECT id FROM acc_transactions WHERE transaction_date = ? AND amount = ? AND description = ? LIMIT 1');
+            $db->query("CREATE TABLE IF NOT EXISTS acc_transactions (id INT AUTO_INCREMENT PRIMARY KEY) ENGINE=InnoDB");
+            $stmt = $db->prepare('SELECT id FROM acc_transactions WHERE transaction_date = ? AND amount = ? AND description = ? LIMIT 1');
         } catch (Throwable $e) {
             $stmt = null;
         }
@@ -149,8 +149,8 @@ class ImportController extends BaseController
     private function loadCategoryMap()
     {
         require_once __DIR__ . '/../services/MappingService.php';
-        global $conn;
-        $svc = new MappingService($conn);
+        $db = accounting_db_connection();
+        $svc = new MappingService($db);
         return $svc->getMap();
     }
 
@@ -161,6 +161,7 @@ class ImportController extends BaseController
             echo 'Invalid CSRF token';
             return;
         }
+        $db = accounting_db_connection();
         $data = $_SESSION['import_preview'] ?? null;
         if (!$data || empty($data['items'])) {
             header('Location: ' . route('import'));
@@ -174,8 +175,7 @@ class ImportController extends BaseController
 
         require_once __DIR__ . '/../repositories/TransactionRepository.php';
         require_once __DIR__ . '/../services/AccountingService.php';
-        global $conn;
-        $repo = new TransactionRepository($conn);
+        $repo = new TransactionRepository($db);
         $svc = new AccountingService();
 
         $created = 0;
@@ -271,7 +271,7 @@ class ImportController extends BaseController
                 $dupDesc = isset($rowPost['description']) ? $rowPost['description'] : ($row['description'] ?? ($row['payee'] ?? ''));
                 $dupDate = isset($rowPost['date']) ? $rowPost['date'] : ($row['date'] ?? date('Y-m-d'));
                 $dupAmt = abs($amount);
-                $stmt = $conn->prepare('SELECT id FROM acc_transactions WHERE transaction_date = ? AND amount = ? AND description = ? LIMIT 1');
+                $stmt = $db->prepare('SELECT id FROM acc_transactions WHERE transaction_date = ? AND amount = ? AND description = ? LIMIT 1');
                 if ($stmt) {
                     $stmt->bind_param('sds', $dupDate, $dupAmt, $dupDesc);
                     $stmt->execute();
@@ -318,8 +318,8 @@ class ImportController extends BaseController
         }
         // Log import summary if table exists
         try {
-            $conn->query("CREATE TABLE IF NOT EXISTS acc_imports (id INT AUTO_INCREMENT PRIMARY KEY, filename VARCHAR(255), rows_imported INT, duplicates_skipped INT, created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
-            $stmt = $conn->prepare('INSERT INTO acc_imports (filename, rows_imported, duplicates_skipped) VALUES (?,?,?)');
+            $db->query("CREATE TABLE IF NOT EXISTS acc_imports (id INT AUTO_INCREMENT PRIMARY KEY, filename VARCHAR(255), rows_imported INT, duplicates_skipped INT, created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+            $stmt = $db->prepare('INSERT INTO acc_imports (filename, rows_imported, duplicates_skipped) VALUES (?,?,?)');
             if ($stmt) {
                 $fn = $data['filename'] ?? '';
                 $stmt->bind_param('sii', $fn, $created, $duplicatesSkipped);
@@ -339,12 +339,12 @@ class ImportController extends BaseController
 
     public function last()
     {
-        global $conn;
+        $db = accounting_db_connection();
         $last = null;
         try {
-            $res = $conn->query("SHOW TABLES LIKE 'acc_imports'");
+            $res = $db->query("SHOW TABLES LIKE 'acc_imports'");
             if ($res && $res->num_rows > 0) {
-                $q = $conn->query("SELECT id, filename, rows_imported, duplicates_skipped, created_at FROM acc_imports ORDER BY id DESC LIMIT 1");
+                $q = $db->query("SELECT id, filename, rows_imported, duplicates_skipped, created_at FROM acc_imports ORDER BY id DESC LIMIT 1");
                 if ($q) {
                     $rows = $q->fetch_all(MYSQLI_ASSOC);
                     $last = $rows ? $rows[0] : null;

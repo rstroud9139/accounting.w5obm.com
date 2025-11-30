@@ -59,11 +59,11 @@ class MigrationController extends BaseController
     public function index()
     {
         requirePermission('accounting_manage');
-        global $conn;
-        $this->ensureMigrationsTable($conn);
+        $db = accounting_db_connection();
+        $this->ensureMigrationsTable($db);
         $path = $this->getMigrationsPath();
         $files = $path ? $this->listFiles($path) : array();
-        $applied = $this->getApplied($conn);
+        $applied = $this->getApplied($db);
 
         $items = array();
         foreach ($files as $f) {
@@ -92,8 +92,8 @@ class MigrationController extends BaseController
             echo 'Invalid CSRF token';
             return;
         }
-        global $conn;
-        $this->ensureMigrationsTable($conn);
+        $db = accounting_db_connection();
+        $this->ensureMigrationsTable($db);
         $path = $this->getMigrationsPath();
         if (!$path) {
             $this->render('migrations/index', array(
@@ -106,7 +106,7 @@ class MigrationController extends BaseController
         }
 
         $files = $this->listFiles($path);
-        $applied = $this->getApplied($conn);
+        $applied = $this->getApplied($db);
         $ran = 0;
         foreach ($files as $f) {
             if (isset($applied[$f])) continue; // skip already applied
@@ -114,16 +114,16 @@ class MigrationController extends BaseController
             $sql = @file_get_contents($full);
             if ($sql === false) continue;
             // Execute multi-query to support multiple statements
-            if ($conn->multi_query($sql)) {
-                while ($conn->more_results() && $conn->next_result()) {
+            if ($db->multi_query($sql)) {
+                while ($db->more_results() && $db->next_result()) {
                     // flush results
-                    $tmp = $conn->use_result();
+                    $tmp = $db->use_result();
                     if ($tmp instanceof mysqli_result) {
                         $tmp->free();
                     }
                 }
                 $checksum = sha1($sql);
-                $stmt = $conn->prepare('INSERT INTO acc_migrations (filename, checksum, applied_at) VALUES (?,?,NOW())');
+                $stmt = $db->prepare('INSERT INTO acc_migrations (filename, checksum, applied_at) VALUES (?,?,NOW())');
                 if ($stmt) {
                     $stmt->bind_param('ss', $f, $checksum);
                     $stmt->execute();

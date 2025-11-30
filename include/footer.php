@@ -224,8 +224,8 @@ $isAdmin = $isLoggedIn ? isAdmin(getCurrentUserId()) : false;
             <div class="row align-items-center">
                 <div class="col-lg-6 text-center text-lg-start">
                     <p class="footer-copyright">
-                        &copy; <?= $current_year ?> KD5BS Robert Stroud.  All rights reserved.<br>
-                        
+                        &copy; <?= $current_year ?> KD5BS Robert Stroud. All rights reserved.<br>
+
                     </p>
                 </div>
 
@@ -284,8 +284,16 @@ $isAdmin = $isLoggedIn ? isAdmin(getCurrentUserId()) : false;
 <!-- Font Awesome -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
 
-<!-- W5OBM Toast Notifications -->
-<script src="https://w5obm.com/js/toast-notifications.js"></script>
+<?php
+$toastScriptPath = realpath(__DIR__ . '/../../dev.w5obm.com/js/toast-notifications.js');
+if ($toastScriptPath && file_exists($toastScriptPath)) {
+    echo "<script>";
+    readfile($toastScriptPath);
+    echo "</script>";
+} else {
+    echo '<script src="https://dev.w5obm.com/js/toast-notifications.js"></script>';
+}
+?>
 
 <script>
     // Initialize Bootstrap components when DOM is ready

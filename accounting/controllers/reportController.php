@@ -98,7 +98,7 @@ function buildStatementPeriod(string $periodType, ?int $year = null, ?int $value
  */
 function generateIncomeStatementRange(string $startDate, string $endDate, ?string $displayLabel = null): array
 {
-    $conn = accounting_db_connection();
+    $db = accounting_db_connection();
 
     try {
         $start = new DateTimeImmutable($startDate);
@@ -111,8 +111,8 @@ function generateIncomeStatementRange(string $startDate, string $endDate, ?strin
         $startStr = $start->format('Y-m-d');
         $endStr = $end->format('Y-m-d');
 
-        $fetchTotals = static function (string $type) use ($conn, $startStr, $endStr) {
-            $stmt = $conn->prepare('
+        $fetchTotals = static function (string $type) use ($db, $startStr, $endStr) {
+            $stmt = $db->prepare('
                 SELECT c.id, c.name, SUM(t.amount) AS total
                 FROM acc_transactions t
                 JOIN acc_transaction_categories c ON t.category_id = c.id
@@ -121,7 +121,7 @@ function generateIncomeStatementRange(string $startDate, string $endDate, ?strin
                 ORDER BY c.name
             ');
             if (!$stmt) {
-                throw new Exception('Failed preparing statement: ' . $conn->error);
+                throw new Exception('Failed preparing statement: ' . $db->error);
             }
             $stmt->bind_param('sss', $type, $startStr, $endStr);
             if (!$stmt->execute()) {
@@ -196,7 +196,7 @@ function generateIncomeStatementRange(string $startDate, string $endDate, ?strin
  */
 function generateBalanceSheet($date = null)
 {
-    $conn = accounting_db_connection();
+    $db = accounting_db_connection();
 
     try {
         if ($date === null) {
@@ -209,7 +209,7 @@ function generateBalanceSheet($date = null)
         }
 
         // Assets from physical assets table
-        $stmt = $conn->prepare("SELECT SUM(value) AS total FROM acc_assets WHERE acquisition_date <= ?");
+        $stmt = $db->prepare("SELECT SUM(value) AS total FROM acc_assets WHERE acquisition_date <= ?");
         $stmt->bind_param('s', $date);
         $stmt->execute();
         $assets_result = $stmt->get_result()->fetch_assoc();
@@ -217,7 +217,7 @@ function generateBalanceSheet($date = null)
         $stmt->close();
 
         // Cash (from transactions)
-        $stmt = $conn->prepare("
+        $stmt = $db->prepare("
             SELECT 
                 SUM(CASE WHEN type = 'Income' THEN amount ELSE 0 END) - 
                 SUM(CASE WHEN type = 'Expense' THEN amount ELSE 0 END) AS balance
@@ -233,7 +233,7 @@ function generateBalanceSheet($date = null)
         // Liabilities (if table exists)
         $total_liabilities = 0;
         if (tableExists('acc_liabilities')) {
-            $stmt = $conn->prepare("
+            $stmt = $db->prepare("
                 SELECT SUM(amount) AS total 
                 FROM acc_liabilities 
                 WHERE date_incurred <= ? AND status = 'Active'
@@ -326,7 +326,7 @@ function generateIncomeStatement($month, $year)
  */
 function saveReport($report_type, $parameters, $file_path = null)
 {
-    $conn = accounting_db_connection();
+    $db = accounting_db_connection();
 
     try {
         // Validate inputs
@@ -334,7 +334,7 @@ function saveReport($report_type, $parameters, $file_path = null)
             throw new Exception("Report type is required");
         }
 
-        $stmt = $conn->prepare("
+        $stmt = $db->prepare("
             INSERT INTO acc_reports (report_type, parameters, file_path, generated_by, generated_at) 
             VALUES (?, ?, ?, ?, NOW())
         ");
@@ -345,7 +345,7 @@ function saveReport($report_type, $parameters, $file_path = null)
         $stmt->bind_param('sssi', $report_type, $parameters_json, $file_path, $generated_by);
 
         if ($stmt->execute()) {
-            $report_id = $conn->insert_id;
+            $report_id = $db->insert_id;
             $stmt->close();
 
             // Log activity
@@ -374,14 +374,14 @@ function saveReport($report_type, $parameters, $file_path = null)
  */
 function getReportById($id)
 {
-    $conn = accounting_db_connection();
+    $db = accounting_db_connection();
 
     try {
         if (!$id || !is_numeric($id)) {
             return false;
         }
 
-        $stmt = $conn->prepare("
+        $stmt = $db->prepare("\
             SELECT r.*, u.username AS generated_by_username
             FROM acc_reports r
             LEFT JOIN auth_users u ON r.generated_by = u.id
@@ -412,7 +412,7 @@ function getReportById($id)
  */
 function getAllReports($filters = [], $limit = null)
 {
-    $conn = accounting_db_connection();
+    \$db = accounting_db_connection();
 
     try {
         $where_conditions = [];
@@ -455,7 +455,7 @@ function getAllReports($filters = [], $limit = null)
             $types .= 'i';
         }
 
-        $stmt = $conn->prepare($query);
+        $stmt = \$db->prepare($query);
 
         if (!empty($params)) {
             $stmt->bind_param($types, ...$params);
@@ -487,7 +487,7 @@ function getAllReports($filters = [], $limit = null)
  */
 function deleteReport($id)
 {
-    $conn = accounting_db_connection();
+    \$db = accounting_db_connection();
 
     try {
         if (!$id || !is_numeric($id)) {
@@ -511,7 +511,7 @@ function deleteReport($id)
             unlink($report['file_path']);
         }
 
-        $stmt = $conn->prepare("DELETE FROM acc_reports WHERE id = ?");
+        $stmt = \$db->prepare("DELETE FROM acc_reports WHERE id = ?");
         $stmt->bind_param('i', $id);
 
         if ($stmt->execute()) {
@@ -544,10 +544,10 @@ function deleteReport($id)
  */
 function getExpenseBreakdown($start_date, $end_date)
 {
-    $conn = accounting_db_connection();
+    \$db = accounting_db_connection();
 
     try {
-        $stmt = $conn->prepare("
+        $stmt = \$db->prepare("
             SELECT c.id, c.name, 
                    SUM(t.amount) AS total_amount,
                    COUNT(t.id) AS transaction_count,

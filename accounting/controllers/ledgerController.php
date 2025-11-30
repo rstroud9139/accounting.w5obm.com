@@ -19,10 +19,9 @@ require_once __DIR__ . '/../lib/helpers.php';
  */
 function addLedgerAccount($data)
 {
-    global $conn;
+    $accConn = accounting_db_connection();
 
     try {
-        // Validate required fields
         $required = ['name', 'account_type', 'account_number'];
         foreach ($required as $field) {
             if (empty($data[$field])) {
@@ -37,7 +36,7 @@ function addLedgerAccount($data)
         }
 
         // Check if account number already exists
-        $stmt = $conn->prepare("SELECT id FROM acc_ledger_accounts WHERE account_number = ?");
+        $stmt = $accConn->prepare("SELECT id FROM acc_ledger_accounts WHERE account_number = ?");
         $stmt->bind_param('s', $data['account_number']);
         $stmt->execute();
         if ($stmt->get_result()->num_rows > 0) {
@@ -46,7 +45,7 @@ function addLedgerAccount($data)
         }
         $stmt->close();
 
-        $stmt = $conn->prepare("
+        $stmt = $accConn->prepare("
             INSERT INTO acc_ledger_accounts 
             (name, account_number, account_type, description, parent_account_id, active, created_by, created_at) 
             VALUES (?, ?, ?, ?, ?, 1, ?, NOW())
@@ -67,7 +66,7 @@ function addLedgerAccount($data)
         );
 
         if ($stmt->execute()) {
-            $account_id = $conn->insert_id;
+            $account_id = $accConn->insert_id;
             $stmt->close();
 
             // Log activity
@@ -97,7 +96,7 @@ function addLedgerAccount($data)
  */
 function updateLedgerAccount($id, $data)
 {
-    global $conn;
+    $accConn = accounting_db_connection();
 
     try {
         // Validate ID
@@ -113,7 +112,7 @@ function updateLedgerAccount($id, $data)
 
         // Check if account number already exists (excluding current account)
         if (!empty($data['account_number'])) {
-            $stmt = $conn->prepare("SELECT id FROM acc_ledger_accounts WHERE account_number = ? AND id != ?");
+            $stmt = $accConn->prepare("SELECT id FROM acc_ledger_accounts WHERE account_number = ? AND id != ?");
             $stmt->bind_param('si', $data['account_number'], $id);
             $stmt->execute();
             if ($stmt->get_result()->num_rows > 0) {
@@ -123,13 +122,12 @@ function updateLedgerAccount($id, $data)
             $stmt->close();
         }
 
-        $stmt = $conn->prepare("
+        $stmt = $accConn->prepare("
             UPDATE acc_ledger_accounts 
             SET name = ?, account_number = ?, account_type = ?, description = ?, 
                 parent_account_id = ?, updated_by = ?, updated_at = NOW()
             WHERE id = ?
         ");
-
         $updated_by = getCurrentUserId();
         $parent_account_id = !empty($data['parent_account_id']) ? intval($data['parent_account_id']) : null;
         $description = sanitizeInput($data['description'] ?? '', 'string');
@@ -175,7 +173,7 @@ function updateLedgerAccount($id, $data)
  */
 function deleteLedgerAccount($id, $reassign_to_id = null)
 {
-    global $conn;
+    $accConn = accounting_db_connection();
 
     try {
         // Validate ID
@@ -190,7 +188,7 @@ function deleteLedgerAccount($id, $reassign_to_id = null)
         }
 
         // Check if account has transactions
-        $stmt = $conn->prepare("SELECT COUNT(*) as count FROM acc_transactions WHERE account_id = ?");
+        $stmt = $accConn->prepare("SELECT COUNT(*) as count FROM acc_transactions WHERE account_id = ?");
         $stmt->bind_param('i', $id);
         $stmt->execute();
         $result = $stmt->get_result()->fetch_assoc();
@@ -215,7 +213,7 @@ function deleteLedgerAccount($id, $reassign_to_id = null)
             }
 
             // Reassign transactions
-            $stmt = $conn->prepare("UPDATE acc_transactions SET account_id = ? WHERE account_id = ?");
+            $stmt = $accConn->prepare("UPDATE acc_transactions SET account_id = ? WHERE account_id = ?");
             $stmt->bind_param('ii', $reassign_to_id, $id);
             if (!$stmt->execute()) {
                 $stmt->close();
@@ -234,7 +232,7 @@ function deleteLedgerAccount($id, $reassign_to_id = null)
         }
 
         // Check for child accounts
-        $stmt = $conn->prepare("SELECT COUNT(*) as count FROM acc_ledger_accounts WHERE parent_account_id = ?");
+        $stmt = $accConn->prepare("SELECT COUNT(*) as count FROM acc_ledger_accounts WHERE parent_account_id = ?");
         $stmt->bind_param('i', $id);
         $stmt->execute();
         $result = $stmt->get_result()->fetch_assoc();
@@ -246,7 +244,7 @@ function deleteLedgerAccount($id, $reassign_to_id = null)
         }
 
         // Delete the account
-        $stmt = $conn->prepare("DELETE FROM acc_ledger_accounts WHERE id = ?");
+        $stmt = $accConn->prepare("DELETE FROM acc_ledger_accounts WHERE id = ?");
         $stmt->bind_param('i', $id);
 
         if ($stmt->execute()) {
@@ -272,28 +270,28 @@ function deleteLedgerAccount($id, $reassign_to_id = null)
 }
 
 /**
- * Get a single ledger account by its ID
+    $accConn = accounting_db_connection();
  * @param int $id Account ID
  * @return array|false Account data or false if not found
  */
 function getLedgerAccountById($id)
 {
-    global $conn;
+    $accConn = accounting_db_connection();
 
     try {
         if (!$id || !is_numeric($id)) {
             return false;
         }
 
-        $stmt = $conn->prepare("
+        $stmt = $accConn->prepare("
             SELECT a.*, 
                    p.name AS parent_account_name,
                    cu.username AS created_by_username,
                    uu.username AS updated_by_username
             FROM acc_ledger_accounts a 
             LEFT JOIN acc_ledger_accounts p ON a.parent_account_id = p.id
-            LEFT JOIN auth_users cu ON a.created_by = cu.id
-            LEFT JOIN auth_users uu ON a.updated_by = uu.id
+            LEFT JOIN w5obm.auth_users cu ON a.created_by = cu.id
+            LEFT JOIN w5obm.auth_users uu ON a.updated_by = uu.id
             WHERE a.id = ?
         ");
 
@@ -317,7 +315,7 @@ function getLedgerAccountById($id)
  */
 function getAllLedgerAccounts($filters = [], $options = [])
 {
-    global $conn;
+    $accConn = accounting_db_connection();
 
     try {
         $where_conditions = [];
@@ -370,7 +368,6 @@ function getAllLedgerAccounts($filters = [], $options = [])
             $where_clause
             ORDER BY $order_by
         ";
-
         // Add limit and offset if specified
         if (!empty($options['limit'])) {
             $query .= " LIMIT ?";
@@ -384,7 +381,7 @@ function getAllLedgerAccounts($filters = [], $options = [])
             }
         }
 
-        $stmt = $conn->prepare($query);
+        $stmt = $accConn->prepare($query);
 
         if (!empty($params)) {
             $stmt->bind_param($types, ...$params);
@@ -408,13 +405,13 @@ function getAllLedgerAccounts($filters = [], $options = [])
 
 /**
  * Get chart of accounts in hierarchical structure
- * @param string $account_type Optional filter by account type
+ * @param string|null $account_type Optional filter by account type
  * @param string $status Optional status filter (active|inactive|all)
  * @return array Hierarchical array of accounts
  */
-function getChartOfAccounts($account_type = null, $status = 'active')
+function getLedgerAccountHierarchy($account_type = null, string $status = 'active')
 {
-    global $conn;
+    $accConn = accounting_db_connection();
 
     try {
         $conditions = [];
@@ -424,7 +421,7 @@ function getChartOfAccounts($account_type = null, $status = 'active')
         if ($status === 'inactive') {
             $conditions[] = 'a.active = 0';
         } elseif ($status === 'all') {
-            // no condition, include all
+            // include all statuses
         } else {
             $conditions[] = 'a.active = 1';
         }
@@ -447,7 +444,7 @@ function getChartOfAccounts($account_type = null, $status = 'active')
             ORDER BY a.account_type, a.account_number ASC, a.name ASC
         ";
 
-        $stmt = $conn->prepare($query);
+        $stmt = $accConn->prepare($query);
 
         if (!empty($params)) {
             $stmt->bind_param($types, ...$params);
@@ -475,12 +472,10 @@ function getChartOfAccounts($account_type = null, $status = 'active')
         // Second pass: build hierarchy
         foreach ($all_accounts as $account) {
             if ($account['parent_account_id']) {
-                // Add as child to parent
                 if (isset($indexed_accounts[$account['parent_account_id']])) {
                     $indexed_accounts[$account['parent_account_id']]['children'][] = &$indexed_accounts[$account['id']];
                 }
             } else {
-                // Top level account
                 $chart[] = &$indexed_accounts[$account['id']];
             }
         }
@@ -500,7 +495,7 @@ function getChartOfAccounts($account_type = null, $status = 'active')
  */
 function getAccountBalance($account_id, $as_of_date = null)
 {
-    global $conn;
+    $accConn = accounting_db_connection();
 
     try {
         if (!$account_id || !is_numeric($account_id)) {
@@ -508,7 +503,7 @@ function getAccountBalance($account_id, $as_of_date = null)
         }
 
         $account_type = 'Asset';
-        $acct_stmt = $conn->prepare("SELECT account_type FROM acc_ledger_accounts WHERE id = ?");
+        $acct_stmt = $accConn->prepare("SELECT account_type FROM acc_ledger_accounts WHERE id = ?");
         if ($acct_stmt) {
             $acct_stmt->bind_param('i', $account_id);
             if ($acct_stmt->execute()) {
@@ -530,7 +525,7 @@ function getAccountBalance($account_id, $as_of_date = null)
             $types .= 's';
         }
 
-        $stmt = $conn->prepare("
+        $stmt = $accConn->prepare("
             SELECT 
                 SUM(CASE WHEN type IN ('Income', 'Asset') THEN amount ELSE 0 END) - 
                 SUM(CASE WHEN type = 'Expense' THEN amount ELSE 0 END) AS balance
@@ -555,7 +550,7 @@ function getAccountBalance($account_id, $as_of_date = null)
             $journal_types .= 's';
         }
 
-        $journal_stmt = $conn->prepare("
+        $journal_stmt = $accConn->prepare("
             SELECT 
                 COALESCE(SUM(jl.debit), 0) AS total_debit,
                 COALESCE(SUM(jl.credit), 0) AS total_credit
@@ -595,10 +590,8 @@ function getAccountBalance($account_id, $as_of_date = null)
  */
 function validateLedgerAccountData($data, $exclude_id = null)
 {
-    global $conn;
+    $accConn = accounting_db_connection();
     $errors = [];
-
-    // Required fields
     $required_fields = ['name', 'account_number', 'account_type'];
     foreach ($required_fields as $field) {
         if (empty($data[$field])) {
@@ -627,7 +620,7 @@ function validateLedgerAccountData($data, $exclude_id = null)
                 $types .= 'i';
             }
 
-            $stmt = $conn->prepare($query);
+            $stmt = $accConn->prepare($query);
             $stmt->bind_param($types, ...$params);
             $stmt->execute();
 

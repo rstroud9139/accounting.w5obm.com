@@ -1,13 +1,11 @@
 <?php
 
-declare(strict_types=1);
-
-session_start();
-
 require_once __DIR__ . '/../../include/session_init.php';
 require_once __DIR__ . '/../../include/dbconn.php';
 require_once __DIR__ . '/../lib/helpers.php';
 require_once __DIR__ . '/../utils/csrf.php';
+
+/** @var mysqli $accConn */
 
 csrf_ensure_token();
 
@@ -24,8 +22,8 @@ if (!hasPermission($userId, 'accounting_manage')) {
 }
 
 $seedData = require __DIR__ . '/../data/coa_seed.php';
-$accountsSeed = $seedData['accounts'] ?? [];
-$categoriesSeed = $seedData['categories'] ?? [];
+$accountsSeed = isset($seedData['accounts']) && is_array($seedData['accounts']) ? $seedData['accounts'] : [];
+$categoriesSeed = isset($seedData['categories']) && is_array($seedData['categories']) ? $seedData['categories'] : [];
 
 $resultMessages = [];
 $errorMessages = [];
@@ -60,7 +58,7 @@ function upsertLedgerAccount(mysqli $conn, array $account, int $userId): void
         if (!$update) {
             throw new RuntimeException('Unable to prepare ledger update: ' . $conn->error);
         }
-        $parentParam = $parentId ?? null;
+        $parentParam = $parentId;
         $templateCode = $account['code'];
         $update->bind_param(
             'sssissii',
@@ -81,10 +79,10 @@ function upsertLedgerAccount(mysqli $conn, array $account, int $userId): void
         if (!$insert) {
             throw new RuntimeException('Unable to prepare ledger insert: ' . $conn->error);
         }
-        $parentParam = $parentId ?? null;
+        $parentParam = $parentId;
         $templateCode = $account['code'];
         $insert->bind_param(
-            'ssssiisss',
+            'ssssiiiss',
             $account['name'],
             $account['description'],
             $account['account_number'],
@@ -131,6 +129,59 @@ function upsertCategory(mysqli $conn, array $category): void
     }
 }
 
+function seedCoaTemplates(mysqli $conn, array $accounts): void
+{
+    $sql = 'INSERT INTO acc_coa_templates (code, account_number, name, account_type, normal_balance, description, parent_code, reporting_category)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            ON DUPLICATE KEY UPDATE account_number = VALUES(account_number), name = VALUES(name), account_type = VALUES(account_type), normal_balance = VALUES(normal_balance), description = VALUES(description), parent_code = VALUES(parent_code), reporting_category = VALUES(reporting_category)';
+    $stmt = $conn->prepare($sql);
+    if (!$stmt) {
+        throw new RuntimeException('Unable to prepare COA template upsert: ' . $conn->error);
+    }
+    foreach ($accounts as $account) {
+        $parent = isset($account['parent_code']) ? $account['parent_code'] : null;
+        $reportingCategory = isset($account['reporting_category']) ? $account['reporting_category'] : null;
+        $stmt->bind_param(
+            'ssssssss',
+            $account['code'],
+            $account['account_number'],
+            $account['name'],
+            $account['account_type'],
+            $account['normal_balance'],
+            $account['description'],
+            $parent,
+            $reportingCategory
+        );
+        $stmt->execute();
+    }
+    $stmt->close();
+}
+
+function seedCategoryTemplates(mysqli $conn, array $categories): void
+{
+    $sql = 'INSERT INTO acc_category_templates (code, name, account_type, description, default_account_number, reporting_group)
+            VALUES (?, ?, ?, ?, ?, ?)
+            ON DUPLICATE KEY UPDATE name = VALUES(name), account_type = VALUES(account_type), description = VALUES(description), default_account_number = VALUES(default_account_number), reporting_group = VALUES(reporting_group)';
+    $stmt = $conn->prepare($sql);
+    if (!$stmt) {
+        throw new RuntimeException('Unable to prepare category template upsert: ' . $conn->error);
+    }
+    foreach ($categories as $category) {
+        $reportingGroup = isset($category['reporting_group']) ? $category['reporting_group'] : null;
+        $stmt->bind_param(
+            'ssssss',
+            $category['code'],
+            $category['name'],
+            $category['account_type'],
+            $category['description'],
+            $category['default_account_number'],
+            $reportingGroup
+        );
+        $stmt->execute();
+    }
+    $stmt->close();
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
         csrf_verify_post_or_throw();
@@ -154,20 +205,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
         $resultMessages[] = 'Categories synchronized (' . count($categoriesSeed) . ' templates).';
 
+        seedCoaTemplates($accConn, $accountsSeed);
+        seedCategoryTemplates($accConn, $categoriesSeed);
+        $resultMessages[] = 'Template tables updated for future provisioning.';
+
         if (function_exists('logActivity')) {
             @logActivity($userId, 'seed_chart_of_accounts', 'acc_ledger_accounts', null, 'Seeded chart + categories from template set');
         }
 
         $didSeed = true;
-    } catch (Throwable $ex) {
+    } catch (Exception $ex) {
         $errorMessages[] = $ex->getMessage();
     }
 }
 
 $pageTitle = 'Seed Chart of Accounts & Categories';
-include __DIR__ . '/../../include/header.php';
-include __DIR__ . '/../../include/menu.php';
 ?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title><?= htmlspecialchars($pageTitle, ENT_QUOTES, 'UTF-8'); ?></title>
+    <?php include __DIR__ . '/../../include/header.php'; ?>
+</head>
+<body class="accounting-app bg-light">
+<?php include __DIR__ . '/../../include/menu.php'; ?>
 
 <div class="page-container accounting-app bg-light">
     <div class="container py-4">
@@ -227,3 +289,5 @@ include __DIR__ . '/../../include/menu.php';
 </div>
 
 <?php include __DIR__ . '/../../include/footer.php'; ?>
+</body>
+</html>

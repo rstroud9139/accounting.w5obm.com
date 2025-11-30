@@ -17,6 +17,14 @@ require_once __DIR__ . '/lib/dashboard_metrics.php';
 
 $cash_balance = 0.00;
 $asset_value = 0.00;
+$asset_current_value = 0.00;
+$asset_summary = [
+    'count' => 0,
+    'book_total' => 0.0,
+    'current_total' => 0.0,
+    'depreciable_count' => 0,
+    'avg_age_years' => 0.0,
+];
 $month_totals = ['income' => 0.00, 'expenses' => 0.00, 'net_balance' => 0.00];
 $ytd_totals = ['income' => 0.00, 'expenses' => 0.00, 'net_balance' => 0.00];
 $recent_transactions = [];
@@ -28,6 +36,11 @@ csrf_ensure_token();
 $metrics = accounting_collect_dashboard_metrics($accConn ?? null, $conn ?? null, 25);
 $cash_balance = $metrics['cash_balance'];
 $asset_value = $metrics['asset_value'];
+$asset_summary = $metrics['asset_summary'] ?? $asset_summary;
+if (($asset_summary['count'] ?? 0) > 0) {
+    $asset_value = $asset_summary['book_total'];
+}
+$asset_current_value = $asset_summary['current_total'] ?? 0.0;
 $month_totals = $metrics['month_totals'];
 $ytd_totals = $metrics['ytd_totals'];
 $recent_transactions = $metrics['recent_transactions'];
@@ -157,7 +170,7 @@ $quickPostToday = date('Y-m-d');
                     <i class="fas fa-boxes text-info"></i>
                 </div>
                 <h4 class="mb-0">$<?= number_format($asset_value, 2) ?></h4>
-                <small class="text-muted">Physical assets</small>
+                <small class="text-muted">Physical assets (book)</small>
             </div>
         </div>
         <div class="col-md-3 col-sm-6 mb-3">
@@ -183,6 +196,47 @@ $quickPostToday = date('Y-m-d');
             </div>
         </div>
     </div>
+
+    <?php if (($asset_summary['count'] ?? 0) > 0): ?>
+        <?php
+            $assetDepreciableLabel = number_format($asset_summary['depreciable_count']) . ' / ' . number_format(max(1, $asset_summary['count']));
+            $assetAvgAgeLabel = $asset_summary['avg_age_years'] > 0
+                ? number_format($asset_summary['avg_age_years'], 1) . ' yrs'
+                : '—';
+        ?>
+        <div class="row g-3 mb-4 asset-summary-row">
+            <div class="col-md-4 col-sm-6">
+                <div class="border rounded p-3 h-100 bg-light hero-summary-card">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="text-muted small">Current Value</span>
+                        <i class="fas fa-gem text-success"></i>
+                    </div>
+                    <h4 class="mb-0">$<?= number_format($asset_current_value, 2) ?></h4>
+                    <small class="text-muted">Straight-line depreciation</small>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-6">
+                <div class="border rounded p-3 h-100 bg-light hero-summary-card">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="text-muted small">Depreciable Coverage</span>
+                        <i class="fas fa-percentage text-warning"></i>
+                    </div>
+                    <h4 class="mb-0"><?= $assetDepreciableLabel ?></h4>
+                    <small class="text-muted">Depreciable / total assets</small>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-6">
+                <div class="border rounded p-3 h-100 bg-light hero-summary-card">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="text-muted small">Average Age</span>
+                        <i class="fas fa-hourglass-half text-secondary"></i>
+                    </div>
+                    <h4 class="mb-0"><?= $assetAvgAgeLabel ?></h4>
+                    <small class="text-muted">Across <?= number_format($asset_summary['count']) ?> assets</small>
+                </div>
+            </div>
+        </div>
+    <?php endif; ?>
 
     <div class="row g-3 mb-4 control-center-grid">
         <div class="col-lg-4 col-md-6">

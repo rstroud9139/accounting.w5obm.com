@@ -16,6 +16,7 @@ require_once __DIR__ . '/../lib/helpers.php';
 require_once __DIR__ . '/../controllers/transactionController.php';
 require_once __DIR__ . '/../views/transactionList.php';
 require_once __DIR__ . '/../../include/premium_hero.php';
+require_once __DIR__ . '/../include/accounting_nav_helpers.php';
 
 // Authentication gate
 if (!isAuthenticated()) {
@@ -44,6 +45,7 @@ error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
 $page_title = 'Transactions - W5OBM Accounting';
+$shouldLaunchAddModal = $can_add_transactions && isset($_GET['start']) && strtolower((string)$_GET['start']) === 'add';
 
 // Handle legacy status query params forwarded from deprecated pages
 if (!empty($_GET['status'])) {
@@ -414,44 +416,13 @@ $transactionHeroActions = array_values(array_filter([
 
     <div class="row">
         <div class="col-lg-3 mb-4">
-            <nav class="bg-light border rounded h-100 p-0 shadow-sm">
-                <div class="px-3 py-2 border-bottom">
-                    <span class="text-muted text-uppercase small">Workspace</span>
-                </div>
-                <div class="list-group list-group-flush">
-                    <a href="/accounting/dashboard.php" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
-                        <span><i class="fas fa-chart-pie me-2 text-primary"></i>Dashboard</span>
-                        <i class="fas fa-chevron-right small text-muted"></i>
-                    </a>
-                    <a href="/accounting/transactions/transactions.php" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center active">
-                        <span><i class="fas fa-exchange-alt me-2 text-success"></i>Transactions</span>
-                        <i class="fas fa-chevron-right small text-muted"></i>
-                    </a>
-                    <a href="/accounting/reports/reports_dashboard.php" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
-                        <span><i class="fas fa-chart-bar me-2 text-info"></i>Reports</span>
-                        <i class="fas fa-chevron-right small text-muted"></i>
-                    </a>
-                    <a href="/accounting/ledger/" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
-                        <span><i class="fas fa-book me-2 text-warning"></i>Chart of Accounts</span>
-                        <i class="fas fa-chevron-right small text-muted"></i>
-                    </a>
-                    <a href="/accounting/categories/" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
-                        <span><i class="fas fa-tags me-2 text-secondary"></i>Categories</span>
-                        <i class="fas fa-chevron-right small text-muted"></i>
-                    </a>
-                    <a href="/accounting/vendors/" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
-                        <span><i class="fas fa-store me-2 text-danger"></i>Vendors</span>
-                        <i class="fas fa-chevron-right small text-muted"></i>
-                    </a>
-                    <div class="list-group-item small text-muted text-uppercase">Other</div>
-                    <a href="/accounting/assets/" class="list-group-item list-group-item-action">
-                        <i class="fas fa-boxes me-2"></i>Assets
-                    </a>
-                    <a href="/accounting/donations/" class="list-group-item list-group-item-action">
-                        <i class="fas fa-heart me-2"></i>Donations
-                    </a>
-                </div>
-            </nav>
+            <?php if (function_exists('accounting_render_workspace_nav')): ?>
+                <?php accounting_render_workspace_nav('transactions', [
+                    'user_id' => $user_id,
+                    'can_manage' => $can_manage_transactions,
+                    'can_add' => $can_add_transactions,
+                ]); ?>
+            <?php endif; ?>
         </div>
 
         <div class="col-lg-9 mb-4">
@@ -473,6 +444,18 @@ $transactionHeroActions = array_values(array_filter([
 </div>
 
     <?php include __DIR__ . '/../../include/footer.php'; ?>
+    <?php if ($shouldLaunchAddModal): ?>
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                var modalElement = document.getElementById('addTransactionModal');
+                if (!modalElement || typeof bootstrap === 'undefined') {
+                    return;
+                }
+                var modal = bootstrap.Modal.getOrCreateInstance(modalElement);
+                modal.show();
+            });
+        </script>
+    <?php endif; ?>
 </body>
 
 </html>

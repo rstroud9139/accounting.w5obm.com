@@ -123,13 +123,21 @@ if (!function_exists('renderPremiumHero')) {
 
                 .premium-hero__actions .btn {
                     min-width: 160px;
-                    color: var(--bs-btn-color, #fff);
                     font-weight: 600;
+                    box-shadow: 0 10px 30px rgba(0, 0, 0, .25);
+                }
+
+                .premium-hero__actions .btn.btn-link {
+                    box-shadow: none;
+                    padding-left: 0;
+                    padding-right: 0;
                 }
 
                 .premium-hero__media {
                     flex: 1 1 320px;
                     min-height: 320px;
+                    height: 320px;
+                    max-height: 320px;
                     border-radius: 22px;
                     overflow: hidden;
                     position: relative;
@@ -221,6 +229,8 @@ if (!function_exists('renderPremiumHero')) {
 
                 .premium-hero--compact .premium-hero__media {
                     min-height: 240px;
+                    height: 240px;
+                    max-height: 240px;
                 }
 
                 .premium-hero--compact .premium-hero__highlights {
@@ -234,6 +244,7 @@ if (!function_exists('renderPremiumHero')) {
 
                 .premium-hero__carousel .carousel-item {
                     min-height: 320px;
+                    height: 100%;
                 }
 
                 .premium-hero__carousel img {
@@ -308,6 +319,8 @@ if (!function_exists('renderPremiumHero')) {
 
                     .premium-hero__media {
                         min-height: 240px;
+                        height: 240px;
+                        max-height: 240px;
                     }
                 }
             </style>
@@ -343,10 +356,32 @@ if (!function_exists('renderPremiumHero')) {
             foreach ($actions as $action) {
                 $label = htmlspecialchars($action['label'] ?? 'Learn more', ENT_QUOTES, 'UTF-8');
                 $url = htmlspecialchars($action['url'] ?? '#', ENT_QUOTES, 'UTF-8');
-                $variant = $action['variant'] ?? 'primary';
+                $variant = strtolower((string)($action['variant'] ?? 'solid'));
                 $icon = $action['icon'] ?? '';
                 $target = !empty($action['external']) ? ' target="_blank" rel="noopener"' : '';
-                $btnClass = $variant === 'outline' ? 'btn btn-outline-light' : 'btn btn-light text-primary fw-semibold';
+                switch ($variant) {
+                    case 'outline':
+                    case 'outline-light':
+                        $btnClass = 'btn btn-outline-light text-white border-2';
+                        break;
+                    case 'dark':
+                        $btnClass = 'btn btn-dark text-white fw-semibold';
+                        break;
+                    case 'primary':
+                        $btnClass = 'btn btn-primary text-white fw-semibold';
+                        break;
+                    case 'secondary':
+                        $btnClass = 'btn btn-secondary text-white fw-semibold';
+                        break;
+                    case 'ghost':
+                    case 'link':
+                        $btnClass = 'btn btn-link text-white text-decoration-none fw-semibold';
+                        break;
+                    case 'solid':
+                    default:
+                        $btnClass = 'btn btn-light text-dark fw-semibold';
+                        break;
+                }
                 echo '<a class="' . $btnClass . '" href="' . $url . '"' . $target . '>';
                 if ($icon) {
                     echo '<i class="fas ' . htmlspecialchars($icon, ENT_QUOTES, 'UTF-8') . ' me-2"></i>';

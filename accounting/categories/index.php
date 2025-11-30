@@ -212,7 +212,7 @@ $categoryHeroActions = array_values(array_filter([
                 'chips' => $categoryHeroChips,
                 'highlights' => $categoryHeroHighlights,
                 'actions' => $categoryHeroActions,
-                'theme' => 'emerald',
+                'theme' => 'midnight',
                 'size' => 'compact',
                 'media_mode' => 'none',
             ]); ?>

@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Ledger Register Mockup</title>
+    <link rel="stylesheet" href="mockups.css">
+</head>
+<body>
+    <div class="mockup-shell">
+        <div class="mockup-header">
+            <div>
+                <h1>Ledger Register</h1>
+                <p class="annotation">Category ➜ Account ➜ Date layout. Transaction details open in a modal from the Actions column.</p>
+            </div>
+            <div class="badge-pill">Filters Active · Account: Main Checking</div>
+        </div>
+
+        <div class="mockup-grid">
+            <div>
+                <div class="mockup-card" style="padding: 16px;">
+                    <div class="ledger-table-wrap">
+                    <table class="table-ledger">
+                        <thead>
+                            <tr>
+                                <th style="width: 16%">Category</th>
+                                <th style="width: 10%">Acct #</th>
+                                <th style="width: 18%">Account</th>
+                                <th style="width: 16%">Transaction Date</th>
+                                <th style="width: 12%">Debit</th>
+                                <th style="width: 12%">Credit</th>
+                                <th style="width: 12%">Balance</th>
+                                <th style="width: 12%">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="category-cell" rowspan="3">Income</td>
+                                <td class="account-number-cell" rowspan="2">4100</td>
+                                <td class="account-cell" rowspan="2">
+                                    <span class="indent account-name">Membership Dues</span>
+                                    <span class="indent account-meta">Deposits from CRM</span>
+                                </td>
+                                <td>Nov 26, 2025</td>
+                                <td class="amount-debit">$5,940.00</td>
+                                <td class="amount-credit">$0.00</td>
+                                <td class="amount-balance">$35,430.55</td>
+                                <td class="actions-cell">
+                                    <button class="btn-icon" title="Details">🔍</button>
+                                    <button class="btn-icon" title="Reverse">↺</button>
+                                    <button class="btn-icon" title="Adjust">✎</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Nov 12, 2025</td>
+                                <td class="amount-debit">$2,130.00</td>
+                                <td class="amount-credit">$0.00</td>
+                                <td class="amount-balance">$29,490.55</td>
+                                <td class="actions-cell">
+                                    <button class="btn-icon" title="Details">🔍</button>
+                                    <button class="btn-icon" title="Reverse">↺</button>
+                                </td>
+                            </tr>
+                            <tr class="ledger-empty">
+                                <td class="account-number-cell">4150</td>
+                                <td class="account-cell">
+                                    <span class="indent account-name">Grant Awards</span>
+                                    <span class="indent account-meta">Awaiting new activity</span>
+                                </td>
+                                <td class="no-transactions">—</td>
+                                <td class="amount-debit">$0.00</td>
+                                <td class="amount-credit">$0.00</td>
+                                <td class="amount-balance">$12,500.00</td>
+                                <td class="actions-cell">
+                                    <button class="btn-icon" title="New Entry">＋</button>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td class="category-cell" rowspan="3">Expenses</td>
+                                <td class="account-number-cell" rowspan="2">5200</td>
+                                <td class="account-cell" rowspan="2">
+                                    <span class="indent account-name">Equipment Maintenance</span>
+                                    <span class="indent account-meta">Capital projects</span>
+                                </td>
+                                <td>Nov 27, 2025</td>
+                                <td class="amount-debit">$0.00</td>
+                                <td class="amount-credit">$1,250.00</td>
+                                <td class="amount-balance">$34,180.55</td>
+                                <td class="actions-cell">
+                                    <button class="btn-icon" title="Details">🔍</button>
+                                    <button class="btn-icon" title="Reverse">↺</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Nov 24, 2025</td>
+                                <td class="amount-debit">$2,400.00</td>
+                                <td class="amount-credit">$0.00</td>
+                                <td class="amount-balance">$27,090.55</td>
+                                <td class="actions-cell">
+                                    <button class="btn-icon" title="Details">🔍</button>
+                                    <button class="btn-icon" title="Adjust">✎</button>
+                                </td>
+                            </tr>
+                            <tr class="ledger-empty">
+                                <td class="account-number-cell">5400</td>
+                                <td class="account-cell">
+                                    <span class="indent account-name">Admin Overhead</span>
+                                    <span class="indent account-meta">Operations reserve</span>
+                                </td>
+                                <td class="no-transactions">—</td>
+                                <td class="amount-debit">$0.00</td>
+                                <td class="amount-credit">$0.00</td>
+                                <td class="amount-balance">$3,800.00</td>
+                                <td class="actions-cell">
+                                    <button class="btn-icon" title="New Entry">＋</button>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td class="category-cell">Equity</td>
+                                <td class="account-number-cell">3900</td>
+                                <td class="account-cell">
+                                    <span class="indent account-name">Retained Earnings</span>
+                                    <span class="indent account-meta">Brought forward balance</span>
+                                </td>
+                                <td class="no-transactions">—</td>
+                                <td class="amount-debit">$0.00</td>
+                                <td class="amount-credit">$0.00</td>
+                                <td class="amount-balance">$152,000.00</td>
+                                <td class="actions-cell">
+                                    <button class="btn-icon" title="Details">🔍</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    </div>
+                </div>
+
+                <div class="mockup-card">
+                    <h2>Entry Actions</h2>
+                    <p class="annotation">Each action launches a modal with required audit documentation and reference fields.</p>
+                    <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                        <button class="btn-primary">New Entry</button>
+                        <button class="btn-outline">Reverse Entry</button>
+                        <button class="btn-outline">Adjust Entry</button>
+                        <button class="btn-outline">Transaction Details</button>
+                    </div>
+                </div>
+            </div>
+
+            <aside class="audit-sidebar">
+                <h3>Audit & Filters</h3>
+                <p class="annotation" style="color: rgba(255,255,255,0.7);">Sidebar will list active filters and the latest manual changes with who/why metadata.</p>
+                <div class="mockup-card" style="background: rgba(15,23,42,0.4); box-shadow:none; color:#fff;">
+                    <h4 style="margin-top:0;">Active Filters</h4>
+                    <ul class="audit-list">
+                        <li>
+                            <strong>Account</strong><br>
+                            Main Checking · 1001
+                        </li>
+                        <li>
+                            <strong>Date Range</strong><br>
+                            Nov 1 – Nov 30, 2025
+                        </li>
+                        <li>
+                            <strong>Status</strong><br>
+                            All entries · Include reversals
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="mockup-card" style="background: rgba(15,23,42,0.4); box-shadow:none; color:#fff;">
+                    <h4 style="margin-top:0;">Recent Manual Changes</h4>
+                    <ul class="audit-list">
+                        <li>
+                            Nov 24 · Adjust Entry<br>
+                            <em>by J. Parker</em><br>
+                            Reason: Updated vendor invoice reference.
+                        </li>
+                        <li>
+                            Nov 22 · Reverse Entry<br>
+                            <em>by C. Smith</em><br>
+                            Reason: Duplicate import detected. Auto reversal posted.
+                        </li>
+                        <li>
+                            Nov 20 · New Entry<br>
+                            <em>by K. Wilson</em><br>
+                            Reason: Manual accrual for tower maintenance.
+                        </li>
+                    </ul>
+                </div>
+            </aside>
+        </div>
+    </div>
+
+    <!-- Example modal overlay (hidden until triggered) -->
+    <div class="modal-backdrop" style="display: none;">
+        <div class="modal">
+            <h2>New Ledger Entry</h2>
+            <div class="form-group">
+                <label>Date</label>
+                <input type="date" value="2025-11-28">
+            </div>
+            <div class="form-group">
+                <label>Account</label>
+                <select>
+                    <option>Main Checking · 1001</option>
+                    <option>Capital Reserve · 1500</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Entry Description</label>
+                <input type="text" placeholder="Short memo...">
+            </div>
+            <div class="form-group">
+                <label>Debit</label>
+                <input type="number" placeholder="0.00">
+            </div>
+            <div class="form-group">
+                <label>Credit</label>
+                <input type="number" placeholder="0.00">
+            </div>
+            <div class="form-group">
+                <label>Audit Note (Required)</label>
+                <textarea rows="3" placeholder="Explain why this direct ledger change is needed..."></textarea>
+                <div class="form-help">Will appear in history sidebar + audit export.</div>
+            </div>
+            <div class="modal-actions">
+                <button class="btn-outline">Cancel</button>
+                <button class="btn-primary">Post Entry</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Transaction detail modal (hidden placeholder) -->
+    <div class="modal-backdrop" style="display: none;">
+        <div class="modal" style="max-width: 560px;">
+            <h2>Entry Details · Membership Dues</h2>
+            <div class="form-group">
+                <label>Account</label>
+                <div class="indent">Membership Dues · 4100</div>
+            </div>
+            <div class="form-group" style="display:flex; gap:10px;">
+                <div style="flex:1;">
+                    <label>Transaction Date</label>
+                    <div>Nov 26, 2025 · 10:14 AM</div>
+                </div>
+                <div style="flex:1;">
+                    <label>Batch Source</label>
+                    <div>Donations Import · CSV #2025-11</div>
+                </div>
+            </div>
+            <div class="form-group" style="display:flex; gap:10px;">
+                <div style="flex:1;">
+                    <label>Debit</label>
+                    <div class="amount-debit">$5,940.00</div>
+                </div>
+                <div style="flex:1;">
+                    <label>Credit</label>
+                    <div class="amount-credit">$0.00</div>
+                </div>
+                <div style="flex:1;">
+                    <label>Running Balance</label>
+                    <div class="amount-balance">$35,430.55</div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Documentation</label>
+                <div class="annotation">18 contributors · Receipt bundle stored · Reconciliation status pending</div>
+            </div>
+            <div class="form-group">
+                <label>Audit Note</label>
+                <div class="annotation">Posted automatically via approved import. Manual edits will require justification.</div>
+            </div>
+            <div class="modal-actions">
+                <button class="btn-outline">Close</button>
+                <button class="btn-primary">Reverse Entry</button>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

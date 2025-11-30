@@ -72,7 +72,7 @@ if ($filters['status'] !== 'all') {
 
 try {
     // Get chart of accounts in hierarchical structure
-    $chart_of_accounts = getChartOfAccounts($filters['account_type'] ?? null, $filters['status']);
+    $chart_of_accounts = getLedgerAccountHierarchy($filters['account_type'] ?? null, $filters['status']);
 
     // If we have search, get flat list instead
     if (!empty($filters['search'])) {

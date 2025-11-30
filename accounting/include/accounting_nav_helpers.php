@@ -59,8 +59,39 @@ if (!function_exists('accounting_render_workspace_nav')) {
     {
         $userId = $options['user_id'] ?? accounting_resolve_user_id();
         $hasPermissionFn = function_exists('hasPermission') ? 'hasPermission' : null;
-        $canManage = $options['can_manage'] ?? ($hasPermissionFn ? ($hasPermissionFn)($userId, 'accounting_manage') : true);
-        $canAdd = $options['can_add'] ?? ($canManage || ($hasPermissionFn ? ($hasPermissionFn)($userId, 'accounting_add') : true));
+        $roleOverride = false;
+        if (function_exists('isSuperAdmin') && isSuperAdmin($userId)) {
+            $roleOverride = true;
+        } elseif (function_exists('isAdmin') && isAdmin($userId)) {
+            $roleOverride = true;
+        }
+
+        $hasPermissionCheck = static function (?string $permission) use ($hasPermissionFn, $userId) {
+            if (!$permission || !$hasPermissionFn) {
+                return true;
+            }
+            try {
+                return (bool)($hasPermissionFn)($userId, $permission);
+            } catch (Exception $e) {
+                error_log('Workspace nav permission error: ' . $e->getMessage());
+                return false;
+            }
+        };
+
+        $hasAnyPermission = static function (?array $permissions = null) use ($hasPermissionCheck, $roleOverride) {
+            if ($roleOverride || empty($permissions)) {
+                return true;
+            }
+            foreach ($permissions as $permission) {
+                if ($hasPermissionCheck($permission)) {
+                    return true;
+                }
+            }
+            return false;
+        };
+
+        $canManage = $options['can_manage'] ?? $hasAnyPermission(['accounting_manage']);
+        $canAdd = $options['can_add'] ?? $hasAnyPermission(['accounting_add', 'accounting_manage']);
 
         $navItems = [
             'workspace' => array_values(array_filter([
@@ -68,8 +99,9 @@ if (!function_exists('accounting_render_workspace_nav')) {
                     'key' => 'transactions-new',
                     'label' => 'Add Transaction',
                     'icon' => 'fa-plus-circle text-success',
-                    'url' => '/accounting/transactions/add_transaction.php',
+                    'url' => '/accounting/transactions/transactions.php?start=add',
                     'chevron' => true,
+                    'permissions' => ['accounting_add', 'accounting_manage'],
                 ] : null,
                 [
                     'key' => 'dashboard',
@@ -77,6 +109,7 @@ if (!function_exists('accounting_render_workspace_nav')) {
                     'icon' => 'fa-chart-pie text-primary',
                     'url' => '/accounting/dashboard.php',
                     'chevron' => true,
+                    'permissions' => ['accounting_view', 'accounting_manage'],
                 ],
                 [
                     'key' => 'transactions',
@@ -84,6 +117,7 @@ if (!function_exists('accounting_render_workspace_nav')) {
                     'icon' => 'fa-exchange-alt text-secondary',
                     'url' => '/accounting/transactions/transactions.php',
                     'chevron' => true,
+                    'permissions' => ['accounting_view', 'accounting_manage'],
                 ],
                 [
                     'key' => 'reports',
@@ -91,6 +125,7 @@ if (!function_exists('accounting_render_workspace_nav')) {
                     'icon' => 'fa-chart-bar text-success',
                     'url' => '/accounting/reports_dashboard.php',
                     'chevron' => true,
+                    'permissions' => ['accounting_view', 'accounting_manage'],
                 ],
                 [
                     'key' => 'imports',
@@ -98,6 +133,7 @@ if (!function_exists('accounting_render_workspace_nav')) {
                     'icon' => 'fa-file-import text-info',
                     'url' => '/accounting/imports.php',
                     'chevron' => true,
+                    'permissions' => ['accounting_manage'],
                 ],
                 [
                     'key' => 'ledger',
@@ -105,6 +141,15 @@ if (!function_exists('accounting_render_workspace_nav')) {
                     'icon' => 'fa-book text-warning',
                     'url' => '/accounting/ledger/',
                     'chevron' => true,
+                    'permissions' => ['accounting_manage'],
+                ],
+                [
+                    'key' => 'budgets',
+                    'label' => 'Budgets',
+                    'icon' => 'fa-wallet text-secondary',
+                    'url' => '/accounting/budgets/',
+                    'chevron' => true,
+                    'permissions' => ['accounting_view', 'accounting_manage'],
                 ],
                 [
                     'key' => 'categories',
@@ -112,6 +157,7 @@ if (!function_exists('accounting_render_workspace_nav')) {
                     'icon' => 'fa-tags text-info',
                     'url' => '/accounting/categories/',
                     'chevron' => true,
+                    'permissions' => ['accounting_view', 'accounting_manage'],
                 ],
                 [
                     'key' => 'vendors',
@@ -119,6 +165,7 @@ if (!function_exists('accounting_render_workspace_nav')) {
                     'icon' => 'fa-store text-danger',
                     'url' => '/accounting/vendors/',
                     'chevron' => true,
+                    'permissions' => ['accounting_view', 'accounting_manage'],
                 ],
             ])),
             'other' => [
@@ -128,6 +175,7 @@ if (!function_exists('accounting_render_workspace_nav')) {
                     'icon' => 'fa-boxes text-primary',
                     'url' => '/accounting/assets/list.php',
                     'chevron' => false,
+                    'permissions' => ['accounting_view', 'accounting_manage', 'accounting_add'],
                 ],
                 [
                     'key' => 'donations',
@@ -135,9 +183,17 @@ if (!function_exists('accounting_render_workspace_nav')) {
                     'icon' => 'fa-heart text-danger',
                     'url' => '/accounting/donations/index.php',
                     'chevron' => false,
+                    'permissions' => ['accounting_view', 'accounting_manage'],
                 ],
             ],
         ];
+
+        $navItems['workspace'] = array_values(array_filter($navItems['workspace'], static function ($item) use ($hasAnyPermission) {
+            return $hasAnyPermission($item['permissions'] ?? []);
+        }));
+        $navItems['other'] = array_values(array_filter($navItems['other'], static function ($item) use ($hasAnyPermission) {
+            return $hasAnyPermission($item['permissions'] ?? []);
+        }));
 
         echo '<nav class="accounting-workspace-nav bg-white border rounded shadow-sm h-100">';
         echo '<div class="px-3 py-2 border-bottom"><span class="text-muted text-uppercase small">Workspace</span></div>';

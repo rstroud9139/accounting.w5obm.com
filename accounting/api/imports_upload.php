@@ -63,6 +63,16 @@ if (!isAdmin($userId) && !hasPermission($userId, 'app.accounting') && !hasPermis
     respond(403, ['success' => false, 'error' => 'Insufficient permissions.']);
 }
 
+try {
+    $accConn = accounting_db_connection();
+} catch (Throwable $dbEx) {
+    imports_upload_log('Accounting DB unavailable', [
+        'user_id' => $userId,
+        'message' => $dbEx->getMessage(),
+    ]);
+    respond(500, ['success' => false, 'error' => 'Accounting database connection unavailable.']);
+}
+
 accounting_imports_ensure_tables($accConn);
 $sourceTypes = accounting_imports_get_source_types();
 $sourceType = trim((string)($_POST['source_type'] ?? ''));
@@ -102,13 +112,13 @@ try {
     accounting_imports_populate_batch($accConn, $batchId, $sourceType, $fileMeta);
     imports_upload_log('Batch staged', ['user_id' => $userId, 'batch_id' => $batchId]);
 } catch (RuntimeException $ex) {
-    if (isset($batchId)) {
+    if (isset($batchId) && $accConn instanceof mysqli) {
         $accConn->query('DELETE FROM acc_import_batches WHERE id = ' . (int)$batchId);
     }
     imports_upload_log('Runtime staging error', ['user_id' => $userId, 'message' => $ex->getMessage()]);
     respond(400, ['success' => false, 'error' => $ex->getMessage()]);
 } catch (Throwable $ex) {
-    if (isset($batchId)) {
+    if (isset($batchId) && $accConn instanceof mysqli) {
         $accConn->query('DELETE FROM acc_import_batches WHERE id = ' . (int)$batchId);
     }
     imports_upload_log('Unexpected staging error', [

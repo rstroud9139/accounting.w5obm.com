@@ -13,6 +13,23 @@ if (is_file($__global_helpers)) {
     require_once $__global_helpers;
 }
 
+if (!function_exists('accounting_db_connection')) {
+    function accounting_db_connection(): mysqli
+    {
+        global $accConn, $conn;
+
+        if (isset($accConn) && $accConn instanceof mysqli && $accConn->connect_errno === 0) {
+            return $accConn;
+        }
+
+        if (isset($conn) && $conn instanceof mysqli) {
+            return $conn;
+        }
+
+        throw new RuntimeException('Accounting database connection is unavailable.');
+    }
+}
+
 // Fallback: basic sanitize
 if (!function_exists('sanitizeInput')) {
     function sanitizeInput($value, $type = 'string')

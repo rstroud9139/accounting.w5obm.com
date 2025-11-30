@@ -21,7 +21,7 @@ require_once __DIR__ . '/../lib/helpers.php';
  */
 function addTransaction($data)
 {
-    global $conn;
+    $accConn = accounting_db_connection();
 
     try {
         // Validate required fields
@@ -48,7 +48,7 @@ function addTransaction($data)
         }
 
         $transaction_type = ($data['type'] === 'Income') ? 'Deposit' : 'Payment';
-        $stmt = $conn->prepare("
+        $stmt = $accConn->prepare("
             INSERT INTO acc_transactions 
             (category_id, amount, transaction_date, description, type, account_id, vendor_id, reference_number, notes, transaction_type, created_by, created_at) 
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())
@@ -78,7 +78,7 @@ function addTransaction($data)
         );
 
         if ($stmt->execute()) {
-            $transaction_id = $conn->insert_id;
+            $transaction_id = $accConn->insert_id;
             $stmt->close();
 
             // Log activity
@@ -108,7 +108,7 @@ function addTransaction($data)
  */
 function updateTransaction($id, $data)
 {
-    global $conn;
+    $accConn = accounting_db_connection();
 
     try {
         // Validate ID
@@ -131,7 +131,7 @@ function updateTransaction($id, $data)
         }
 
         $transaction_type = ($data['type'] === 'Income') ? 'Deposit' : 'Payment';
-        $stmt = $conn->prepare("
+        $stmt = $accConn->prepare("
             UPDATE acc_transactions 
             SET category_id = ?, amount = ?, transaction_date = ?, description = ?, 
                 type = ?, account_id = ?, vendor_id = ?, reference_number = ?, 
@@ -191,7 +191,7 @@ function updateTransaction($id, $data)
  */
 function deleteTransaction($id)
 {
-    global $conn;
+    $accConn = accounting_db_connection();
 
     try {
         // Validate ID
@@ -211,7 +211,7 @@ function deleteTransaction($id)
             throw new Exception("Insufficient permissions to delete this transaction");
         }
 
-        $stmt = $conn->prepare("DELETE FROM acc_transactions WHERE id = ?");
+        $stmt = $accConn->prepare("DELETE FROM acc_transactions WHERE id = ?");
         $stmt->bind_param('i', $id);
 
         if ($stmt->execute()) {
@@ -243,14 +243,14 @@ function deleteTransaction($id)
  */
 function getTransactionById($id)
 {
-    global $conn;
+    $accConn = accounting_db_connection();
 
     try {
         if (!$id || !is_numeric($id)) {
             return false;
         }
 
-        $stmt = $conn->prepare("
+        $stmt = $accConn->prepare("
             SELECT t.*, 
                    c.name AS category_name,
                    a.name AS account_name, 
@@ -261,8 +261,8 @@ function getTransactionById($id)
             LEFT JOIN acc_transaction_categories c ON t.category_id = c.id 
             LEFT JOIN acc_ledger_accounts a ON t.account_id = a.id
             LEFT JOIN acc_vendors v ON t.vendor_id = v.id
-            LEFT JOIN auth_users cu ON t.created_by = cu.id
-            LEFT JOIN auth_users uu ON t.updated_by = uu.id
+            LEFT JOIN w5obm.auth_users cu ON t.created_by = cu.id
+            LEFT JOIN w5obm.auth_users uu ON t.updated_by = uu.id
             WHERE t.id = ?
         ");
 
@@ -287,7 +287,7 @@ function getTransactionById($id)
  */
 function getAllTransactions($filters = [], $limit = null, $offset = 0)
 {
-    global $conn;
+    $accConn = accounting_db_connection();
 
     try {
         $where_conditions = [];
@@ -361,7 +361,7 @@ function getAllTransactions($filters = [], $limit = null, $offset = 0)
             }
         }
 
-        $stmt = $conn->prepare($query);
+        $stmt = $accConn->prepare($query);
 
         if (!empty($params)) {
             $stmt->bind_param($types, ...$params);
@@ -411,7 +411,7 @@ function calculateTransactionTotals($filters = [])
         ];
     }
     // Fallback to local SQL path when date range not provided
-    global $conn;
+    $accConn = accounting_db_connection();
     try {
         $where_conditions = [];
         $params = [];
@@ -455,7 +455,7 @@ function calculateTransactionTotals($filters = [])
                 SUM(CASE WHEN type = 'Expense' THEN amount ELSE 0 END) AS total_expenses,
                 COUNT(*) AS transaction_count
             FROM acc_transactions $where_clause";
-        $stmt = $conn->prepare($query);
+        $stmt = $accConn->prepare($query);
         if (!empty($params)) {
             $stmt->bind_param($types, ...$params);
         }
@@ -628,10 +628,9 @@ if (!function_exists('calculate_total_income')) {
             return (float)$totals['income'];
         }
 
-        $c = $connRef ?: (function_exists('getDbConnection') ? getDbConnection() : null);
-        if (!$c) {
-            global $conn;
-            $c = $conn;
+        $c = $connRef;
+        if (!$c instanceof mysqli) {
+            $c = accounting_db_connection();
         }
         $res = $c->query("SELECT COALESCE(SUM(amount),0) AS total FROM acc_transactions WHERE type='Income'");
         $row = $res->fetch_assoc();
@@ -648,10 +647,9 @@ if (!function_exists('calculate_total_expenses')) {
             return (float)$totals['expenses'];
         }
 
-        $c = $connRef ?: (function_exists('getDbConnection') ? getDbConnection() : null);
-        if (!$c) {
-            global $conn;
-            $c = $conn;
+        $c = $connRef;
+        if (!$c instanceof mysqli) {
+            $c = accounting_db_connection();
         }
         $res = $c->query("SELECT COALESCE(SUM(amount),0) AS total FROM acc_transactions WHERE type='Expense'");
         $row = $res->fetch_assoc();
@@ -666,13 +664,13 @@ if (!function_exists('calculate_income_by_category')) {
             return get_income_by_category($start_date, $end_date, $limit);
         }
 
-        global $conn;
+        $accConn = accounting_db_connection();
         $limit = ($limit !== null) ? (int)$limit : null;
         $sql = "SELECT c.name, SUM(t.amount) AS total FROM acc_transactions t JOIN acc_transaction_categories c ON t.category_id=c.id WHERE t.type='Income' AND t.transaction_date BETWEEN ? AND ? GROUP BY c.name ORDER BY total DESC";
         if ($limit && $limit > 0) {
             $sql .= " LIMIT " . $limit;
         }
-        $stmt = $conn->prepare($sql);
+        $stmt = $accConn->prepare($sql);
         $stmt->bind_param('ss', $start_date, $end_date);
         $stmt->execute();
         $res = $stmt->get_result();
@@ -693,13 +691,13 @@ if (!function_exists('calculate_expenses_by_category')) {
             return get_expenses_by_category($start_date, $end_date, $limit);
         }
 
-        global $conn;
+        $accConn = accounting_db_connection();
         $limit = ($limit !== null) ? (int)$limit : null;
         $sql = "SELECT c.name, SUM(t.amount) AS total FROM acc_transactions t JOIN acc_transaction_categories c ON t.category_id=c.id WHERE t.type='Expense' AND t.transaction_date BETWEEN ? AND ? GROUP BY c.name ORDER BY total DESC";
         if ($limit && $limit > 0) {
             $sql .= " LIMIT " . $limit;
         }
-        $stmt = $conn->prepare($sql);
+        $stmt = $accConn->prepare($sql);
         $stmt->bind_param('ss', $start_date, $end_date);
         $stmt->execute();
         $res = $stmt->get_result();

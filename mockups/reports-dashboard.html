@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Reports Dashboard Mockup</title>
+    <link rel="stylesheet" href="mockups.css">
+</head>
+<body>
+    <div class="mockup-shell">
+        <div class="mockup-header">
+            <div>
+                <h1>Reports Dashboard</h1>
+                <p class="annotation">Primary KPIs plus grouped report cards. Filters stay tucked away until needed but always show how many are active.</p>
+            </div>
+            <div class="badge-pill">Last refresh · 4m ago</div>
+        </div>
+
+        <div class="reports-layout">
+            <section class="filters-shell mockup-card compact">
+                <div class="section-heading">
+                    <h2>Filters</h2>
+                    <button class="filters-toggle">Adjust Filters <span>4</span></button>
+                </div>
+                <div class="filters-summary">
+                    <div class="filter-pill"><strong>Date</strong> Jan 1 – Nov 30, 2025</div>
+                    <div class="filter-pill"><strong>Fund</strong> General Ops</div>
+                    <div class="filter-pill"><strong>Dept</strong> Finance · Outreach</div>
+                    <div class="filter-pill"><strong>Format</strong> Modal + CSV</div>
+                </div>
+                <div class="filters-drawer">
+                    <div class="filters-grid">
+                        <div class="ghost-field">
+                            <label>Date Range</label>
+                            <span>Jan 1 – Nov 30, 2025</span>
+                        </div>
+                        <div class="ghost-field">
+                            <label>Fund / Program</label>
+                            <span>General Operations (default)</span>
+                        </div>
+                        <div class="ghost-field">
+                            <label>Department</label>
+                            <span>Finance + Outreach</span>
+                        </div>
+                        <div class="ghost-field">
+                            <label>Output Format</label>
+                            <span>Interactive + CSV bundle</span>
+                        </div>
+                    </div>
+                    <div class="stack-note">Compact summary pills stay visible; expanding the drawer reveals full controls.</div>
+                    <div style="margin-top:12px; display:flex; gap:8px; flex-wrap:wrap;">
+                        <span class="filter-chip">Open Grants<button title="Remove">×</button></span>
+                        <span class="filter-chip">Board-ready<button title="Remove">×</button></span>
+                        <span class="filter-chip">Exclude drafts<button title="Remove">×</button></span>
+                        <span class="filter-chip">Include CRM actuals<button title="Remove">×</button></span>
+                    </div>
+                </div>
+            </section>
+
+            <section class="mockup-card">
+                <div class="section-heading">
+                    <h2>Key Metrics</h2>
+                    <div class="quick-links">
+                        <a href="#">Compare Periods</a>
+                        <a href="#">Schedule Email</a>
+                        <a href="#">Open KPI Builder</a>
+                    </div>
+                </div>
+                <div class="kpi-grid">
+                    <div class="kpi-card">
+                        <h4>Net Operating Margin</h4>
+                        <div class="kpi-value">18.6%</div>
+                        <div class="kpi-trend">▲ 2.1 pts vs LY</div>
+                    </div>
+                    <div class="kpi-card">
+                        <h4>True Cash Available</h4>
+                        <div class="kpi-value">$178,210</div>
+                        <div class="kpi-trend">Includes uncleared checks from reconciliation</div>
+                    </div>
+                    <div class="kpi-card">
+                        <h4>Restricted Funds</h4>
+                        <div class="kpi-value">$64,880</div>
+                        <div class="kpi-trend negative">▼ $6,210 spend-down</div>
+                    </div>
+                    <div class="kpi-card">
+                        <h4>Fundraising Velocity</h4>
+                        <div class="kpi-value">$9.4k/mo</div>
+                        <div class="kpi-trend">▲ 14% rolling avg</div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="mockup-card">
+                <div class="section-heading">
+                    <h2>Monthly Reports</h2>
+                    <a class="view-all-link" href="#">View full list (18)</a>
+                </div>
+                <p class="section-note">Core statements for each period; click opens in a modal by default with options to pop out.</p>
+                <div class="report-button-grid">
+                    <button class="report-button sky">Monthly Financial Snapshot<span>Modal + pop-out</span></button>
+                    <button class="report-button indigo">Actual vs Budget (Income)<span>Variance view</span></button>
+                    <button class="report-button mint">Member Dues Detail<span>Class + status</span></button>
+                    <button class="report-button sunset">Expense Watchlist<span>Variance >10%</span></button>
+                    <button class="report-button gold">Cash vs Forecast<span>Reconciliation aware</span></button>
+                    <button class="report-button slate">Operations Checklist<span>Close tasks</span></button>
+                </div>
+            </section>
+
+            <section class="mockup-card">
+                <div class="section-heading">
+                    <h2>Monthly Income Statement · Modal Preview</h2>
+                    <span class="section-note">Appears when selecting “Monthly Financial Snapshot.” Actual experience loads the PDF statement inside the modal so underscore lines and totals remain faithful.</span>
+                </div>
+                <div class="report-modal-shell">
+                    <div class="report-modal-frame">
+                        <div class="statement-header">
+                            <div>
+                                <h3 style="margin:0;">Income Statement · November 2025</h3>
+                                <p class="annotation" style="margin:6px 0 0;">Filtered to Main Checking · Board version</p>
+                            </div>
+                            <div class="statement-actions">
+                                <button class="btn-outline">Export CSV</button>
+                                <button class="btn-primary">Share Link</button>
+                            </div>
+                        </div>
+                        <div class="statement-meta">
+                                                <div class="statement-table-wrap" style="margin-top:18px;">
+                                                    <table class="statement-table two-amount-columns">
+                                                        <thead>
+                                                            <tr>
+                                                                <th style="text-align:left;">Account</th>
+                                                                <th style="width:28%;">Current Month Activity</th>
+                                                                <th style="width:28%;">Totals &amp; Subtotals</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <tr class="statement-section">
+                                                                <td colspan="2">Income</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="statement-indent">Net sales</td>
+                                                                <td class="amount">$25,000</td>
+                                                                <td></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="statement-indent">Cost of sales</td>
+                                                                <td class="amount amount-expense">(10,000)</td>
+                                                                <td></td>
+                                                            </tr>
+                                                            <tr class="statement-total statement-line-single">
+                                                                <td>Gross income</td>
+                                                                <td></td>
+                                                                <td class="totals-cell">$15,000</td>
+                                                            </tr>
+
+                                                            <tr class="statement-section">
+                                                                <td colspan="2">Operating expenses</td>
+                                                            </tr>
+                                                            <tr class="statement-subsection">
+                                                                <td colspan="2">Distribution costs</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="statement-indent">Depreciation expense</td>
+                                                                <td class="amount amount-expense">(300)</td>
+                                                                <td></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="statement-indent">Sales commission</td>
+                                                                <td class="amount amount-expense">(2,500)</td>
+                                                                <td></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="statement-indent">Salaries expense</td>
+                                                                <td class="amount amount-expense">(1,650)</td>
+                                                                <td></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="statement-indent">Rent expense</td>
+                                                                <td class="amount amount-expense">(175)</td>
+                                                                <td></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="statement-indent">Utilities expense</td>
+                                                                <td class="amount amount-expense">(525)</td>
+                                                                <td></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="statement-indent">Supplies expense</td>
+                                                                <td class="amount amount-expense">(30)</td>
+                                                                <td></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="statement-indent">Advertising expense</td>
+                                                                <td class="amount amount-expense">(1,750)</td>
+                                                                <td></td>
+                                                            </tr>
+                                                            <tr class="statement-total statement-line-single">
+                                                                <td>Total distribution costs</td>
+                                                                <td></td>
+                                                                <td class="totals-cell">(6,930)</td>
+                                                            </tr>
+
+                                                            <tr class="statement-subsection">
+                                                                <td colspan="2">Administrative costs</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="statement-indent">Depreciation expense</td>
+                                                                <td class="amount amount-expense">(200)</td>
+                                                                <td></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="statement-indent">Salaries expense</td>
+                                                                <td class="amount amount-expense">(2,100)</td>
+                                                                <td></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="statement-indent">Rent expense</td>
+                                                                <td class="amount amount-expense">(700)</td>
+                                                                <td></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="statement-indent">Utilities expense</td>
+                                                                <td class="amount amount-expense">(905)</td>
+                                                                <td></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="statement-indent">Supplies expense</td>
+                                                                <td class="amount amount-expense">(95)</td>
+                                                                <td></td>
+                                                            </tr>
+                                                            <tr class="statement-total statement-line-single">
+                                                                <td>Total administrative costs</td>
+                                                                <td></td>
+                                                                <td class="totals-cell">(4,000)</td>
+                                                            </tr>
+
+                                                            <tr class="statement-total statement-line-single">
+                                                                <td>Total operating expenses</td>
+                                                                <td></td>
+                                                                <td class="totals-cell">(10,930)</td>
+                                                            </tr>
+                                                            <tr class="statement-total statement-line-double">
+                                                                <td>Operating income</td>
+                                                                <td></td>
+                                                                <td class="totals-cell">$4,070</td>
+                                                            </tr>
+
+                                                            <tr class="statement-section">
+                                                                <td colspan="2">Other income and expenses</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="statement-indent">Dividend income</td>
+                                                                <td class="amount amount-income">$175</td>
+                                                                <td></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="statement-indent">Interest income</td>
+                                                                <td class="amount amount-income">545</td>
+                                                                <td></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="statement-indent">Gain on sale of property</td>
+                                                                <td class="amount amount-income">50</td>
+                                                                <td></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="statement-indent">Interest expense</td>
+                                                                <td class="amount amount-expense">(200)</td>
+                                                                <td></td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="statement-indent">Impairment loss on investment</td>
+                                                                <td class="amount amount-expense">(40)</td>
+                                                                <td></td>
+                                                            </tr>
+                                                            <tr class="statement-total statement-line-single">
+                                                                <td>Total other income &amp; expenses</td>
+                                                                <td></td>
+                                                                <td class="totals-cell">$530</td>
+                                                            </tr>
+
+                                                            <tr class="statement-total statement-line-double">
+                                                                <td>Income before taxes</td>
+                                                                <td></td>
+                                                                <td class="totals-cell">$4,600</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="statement-indent">Income tax expense</td>
+                                                                <td class="amount amount-expense">0</td>
+                                                                <td></td>
+                                                            </tr>
+                                                            <tr class="total-row statement-line-double">
+                                                                <td>Net income</td>
+                                                                <td></td>
+                                                                <td class="totals-cell">$4,600</td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                                <div class="statement-pdf-note">
+                                                    <strong>PDF preview:</strong> This modal streams the finalized PDF so lines, typography, and spacing align exactly with the exported statement.
+                                                </div>
+                                        <td>Favorable · meets 15% target.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="statement-summary">
+                            <div><strong>Reminder:</strong> Variance notes are required when +/- exceeds 8% or $1,000.</div>
+                            <div><strong>Next Actions:</strong> Attach maintenance invoices, schedule donor update call.</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="mockup-card">
+                <div class="section-heading">
+                    <h2>YTD Reports</h2>
+                    <a class="view-all-link" href="#">View full list (22)</a>
+                </div>
+                <p class="section-note">Rolling fiscal view including 13-column variants and deeper variance analysis.</p>
+                <div class="report-button-grid">
+                    <button class="report-button sky">YTD Consolidated Statement<span>Interactive/PDF</span></button>
+                    <button class="report-button indigo">13-Column Income Statement<span>Jan–Dec + total</span></button>
+                    <button class="report-button mint">Actual vs Budget (YTD)<span>Variance grid</span></button>
+                    <button class="report-button sunset">13-Column Balance Sheet<span>Assets/Liabilities</span></button>
+                    <button class="report-button gold">YTD Expense Heatmap<span>Color-coded</span></button>
+                    <button class="report-button slate">Rolling Cash Balance<span>Runway insight</span></button>
+                </div>
+            </section>
+
+                <div class="report-modal-frame">
+                    <div class="statement-header">
+                        <div class="statement-banner">
+                            <h3>SAMPLE COMPANY</h3>
+                            <p>Income Statement · For the month ended November 30, 2025</p>
+                            <p style="font-size:0.75rem; opacity:0.8;">Amounts in US Dollars</p>
+                        </div>
+                        <div class="statement-actions">
+                            <button class="btn-outline">Export CSV</button>
+                            <button class="btn-primary">Print / Share</button>
+                        </div>
+                    </div>
+                    <div class="statement-meta">
+                        <span class="statement-chip">Prepared Dec 02 · 4:10 PM</span>
+                        <span class="statement-chip">Source: Accounting Ledger</span>
+                        <span class="statement-chip">Review: Treasurer</span>
+                    </div>
+
+                    <div class="statement-table-wrap" style="margin-top:18px;">
+                        <table class="statement-table">
+                            <thead>
+                                <tr>
+                                    <th style="text-align:left;">Account</th>
+                                    <th style="width:30%;">Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Net sales</td>
+                                    <td class="amount">$25,000</td>
+                                </tr>
+                                <tr>
+                                    <td>Cost of sales</td>
+                                    <td class="amount">(10,000)</td>
+                                </tr>
+                                <tr class="subtotal-row">
+                                    <td>Gross income</td>
+                                    <td class="amount">$15,000</td>
+                                </tr>
+                                <tr class="section-row">
+                                    <td colspan="2">Operating expenses</td>
+                                </tr>
+                                <tr>
+                                    <td>Distribution costs</td>
+                                    <td class="amount">$6,930</td>
+                                </tr>
+                                <tr>
+                                    <td class="statement-indent">Depreciation expense</td>
+                                    <td class="amount">300</td>
+                                </tr>
+                                <tr>
+                                    <td class="statement-indent">Sales commission</td>
+                                    <td class="amount">2,500</td>
+                                </tr>
+                                <tr>
+                                    <td class="statement-indent">Salaries expense</td>
+                                    <td class="amount">1,650</td>
+                                </tr>
+                                <tr>
+                                    <td class="statement-indent">Rent expense</td>
+                                    <td class="amount">175</td>
+                                </tr>
+                                <tr>
+                                    <td class="statement-indent">Utilities expense</td>
+                                    <td class="amount">525</td>
+                                </tr>
+                                <tr>
+                                    <td class="statement-indent">Supplies expense</td>
+                                    <td class="amount">30</td>
+                                </tr>
+                                <tr>
+                                    <td class="statement-indent">Advertising expense</td>
+                                    <td class="amount">1,750</td>
+                                </tr>
+                                <tr>
+                                    <td>Administrative costs</td>
+                                    <td class="amount">$4,000</td>
+                                </tr>
+                                <tr>
+                                    <td class="statement-indent">Depreciation expense</td>
+                                    <td class="amount">200</td>
+                                </tr>
+                                <tr>
+                                    <td class="statement-indent">Salaries expense</td>
+                                    <td class="amount">2,100</td>
+                                </tr>
+                                <tr>
+                                    <td class="statement-indent">Rent expense</td>
+                                    <td class="amount">700</td>
+                                </tr>
+                                <tr>
+                                    <td class="statement-indent">Utilities expense</td>
+                                    <td class="amount">975</td>
+                                </tr>
+                                <tr>
+                                    <td class="statement-indent">Supplies expense</td>
+                                    <td class="amount">95</td>
+                                </tr>
+                                <tr>
+                                    <td>Total operating expenses</td>
+                                    <td class="amount">$10,930</td>
+                                </tr>
+                                <tr class="section-row">
+                                    <td colspan="2">Other income &amp; expenses</td>
+                                </tr>
+                                <tr>
+                                    <td>Other income, net</td>
+                                    <td class="amount">$530</td>
+                                </tr>
+                                <tr>
+                                    <td class="statement-indent">Dividend income</td>
+                                    <td class="amount">175</td>
+                                </tr>
+                                <tr>
+                                    <td class="statement-indent">Interest income</td>
+                                    <td class="amount">545</td>
+                                </tr>
+                                <tr>
+                                    <td class="statement-indent">Gain on sale of property</td>
+                                    <td class="amount">50</td>
+                                </tr>
+                                <tr>
+                                    <td class="statement-indent">Interest expense</td>
+                                    <td class="amount">(240)</td>
+                                </tr>
+                                <tr>
+                                    <td class="statement-indent">Impairment loss on investment</td>
+                                    <td class="amount">(40)</td>
+                                </tr>
+                                <tr class="subtotal-row">
+                                    <td>Income before taxes</td>
+                                    <td class="amount">$4,600</td>
+                                </tr>
+                                <tr>
+                                    <td>Income tax expense</td>
+                                    <td class="amount">(815)</td>
+                                </tr>
+                                <tr class="total-row">
+                                    <td>Net income</td>
+                                    <td class="amount">$3,785</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                        <div class="report-actions">
+                            <button class="btn-primary">View Matrix</button>
+                            <button class="btn-outline">Export XLSX</button>
+                        </div>
+                    </article>
+                    <article class="report-card">
+                        <h3>Compliance Checklist</h3>
+                        <p class="report-meta">Ensures 501(c)(3) filings, donor acknowledgments, and policies are current.</p>
+                        <div class="report-actions">
+                            <button class="btn-primary">Review Checklist</button>
+                            <button class="btn-outline">Send Reminder</button>
+                        </div>
+                    </article>
+                </div>
+            </section>
+
+            <section class="export-bar">
+                <div>
+                    <strong>Quick Export</strong>
+                    <p class="annotation">Bundle selected reports into a board packet or share links with committees.</p>
+                </div>
+                <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                    <button class="btn-primary">Generate Board Packet</button>
+                    <button class="btn-outline">Download CSV Batch</button>
+                    <button class="btn-outline">Schedule Weekly Email</button>
+                </div>
+            </section>
+        </div>
+    </div>
+</body>
+</html>

@@ -7,6 +7,8 @@ require_once __DIR__ . '/../include/premium_hero.php';
 require_once __DIR__ . '/utils/csrf.php';
 require_once __DIR__ . '/lib/import_helpers.php';
 
+/** @var mysqli $accConn */
+
 csrf_ensure_token();
 
 if (!isAuthenticated()) {
@@ -26,6 +28,28 @@ accounting_imports_ensure_tables($accConn);
 $sourceTypes = accounting_imports_get_source_types();
 $recentBatches = accounting_imports_fetch_recent_batches($accConn, 8);
 $page_title = 'Accounting Imports - W5OBM';
+
+$heroActions = [
+    [
+        'label' => 'Read Scope Notes',
+        'url' => '/docs/accounting_imports_scope.md',
+        'icon' => 'fa-book-open',
+        'variant' => 'outline',
+    ],
+    [
+        'label' => 'Back to Dashboard',
+        'url' => '/accounting/dashboard.php',
+        'icon' => 'fa-arrow-left',
+    ],
+];
+if (hasPermission($user_id, 'accounting_manage')) {
+    $heroActions[] = [
+        'label' => 'Review Staged Batches',
+        'url' => '/accounting/admin/import_batches.php',
+        'icon' => 'fa-layer-group',
+        'variant' => 'primary',
+    ];
+}
 
 ?>
 <!DOCTYPE html>
@@ -86,19 +110,7 @@ $page_title = 'Accounting Imports - W5OBM';
                 'Audit-friendly staging',
                 'Rollback ready',
             ],
-            'actions' => [
-                [
-                    'label' => 'Read Scope Notes',
-                    'url' => '/docs/accounting_imports_scope.md',
-                    'icon' => 'fa-book-open',
-                    'variant' => 'outline',
-                ],
-                [
-                    'label' => 'Back to Dashboard',
-                    'url' => '/accounting/dashboard.php',
-                    'icon' => 'fa-arrow-left',
-                ],
-            ],
+            'actions' => $heroActions,
             'highlights' => [
                 [
                     'label' => 'Batches',
@@ -123,6 +135,12 @@ $page_title = 'Accounting Imports - W5OBM';
                 <?php accounting_render_workspace_nav('imports'); ?>
             </div>
             <div class="col-lg-9">
+        <?php if (hasPermission($user_id, 'accounting_manage')): ?>
+            <div class="alert alert-info border-0 shadow-sm mb-4" role="alert">
+                <i class="fas fa-compass me-2"></i>
+                Next step after staging: open the <a href="/accounting/admin/import_batches.php" class="alert-link">Import Batch Review</a> tool to map source accounts and post clean journals.
+            </div>
+        <?php endif; ?>
         <div class="row g-4 mb-4">
             <div class="col-lg-7">
                 <div class="card shadow-sm border-0 h-100">
@@ -216,9 +234,15 @@ $page_title = 'Accounting Imports - W5OBM';
                             <h5 class="mb-0"><i class="fas fa-clock me-2 text-secondary"></i>Recent Batches</h5>
                             <small class="text-muted">This list will populate once uploads are wired to staging tables.</small>
                         </div>
-                        <button class="btn btn-outline-secondary btn-sm" type="button" disabled>
-                            <i class="fas fa-sync-alt me-1"></i>Refresh
-                        </button>
+                        <?php if (hasPermission($user_id, 'accounting_manage')): ?>
+                            <a class="btn btn-outline-primary btn-sm" href="/accounting/admin/import_batches.php">
+                                <i class="fas fa-layer-group me-1"></i>Review Batches
+                            </a>
+                        <?php else: ?>
+                            <button class="btn btn-outline-secondary btn-sm" type="button" disabled>
+                                <i class="fas fa-sync-alt me-1"></i>Refresh
+                            </button>
+                        <?php endif; ?>
                     </div>
                     <div class="card-body">
                         <?php if (empty($recentBatches)): ?>

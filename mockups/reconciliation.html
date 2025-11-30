@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Reconciliation Workspace Mockup</title>
+    <link rel="stylesheet" href="mockups.css">
+</head>
+<body>
+    <div class="mockup-shell">
+        <div class="mockup-header">
+            <div>
+                <h1>Reconciliation Workspace</h1>
+                <p class="annotation">Guided three-step flow to verify statement balances, clear transactions, and document adjustments.</p>
+            </div>
+            <div class="status-pill">On track · 78% cleared</div>
+        </div>
+
+        <section class="hero-highlight">
+            <div style="display:flex; justify-content:space-between; gap:24px; flex-wrap:wrap; align-items:flex-end;">
+                <div>
+                    <h2>November Statement · Main Checking</h2>
+                    <p class="annotation" style="color:rgba(255,255,255,0.75);">Statement ending balance is locked once reconciliation begins. Any delta below must hit an adjustment entry with an audit note.</p>
+                </div>
+                <div>
+                    <span class="hero-meta-label">Open Since</span>
+                    <div class="hero-meta-value">Nov 25, 2025</div>
+                </div>
+            </div>
+            <div class="progress-ribbon" aria-label="78 percent of this statement is cleared">
+                <div class="progress-ribbon-fill" style="width:78%;"></div>
+            </div>
+            <div class="hero-meta">
+                <div class="hero-meta-block">
+                    <div class="hero-meta-label">Statement Ending Balance</div>
+                    <div class="hero-meta-value">$48,320.77</div>
+                </div>
+                <div class="hero-meta-block">
+                    <div class="hero-meta-label">Ledger Balance</div>
+                    <div class="hero-meta-value">$48,102.29</div>
+                </div>
+                <div class="hero-meta-block">
+                    <div class="hero-meta-label">Difference</div>
+                    <div class="hero-meta-value">$218.48</div>
+                </div>
+                <div class="hero-meta-block">
+                    <div class="hero-meta-label">Last Cleared</div>
+                    <div class="hero-meta-value">3m ago · K. Wilson</div>
+                </div>
+            </div>
+        </section>
+
+        <div class="steps-grid">
+            <div class="step-card completed">
+                <div class="step-top">
+                    <div class="step-ident">
+                        <span class="step-number">1</span>
+                        <span class="step-icon" aria-hidden="true">&#128196;</span>
+                        <span class="step-label">Lock Statement</span>
+                    </div>
+                    <span class="status-badge success">Locked</span>
+                </div>
+                <div class="step-body">
+                    Import bank statement and enter the ending balance. Any edits require supervisor approval.
+                </div>
+                <div class="step-actions">
+                    <button class="btn-outline">View Statement</button>
+                </div>
+            </div>
+            <div class="step-card active">
+                <div class="step-top">
+                    <div class="step-ident">
+                        <span class="step-number">2</span>
+                        <span class="step-icon" aria-hidden="true">&#9989;</span>
+                        <span class="step-label">Clear Transactions</span>
+                    </div>
+                    <span class="status-badge info">In Progress</span>
+                </div>
+                <div class="step-body">
+                    Clear transactions in batches. Uncleared items sit on the left; confirmed items move right with running totals.
+                </div>
+                <div class="step-actions">
+                    <button class="btn-primary">Continue Clearing</button>
+                    <button class="btn-outline">Attach Audit Note</button>
+                </div>
+            </div>
+            <div class="step-card">
+                <div class="step-top">
+                    <div class="step-ident">
+                        <span class="step-number">3</span>
+                        <span class="step-icon" aria-hidden="true">&#128295;</span>
+                        <span class="step-label">Adjust & Close</span>
+                    </div>
+                    <span class="status-badge">Pending</span>
+                </div>
+                <div class="step-body">
+                    Post adjustments for any remaining difference and finalize the reconciliation with required reviewer initials.
+                </div>
+                <div class="step-actions">
+                    <button class="btn-outline">Prep Adjustment</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="recon-layout">
+            <div>
+                <div class="mockup-card">
+                    <h2>Statement Inputs</h2>
+                    <p class="annotation">Values originate from uploaded statements; edits trigger an approval workflow and are logged in audit history.</p>
+                    <div class="ghost-inputs">
+                        <div class="ghost-field">
+                            <label>Statement Date</label>
+                            <span>Nov 30, 2025</span>
+                        </div>
+                        <div class="ghost-field">
+                            <label>Opening Balance</label>
+                            <span>$42,188.45</span>
+                        </div>
+                        <div class="ghost-field">
+                            <label>Ending Balance</label>
+                            <span>$48,320.77</span>
+                        </div>
+                        <div class="ghost-field">
+                            <label>Reviewed By</label>
+                            <span>Pending · Add initials</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dual-pane">
+                    <div class="pane-card">
+                        <div class="pane-header">
+                            <h3>Uncleared Transactions</h3>
+                            <span class="annotation">9 items · $12,418.33</span>
+                        </div>
+                        <table class="recon-table">
+                            <thead>
+                                <tr>
+                                    <th class="checkbox-cell"></th>
+                                    <th>Date</th>
+                                    <th>Description</th>
+                                    <th>Notes</th>
+                                    <th>Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="checkbox-cell"><input type="checkbox"></td>
+                                    <td>Nov 27</td>
+                                    <td>Field Day Permit Fee</td>
+                                    <td class="annotation">Imported via Stripe · Waiting on invoice</td>
+                                    <td class="amount-cell">$650.00</td>
+                                </tr>
+                                <tr>
+                                    <td class="checkbox-cell"><input type="checkbox"></td>
+                                    <td>Nov 26</td>
+                                    <td>Equipment Grant</td>
+                                    <td class="annotation">ACH credit · auto-match suggested</td>
+                                    <td class="amount-cell">$4,500.00</td>
+                                </tr>
+                                <tr>
+                                    <td class="checkbox-cell"><input type="checkbox"></td>
+                                    <td>Nov 24</td>
+                                    <td>Repeater Insurance</td>
+                                    <td class="annotation">Manual entry · needs receipt</td>
+                                    <td class="amount-cell">$1,180.00</td>
+                                </tr>
+                                <tr>
+                                    <td class="checkbox-cell"><input type="checkbox" checked></td>
+                                    <td>Nov 21</td>
+                                    <td>Weekly Dues Batch</td>
+                                    <td class="annotation">Clears when CRM export posts</td>
+                                    <td class="amount-cell">$2,310.00</td>
+                                </tr>
+                                <tr>
+                                    <td class="checkbox-cell"><input type="checkbox"></td>
+                                    <td>Nov 18</td>
+                                    <td>Merch Payout</td>
+                                    <td class="annotation">Square deposit · 48hr hold</td>
+                                    <td class="amount-cell">$1,840.50</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div class="running-total">
+                            <small>Checked items ready to move</small>
+                            <span>$2,960.00</span>
+                        </div>
+                        <p class="pane-caption">Step 2a · Move ready items once supporting documentation is verified.</p>
+                    </div>
+
+                    <div class="pane-card">
+                        <div class="pane-header">
+                            <h3>Cleared This Cycle</h3>
+                            <span class="annotation">26 items · $38,112.44</span>
+                        </div>
+                        <table class="recon-table">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Description</th>
+                                    <th>Cleared By</th>
+                                    <th>Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Nov 25</td>
+                                    <td>Utility Draft</td>
+                                    <td>K. Wilson</td>
+                                    <td class="amount-cell">$-412.67</td>
+                                </tr>
+                                <tr>
+                                    <td>Nov 23</td>
+                                    <td>Membership Dues Import</td>
+                                    <td>Automation</td>
+                                    <td class="amount-cell">$5,940.00</td>
+                                </tr>
+                                <tr>
+                                    <td>Nov 22</td>
+                                    <td>Repeater Maintenance</td>
+                                    <td>J. Parker</td>
+                                    <td class="amount-cell">$-1,250.00</td>
+                                </tr>
+                                <tr>
+                                    <td>Nov 20</td>
+                                    <td>ARRL Grant</td>
+                                    <td>Automation</td>
+                                    <td class="amount-cell">$12,700.00</td>
+                                </tr>
+                                <tr>
+                                    <td>Nov 18</td>
+                                    <td>Fuel Reimbursement</td>
+                                    <td>C. Smith</td>
+                                    <td class="amount-cell">$-380.00</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div class="running-total">
+                            <small>Running cleared total</small>
+                            <span>$38,112.44</span>
+                        </div>
+                        <p class="pane-caption">Step 2b · Cleared totals feed the “true cash available” KPI in monthly reports.</p>
+                        <p class="annotation" style="margin-top:12px;">Auto-matched entries display in green and can be expanded for supporting documents.</p>
+                    </div>
+                </div>
+            </div>
+
+            <aside class="mini-stack">
+                <div class="history-card">
+                    <h3>Progress Snapshot</h3>
+                    <div class="stat-block">
+                        <div class="stat-label">Difference Remaining</div>
+                        <div class="stat-value">$218.48</div>
+                        <p class="annotation">Post an adjustment only after uncleared items are resolved.</p>
+                        <div class="metric-note">Monthly report subtracts this delta from ledger cash until adjustments post.</div>
+                    </div>
+                    <div class="stat-block">
+                        <div class="stat-label">Cleared Transactions</div>
+                        <div class="stat-value">26 / 35</div>
+                        <p class="annotation">Batch actions available when 5+ selections share a payee.</p>
+                        <div class="metric-note">Board packet flags accounts under 90% cleared before close.</div>
+                    </div>
+                    <div class="stat-block">
+                        <div class="stat-label">Next Review</div>
+                        <div class="stat-value">Dec 02 · Finance</div>
+                    </div>
+                </div>
+
+                <div class="history-card">
+                    <h3>Recent Reconciliations</h3>
+                    <ul class="history-list">
+                        <li>
+                            <strong>Oct 2025</strong>
+                            Closed by C. Smith · Difference $0.00
+                        </li>
+                        <li>
+                            <strong>Sep 2025</strong>
+                            Closed by Automation · Imported ACH corrections
+                        </li>
+                        <li>
+                            <strong>Aug 2025</strong>
+                            Closed by J. Parker · Required $72.18 adjustment
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="history-card">
+                    <h3>Notes & Tasks</h3>
+                    <ul class="history-list">
+                        <li>
+                            <strong>Follow up</strong>
+                            Await vendor invoice for Field Day permit.
+                        </li>
+                        <li>
+                            <strong>Attachment needed</strong>
+                            Upload deposit slip for Square payout.
+                        </li>
+                        <li>
+                            <strong>Reminder</strong>
+                            Confirm reviewer initials before Dec 2 meeting.
+                        </li>
+                    </ul>
+                </div>
+            </aside>
+        </div>
+    </div>
+</body>
+</html>

@@ -11,12 +11,38 @@ if (!function_exists('accounting_table_exists')) {
     }
 }
 
+if (!function_exists('accounting_years_since')) {
+    function accounting_years_since(?string $date): float
+    {
+        if (empty($date)) {
+            return 0.0;
+        }
+
+        try {
+            $start = new DateTime($date);
+            $now = new DateTime();
+            $interval = $start->diff($now);
+            return $interval->y + ($interval->m / 12) + ($interval->d / 365);
+        } catch (Exception $e) {
+            logError('Dashboard metrics date error: ' . $e->getMessage(), 'accounting');
+            return 0.0;
+        }
+    }
+}
+
 if (!function_exists('accounting_collect_dashboard_metrics')) {
     function accounting_collect_dashboard_metrics(?mysqli $ledgerConn, ?mysqli $reportConn = null, int $recentLimit = 25): array
     {
         $metrics = [
             'cash_balance' => 0.0,
             'asset_value' => 0.0,
+            'asset_summary' => [
+                'count' => 0,
+                'book_total' => 0.0,
+                'current_total' => 0.0,
+                'depreciable_count' => 0,
+                'avg_age_years' => 0.0,
+            ],
             'month_totals' => ['income' => 0.0, 'expenses' => 0.0, 'net_balance' => 0.0],
             'ytd_totals' => ['income' => 0.0, 'expenses' => 0.0, 'net_balance' => 0.0],
             'recent_transactions' => [],
@@ -31,6 +57,7 @@ if (!function_exists('accounting_collect_dashboard_metrics')) {
             $hasAccounts = accounting_table_exists($ledgerConn, 'acc_accounts');
             $hasTransactions = accounting_table_exists($ledgerConn, 'acc_transactions');
             $hasCategories = accounting_table_exists($ledgerConn, 'acc_categories');
+            $hasAssets = accounting_table_exists($ledgerConn, 'acc_assets');
 
             if ($hasAccounts) {
                 $cashQuery = $ledgerConn->query("SELECT COALESCE(SUM(current_balance), 0) as total FROM acc_accounts WHERE account_type = 'Asset' AND (account_name LIKE '%Cash%' OR account_name LIKE '%Bank%')");
@@ -69,6 +96,43 @@ if (!function_exists('accounting_collect_dashboard_metrics')) {
                         $metrics['recent_transactions'][] = $row;
                     }
                 }
+            }
+
+            if ($hasAssets) {
+                $assetSummary = $metrics['asset_summary'];
+                $totalAgeYears = 0.0;
+                $assetResult = $ledgerConn->query("SELECT id, value, acquisition_date, depreciation_rate FROM acc_assets");
+                if ($assetResult) {
+                    while ($row = $assetResult->fetch_assoc()) {
+                        $value = (float)($row['value'] ?? 0);
+                        $assetSummary['count'] += 1;
+                        $assetSummary['book_total'] += $value;
+
+                        $ratePercent = max(0.0, (float)($row['depreciation_rate'] ?? 0));
+                        $rate = $ratePercent > 0 ? $ratePercent / 100 : 0.0;
+                        $years = accounting_years_since($row['acquisition_date'] ?? null);
+                        $currentValue = $value;
+                        if ($rate > 0 && $years > 0) {
+                            $currentValue = max(0.0, $value * pow(1 - $rate, $years));
+                        }
+                        $assetSummary['current_total'] += $currentValue;
+
+                        if ($ratePercent > 0) {
+                            $assetSummary['depreciable_count'] += 1;
+                        }
+
+                        if ($years > 0) {
+                            $totalAgeYears += $years;
+                        }
+                    }
+                    $assetResult->close();
+                }
+
+                if ($assetSummary['count'] > 0) {
+                    $assetSummary['avg_age_years'] = $totalAgeYears / $assetSummary['count'];
+                }
+
+                $metrics['asset_summary'] = $assetSummary;
             }
         }
 

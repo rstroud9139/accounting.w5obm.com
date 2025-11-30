@@ -19,7 +19,7 @@ require_once __DIR__ . '/../lib/helpers.php';
  */
 function addCategory($data)
 {
-    global $conn;
+    $conn = accounting_db_connection();
 
     try {
         // Validate required fields
@@ -96,7 +96,7 @@ function addCategory($data)
  */
 function updateCategory($id, $data)
 {
-    global $conn;
+    $conn = accounting_db_connection();
 
     try {
         // Validate ID
@@ -173,7 +173,7 @@ function updateCategory($id, $data)
  */
 function deleteCategory($id, $reassign_to_id = null)
 {
-    global $conn;
+    $conn = accounting_db_connection();
 
     try {
         // Validate ID
@@ -276,7 +276,7 @@ function deleteCategory($id, $reassign_to_id = null)
  */
 function getCategoryById($id)
 {
-    global $conn;
+    $conn = accounting_db_connection();
 
     try {
         if (!$id || !is_numeric($id)) {
@@ -291,8 +291,8 @@ function getCategoryById($id)
                    (SELECT COUNT(*) FROM acc_transactions WHERE category_id = c.id) AS transaction_count
             FROM acc_transaction_categories c 
             LEFT JOIN acc_transaction_categories p ON c.parent_category_id = p.id
-            LEFT JOIN auth_users cu ON c.created_by = cu.id
-            LEFT JOIN auth_users uu ON c.updated_by = uu.id
+            LEFT JOIN w5obm.auth_users cu ON c.created_by = cu.id
+            LEFT JOIN w5obm.auth_users uu ON c.updated_by = uu.id
             WHERE c.id = ?
         ");
 
@@ -316,7 +316,7 @@ function getCategoryById($id)
  */
 function getAllCategories($filters = [], $options = [])
 {
-    global $conn;
+    $conn = accounting_db_connection();
 
     try {
         $where_conditions = [];
@@ -424,7 +424,7 @@ function getCategoriesByType($type)
  */
 function validateCategoryData($data, $exclude_id = null)
 {
-    global $conn;
+    $conn = accounting_db_connection();
     $errors = [];
 
     // Required fields

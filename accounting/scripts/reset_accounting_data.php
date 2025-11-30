@@ -1,13 +1,11 @@
 <?php
 
-declare(strict_types=1);
-
-session_start();
-
 require_once __DIR__ . '/../../include/session_init.php';
 require_once __DIR__ . '/../../include/dbconn.php';
 require_once __DIR__ . '/../lib/helpers.php';
 require_once __DIR__ . '/../utils/csrf.php';
+
+/** @var mysqli $accConn */
 
 csrf_ensure_token();
 
@@ -51,7 +49,7 @@ $results = [];
 $errors = [];
 $didReset = false;
 
-function tableExists(mysqli $conn, string $table): bool
+function accounting_reset_table_exists(mysqli $conn, string $table): bool
 {
     $sql = 'SELECT 1 FROM information_schema.TABLES WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ? LIMIT 1';
     $stmt = $conn->prepare($sql);
@@ -81,18 +79,21 @@ function ensureResetAuditTable(mysqli $conn): void
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
         csrf_verify_post_or_throw();
-    } catch (Throwable $ex) {
+    } catch (Exception $ex) {
         $errors[] = $ex->getMessage();
     }
 
     if (empty($errors)) {
         $wipeChart = isset($_POST['wipe_coa']) && $_POST['wipe_coa'] === '1';
-        $note = trim((string)($_POST['note'] ?? ''));
+        $note = '';
+        if (isset($_POST['note'])) {
+            $note = trim((string)$_POST['note']);
+        }
 
         $tablesToClear = [];
         foreach ($tableGroups as $groupTables) {
             foreach ($groupTables as $table) {
-                if (tableExists($accConn, $table)) {
+                if (accounting_reset_table_exists($accConn, $table)) {
                     $tablesToClear[] = $table;
                 }
             }
@@ -100,7 +101,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if ($wipeChart) {
             foreach ($chartTables as $table) {
-                if (tableExists($accConn, $table)) {
+                if (accounting_reset_table_exists($accConn, $table)) {
                     $tablesToClear[] = $table;
                 }
             }
@@ -141,9 +142,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 $pageTitle = 'Accounting Data Reset Utility';
-include __DIR__ . '/../../include/header.php';
-include __DIR__ . '/../../include/menu.php';
 ?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title><?= htmlspecialchars($pageTitle, ENT_QUOTES, 'UTF-8'); ?></title>
+    <?php include __DIR__ . '/../../include/header.php'; ?>
+</head>
+<body class="accounting-app bg-light">
+<?php include __DIR__ . '/../../include/menu.php'; ?>
 
 <div class="page-container accounting-app bg-light">
     <div class="container py-4">
@@ -217,3 +225,5 @@ include __DIR__ . '/../../include/menu.php';
 </div>
 
 <?php include __DIR__ . '/../../include/footer.php'; ?>
+</body>
+</html>

@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS acc_bank_connections (
 CREATE TABLE IF NOT EXISTS acc_bank_accounts (
     id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
     connection_id INT UNSIGNED NULL,
-    ledger_account_id INT UNSIGNED NULL,
+    ledger_account_id INT NULL,
     institution_name VARCHAR(120) NOT NULL,
     display_name VARCHAR(120) NOT NULL,
     account_type ENUM('checking','savings','credit','loan','other') NOT NULL DEFAULT 'checking',
@@ -78,15 +78,90 @@ CREATE TABLE IF NOT EXISTS acc_admin_resets (
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-ALTER TABLE acc_ledger_accounts
-    ADD COLUMN IF NOT EXISTS normal_balance ENUM('Debit','Credit') NULL AFTER account_type,
-    ADD COLUMN IF NOT EXISTS template_code VARCHAR(30) NULL AFTER normal_balance,
-    ADD COLUMN IF NOT EXISTS external_reference VARCHAR(80) NULL AFTER template_code,
-    ADD INDEX IF NOT EXISTS idx_ledger_template_code (template_code);
+-- Add ledger columns safely for MySQL 8 (no IF NOT EXISTS on ALTER)
+SET @missing_normal_balance := (
+    SELECT COUNT(*)
+    FROM information_schema.COLUMNS
+    WHERE TABLE_SCHEMA = DATABASE()
+      AND TABLE_NAME = 'acc_ledger_accounts'
+      AND COLUMN_NAME = 'normal_balance'
+);
+SET @ddl := IF(@missing_normal_balance = 0,
+    'ALTER TABLE acc_ledger_accounts ADD COLUMN normal_balance ENUM(''Debit'',''Credit'') NULL AFTER account_type',
+    'SELECT 0');
+PREPARE stmt FROM @ddl;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
 
-ALTER TABLE acc_categories
-    ADD COLUMN IF NOT EXISTS account_number VARCHAR(20) NULL AFTER name,
-    ADD COLUMN IF NOT EXISTS account_type ENUM('Asset','Liability','Equity','Revenue','Expense','COGS') NULL AFTER account_number;
+SET @missing_template_code := (
+    SELECT COUNT(*)
+    FROM information_schema.COLUMNS
+    WHERE TABLE_SCHEMA = DATABASE()
+      AND TABLE_NAME = 'acc_ledger_accounts'
+      AND COLUMN_NAME = 'template_code'
+);
+SET @ddl := IF(@missing_template_code = 0,
+    'ALTER TABLE acc_ledger_accounts ADD COLUMN template_code VARCHAR(30) NULL AFTER normal_balance',
+    'SELECT 0');
+PREPARE stmt FROM @ddl;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+
+SET @missing_external_reference := (
+    SELECT COUNT(*)
+    FROM information_schema.COLUMNS
+    WHERE TABLE_SCHEMA = DATABASE()
+      AND TABLE_NAME = 'acc_ledger_accounts'
+      AND COLUMN_NAME = 'external_reference'
+);
+SET @ddl := IF(@missing_external_reference = 0,
+    'ALTER TABLE acc_ledger_accounts ADD COLUMN external_reference VARCHAR(80) NULL AFTER template_code',
+    'SELECT 0');
+PREPARE stmt FROM @ddl;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+
+SET @has_template_index := (
+    SELECT COUNT(*)
+    FROM information_schema.statistics
+    WHERE TABLE_SCHEMA = DATABASE()
+      AND TABLE_NAME = 'acc_ledger_accounts'
+      AND INDEX_NAME = 'idx_ledger_template_code'
+);
+SET @ddl := IF(@has_template_index = 0,
+    'ALTER TABLE acc_ledger_accounts ADD INDEX idx_ledger_template_code (template_code)',
+    'SELECT 0');
+PREPARE stmt FROM @ddl;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+
+SET @missing_category_account_number := (
+    SELECT COUNT(*)
+    FROM information_schema.COLUMNS
+    WHERE TABLE_SCHEMA = DATABASE()
+      AND TABLE_NAME = 'acc_categories'
+      AND COLUMN_NAME = 'account_number'
+);
+SET @ddl := IF(@missing_category_account_number = 0,
+    'ALTER TABLE acc_categories ADD COLUMN account_number VARCHAR(20) NULL AFTER name',
+    'SELECT 0');
+PREPARE stmt FROM @ddl;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+
+SET @missing_category_account_type := (
+    SELECT COUNT(*)
+    FROM information_schema.COLUMNS
+    WHERE TABLE_SCHEMA = DATABASE()
+      AND TABLE_NAME = 'acc_categories'
+      AND COLUMN_NAME = 'account_type'
+);
+SET @ddl := IF(@missing_category_account_type = 0,
+    'ALTER TABLE acc_categories ADD COLUMN account_type ENUM(''Asset'',''Liability'',''Equity'',''Revenue'',''Expense'',''COGS'') NULL AFTER account_number',
+    'SELECT 0');
+PREPARE stmt FROM @ddl;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
 
 INSERT INTO acc_schema_migrations (name)
 SELECT '2025_11_28_bank_links_and_templates'

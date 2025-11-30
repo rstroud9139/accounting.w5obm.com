@@ -1,12 +1,15 @@
 <?php
 
+require_once __DIR__ . '/../../include/dbconn.php';
+require_once __DIR__ . '/../lib/helpers.php';
+
 class LedgerRegisterController
 {
     private mysqli $conn;
 
-    public function __construct(mysqli $conn)
+    public function __construct(?mysqli $conn = null)
     {
-        $this->conn = $conn;
+        $this->conn = $conn ?? accounting_db_connection();
     }
 
     /**

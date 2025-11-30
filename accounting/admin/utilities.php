@@ -30,6 +30,13 @@ $utilityLinks = [
         'impact' => 'Destructive'
     ],
     [
+        'title' => 'Data Imports',
+        'description' => 'Stage QuickBooks/gnuCash files, map accounts, and post staged batches.',
+        'url' => '../imports.php',
+        'icon' => 'fa-file-import',
+        'impact' => 'Workflow'
+    ],
+    [
         'title' => 'Seed Chart & Categories',
         'description' => 'Reloads the industry-standard chart of accounts and synchronized category list.',
         'url' => '../scripts/seed_chart_and_categories.php',

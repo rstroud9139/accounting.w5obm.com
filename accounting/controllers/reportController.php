@@ -98,7 +98,7 @@ function buildStatementPeriod(string $periodType, ?int $year = null, ?int $value
  */
 function generateIncomeStatementRange(string $startDate, string $endDate, ?string $displayLabel = null): array
 {
-    global $conn;
+    $conn = accounting_db_connection();
 
     try {
         $start = new DateTimeImmutable($startDate);
@@ -196,7 +196,7 @@ function generateIncomeStatementRange(string $startDate, string $endDate, ?strin
  */
 function generateBalanceSheet($date = null)
 {
-    global $conn;
+    $conn = accounting_db_connection();
 
     try {
         if ($date === null) {
@@ -326,7 +326,7 @@ function generateIncomeStatement($month, $year)
  */
 function saveReport($report_type, $parameters, $file_path = null)
 {
-    global $conn;
+    $conn = accounting_db_connection();
 
     try {
         // Validate inputs
@@ -374,7 +374,7 @@ function saveReport($report_type, $parameters, $file_path = null)
  */
 function getReportById($id)
 {
-    global $conn;
+    $conn = accounting_db_connection();
 
     try {
         if (!$id || !is_numeric($id)) {
@@ -412,7 +412,7 @@ function getReportById($id)
  */
 function getAllReports($filters = [], $limit = null)
 {
-    global $conn;
+    $conn = accounting_db_connection();
 
     try {
         $where_conditions = [];
@@ -487,7 +487,7 @@ function getAllReports($filters = [], $limit = null)
  */
 function deleteReport($id)
 {
-    global $conn;
+    $conn = accounting_db_connection();
 
     try {
         if (!$id || !is_numeric($id)) {
@@ -544,7 +544,7 @@ function deleteReport($id)
  */
 function getExpenseBreakdown($start_date, $end_date)
 {
-    global $conn;
+    $conn = accounting_db_connection();
 
     try {
         $stmt = $conn->prepare("

@@ -4,6 +4,7 @@ require_once __DIR__ . '/../utils/session_manager.php';
 require_once __DIR__ . '/../../include/dbconn.php';
 require_once __DIR__ . '/../controllers/assetController.php';
 require_once __DIR__ . '/../../include/premium_hero.php';
+require_once __DIR__ . '/../include/accounting_nav_helpers.php';
 
 // Validate session
 validate_session();
@@ -51,7 +52,7 @@ if (!$asset) {
  <body>
      <?php include '../../include/menu.php'; ?>
 
-     <div class="page-container" style="margin-top:0;padding-top:0;">
+    <div class="page-container" style="margin-top:0;padding-top:0;">
          <?php if (function_exists('renderPremiumHero')): ?>
              <?php renderPremiumHero([
                  'eyebrow' => 'Asset Operations',
@@ -118,42 +119,56 @@ if (!$asset) {
              </section>
          <?php endif; ?>
 
-         <div class="container mt-4">
-             <div class="card shadow">
-             <div class="card-header">
-                 <h3>Edit Asset</h3>
-             </div>
-             <div class="card-body">
-                 <?php if (isset($error_message)): ?>
-                     <div class="alert alert-danger"><?php echo $error_message; ?></div>
-                 <?php endif; ?>
-                 <form action="edit.php?id=<?php echo $id; ?>" method="POST">
-                     <div class="mb-3">
-                         <label for="name" class="form-label">Asset Name</label>
-                         <input type="text" id="name" name="name" class="form-control" value="<?php echo htmlspecialchars($asset['name']); ?>" required>
-                     </div>
-                     <div class="mb-3">
-                         <label for="value" class="form-label">Value</label>
-                         <input type="number" step="0.01" id="value" name="value" class="form-control" value="<?php echo $asset['value']; ?>" required>
-                     </div>
-                     <div class="mb-3">
-                         <label for="acquisition_date" class="form-label">Acquisition Date</label>
-                         <input type="date" id="acquisition_date" name="acquisition_date" class="form-control" value="<?php echo $asset['acquisition_date']; ?>" required>
-                     </div>
-                     <div class="mb-3">
-                         <label for="depreciation_rate" class="form-label">Annual Depreciation Rate (%)</label>
-                         <input type="number" step="0.01" id="depreciation_rate" name="depreciation_rate" class="form-control" value="<?php echo $asset['depreciation_rate']; ?>">
-                     </div>
-                     <div class="mb-3">
-                         <label for="description" class="form-label">Description</label>
-                         <textarea id="description" name="description" class="form-control"><?php echo htmlspecialchars($asset['description']); ?></textarea>
-                     </div>
-                     <button type="submit" class="btn btn-primary">Update Asset</button>
-                     <a href="list.php" class="btn btn-secondary">Cancel</a>
-                 </form>
-             </div>
-             </div>
-         </div>
+        <div class="container-fluid py-4">
+            <div class="row g-4">
+                <div class="col-lg-3">
+                    <?php if (function_exists('accounting_render_workspace_nav')): ?>
+                        <?php accounting_render_workspace_nav('assets'); ?>
+                    <?php endif; ?>
+                </div>
+                <div class="col-lg-9">
+                    <div class="card shadow">
+                        <div class="card-header">
+                            <h3 class="mb-0">Edit Asset</h3>
+                        </div>
+                        <div class="card-body">
+                            <?php if (isset($error_message)): ?>
+                                <div class="alert alert-danger"><?php echo $error_message; ?></div>
+                            <?php endif; ?>
+                            <form action="edit.php?id=<?php echo $id; ?>" method="POST" class="row g-3">
+                                <div class="col-12">
+                                    <label for="name" class="form-label">Asset Name</label>
+                                    <input type="text" id="name" name="name" class="form-control" value="<?php echo htmlspecialchars($asset['name']); ?>" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="value" class="form-label">Value</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">$</span>
+                                        <input type="number" step="0.01" id="value" name="value" class="form-control" value="<?php echo htmlspecialchars($asset['value']); ?>" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="acquisition_date" class="form-label">Acquisition Date</label>
+                                    <input type="date" id="acquisition_date" name="acquisition_date" class="form-control" value="<?php echo htmlspecialchars($asset['acquisition_date']); ?>" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="depreciation_rate" class="form-label">Annual Depreciation Rate (%)</label>
+                                    <input type="number" step="0.01" id="depreciation_rate" name="depreciation_rate" class="form-control" value="<?php echo htmlspecialchars($asset['depreciation_rate']); ?>">
+                                </div>
+                                <div class="col-12">
+                                    <label for="description" class="form-label">Description</label>
+                                    <textarea id="description" name="description" class="form-control" rows="4"><?php echo htmlspecialchars($asset['description']); ?></textarea>
+                                </div>
+                                <div class="col-12 d-flex gap-2">
+                                    <button type="submit" class="btn btn-primary"><i class="fas fa-save me-1"></i>Update Asset</button>
+                                    <a href="list.php" class="btn btn-secondary">Cancel</a>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
      </div>
 
      <?php include '../../include/footer.php'; ?>

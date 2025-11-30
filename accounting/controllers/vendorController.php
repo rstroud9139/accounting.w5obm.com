@@ -18,7 +18,7 @@ require_once __DIR__ . '/../lib/helpers.php';
  */
 function addVendor($data)
 {
-    global $conn;
+    $db = accounting_db_connection();
 
     try {
         // Validate required fields
@@ -26,7 +26,7 @@ function addVendor($data)
             throw new Exception("Vendor name is required");
         }
 
-        $stmt = $conn->prepare("
+        $stmt = $db->prepare("
             INSERT INTO acc_vendors 
             (name, contact_name, email, phone, address, notes, created_by, created_at) 
             VALUES (?, ?, ?, ?, ?, ?, ?, NOW())
@@ -51,7 +51,7 @@ function addVendor($data)
         );
 
         if ($stmt->execute()) {
-            $vendor_id = $conn->insert_id;
+            $vendor_id = $db->insert_id;
             $stmt->close();
 
             logActivity(
@@ -80,7 +80,7 @@ function addVendor($data)
  */
 function updateVendor($id, $data)
 {
-    global $conn;
+    $db = accounting_db_connection();
 
     try {
         if (!$id || !is_numeric($id)) {
@@ -96,7 +96,7 @@ function updateVendor($id, $data)
             throw new Exception("Vendor name is required");
         }
 
-        $stmt = $conn->prepare("
+        $stmt = $db->prepare("
             UPDATE acc_vendors 
             SET name = ?, contact_name = ?, email = ?, phone = ?, address = ?, 
                 notes = ?, updated_by = ?, updated_at = NOW()
@@ -150,7 +150,7 @@ function updateVendor($id, $data)
  */
 function deleteVendor($id)
 {
-    global $conn;
+    $db = accounting_db_connection();
 
     try {
         if (!$id || !is_numeric($id)) {
@@ -168,7 +168,7 @@ function deleteVendor($id)
         }
 
         // Check if vendor has transactions
-        $stmt = $conn->prepare("SELECT COUNT(*) as count FROM acc_transactions WHERE vendor_id = ?");
+        $stmt = $db->prepare("SELECT COUNT(*) as count FROM acc_transactions WHERE vendor_id = ?");
         $stmt->bind_param('i', $id);
         $stmt->execute();
         $result = $stmt->get_result()->fetch_assoc();
@@ -178,7 +178,7 @@ function deleteVendor($id)
             throw new Exception("Cannot delete vendor with existing transactions");
         }
 
-        $stmt = $conn->prepare("DELETE FROM acc_vendors WHERE id = ?");
+        $stmt = $db->prepare("DELETE FROM acc_vendors WHERE id = ?");
         $stmt->bind_param('i', $id);
 
         if ($stmt->execute()) {
@@ -209,20 +209,20 @@ function deleteVendor($id)
  */
 function getVendorById($id)
 {
-    global $conn;
+    $db = accounting_db_connection();
 
     try {
         if (!$id || !is_numeric($id)) {
             return false;
         }
 
-        $stmt = $conn->prepare("
+        $stmt = $db->prepare("
             SELECT v.*, 
                    cu.username AS created_by_username,
                    uu.username AS updated_by_username
             FROM acc_vendors v
-            LEFT JOIN auth_users cu ON v.created_by = cu.id
-            LEFT JOIN auth_users uu ON v.updated_by = uu.id
+            LEFT JOIN w5obm.auth_users cu ON v.created_by = cu.id
+            LEFT JOIN w5obm.auth_users uu ON v.updated_by = uu.id
             WHERE v.id = ?
         ");
 
@@ -245,7 +245,7 @@ function getVendorById($id)
  */
 function getAllVendors($filters = [])
 {
-    global $conn;
+    $db = accounting_db_connection();
 
     try {
         $where_conditions = [];
@@ -269,12 +269,12 @@ function getAllVendors($filters = [])
                    cu.username AS created_by_username,
                    (SELECT COUNT(*) FROM acc_transactions t WHERE t.vendor_id = v.id) AS transaction_count
             FROM acc_vendors v
-            LEFT JOIN auth_users cu ON v.created_by = cu.id
+            LEFT JOIN w5obm.auth_users cu ON v.created_by = cu.id
             $where_clause
             ORDER BY v.name ASC
         ";
 
-        $stmt = $conn->prepare($query);
+        $stmt = $db->prepare($query);
 
         if (!empty($params)) {
             $stmt->bind_param($types, ...$params);
@@ -303,14 +303,14 @@ function getAllVendors($filters = [])
  */
 function getVendorTransactions($vendor_id)
 {
-    global $conn;
+    $db = accounting_db_connection();
 
     try {
         if (!$vendor_id || !is_numeric($vendor_id)) {
             return [];
         }
 
-        $stmt = $conn->prepare("
+         $stmt = $db->prepare("
             SELECT t.*, 
                    c.name AS category_name,
                    a.name AS account_name

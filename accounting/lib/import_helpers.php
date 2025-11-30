@@ -9,6 +9,8 @@ if (!function_exists('accounting_imports_ensure_tables')) {
             "CREATE TABLE IF NOT EXISTS acc_import_batches (\n                id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,\n                source_type VARCHAR(40) NOT NULL,\n                status VARCHAR(40) NOT NULL DEFAULT 'draft',\n                original_filename VARCHAR(255) NULL,\n                stored_path VARCHAR(255) NULL,\n                checksum CHAR(64) NULL,\n                total_rows INT UNSIGNED NOT NULL DEFAULT 0,\n                ready_rows INT UNSIGNED NOT NULL DEFAULT 0,\n                error_rows INT UNSIGNED NOT NULL DEFAULT 0,\n                created_by INT NULL,\n                created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,\n                updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\n                committed_at DATETIME NULL,\n                INDEX idx_status (status),\n                INDEX idx_created_by (created_by)\n            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4",
             "CREATE TABLE IF NOT EXISTS acc_import_rows (\n                id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,\n                batch_id INT UNSIGNED NOT NULL,\n                `row_number` INT UNSIGNED NOT NULL,\n                payload LONGTEXT NULL,\n                normalized LONGTEXT NULL,\n                status VARCHAR(40) NOT NULL DEFAULT 'pending',\n                message TEXT NULL,\n                created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,\n                updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\n                UNIQUE KEY idx_batch_row (batch_id, `row_number`),\n                INDEX idx_status (status),\n                CONSTRAINT fk_import_rows_batch FOREIGN KEY (batch_id) REFERENCES acc_import_batches(id) ON DELETE CASCADE\n            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4",
             "CREATE TABLE IF NOT EXISTS acc_import_row_errors (\n                id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,\n                batch_id INT UNSIGNED NOT NULL,\n                row_id BIGINT UNSIGNED NULL,\n                `row_number` INT UNSIGNED NULL,\n                error_code VARCHAR(60) NULL,\n                error_message TEXT NOT NULL,\n                created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,\n                INDEX idx_batch (batch_id),\n                INDEX idx_row (row_id),\n                CONSTRAINT fk_import_errors_batch FOREIGN KEY (batch_id) REFERENCES acc_import_batches(id) ON DELETE CASCADE\n            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4",
+            "CREATE TABLE IF NOT EXISTS acc_import_account_maps (\n                id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,\n                source_type VARCHAR(40) NOT NULL,\n                source_key VARCHAR(160) NOT NULL,\n                source_label VARCHAR(255) NULL,\n                ledger_account_id INT UNSIGNED NOT NULL,\n                created_by INT NULL,\n                updated_by INT NULL,\n                created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,\n                updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\n                UNIQUE KEY uk_account_map_source (source_type, source_key),\n                CONSTRAINT fk_account_map_ledger FOREIGN KEY (ledger_account_id) REFERENCES acc_ledger_accounts(id) ON DELETE CASCADE\n            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4",
+            "CREATE TABLE IF NOT EXISTS acc_import_batch_commits (\n                id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,\n                batch_id INT UNSIGNED NOT NULL,\n                committed_by INT NULL,\n                journal_count INT UNSIGNED NOT NULL DEFAULT 0,\n                line_count INT UNSIGNED NOT NULL DEFAULT 0,\n                notes VARCHAR(255) NULL,\n                created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,\n                CONSTRAINT fk_batch_commit_batch FOREIGN KEY (batch_id) REFERENCES acc_import_batches(id) ON DELETE CASCADE\n            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4",
         ];
 
         foreach ($tables as $sql) {
@@ -556,6 +558,307 @@ if (!function_exists('accounting_imports_parse_ofx_transactions')) {
         }
         
         return $transactions;
+    }
+}
+
+if (!function_exists('accounting_imports_fetch_batch')) {
+    function accounting_imports_fetch_batch(mysqli $conn, int $batchId): ?array
+    {
+        $stmt = $conn->prepare('SELECT * FROM acc_import_batches WHERE id = ?');
+        if (!$stmt) {
+            return null;
+        }
+        $stmt->bind_param('i', $batchId);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $row = $result ? $result->fetch_assoc() : null;
+        $stmt->close();
+        return $row ?: null;
+    }
+}
+
+if (!function_exists('accounting_imports_fetch_batch_accounts')) {
+    function accounting_imports_fetch_batch_accounts(mysqli $conn, int $batchId): array
+    {
+        $sql = "SELECT
+                COALESCE(
+                    JSON_UNQUOTE(JSON_EXTRACT(normalized, '$.account_guid')),
+                    JSON_UNQUOTE(JSON_EXTRACT(payload, '$.account_guid')),
+                    JSON_UNQUOTE(JSON_EXTRACT(normalized, '$.account_name')),
+                    JSON_UNQUOTE(JSON_EXTRACT(payload, '$.account_name')),
+                    CONCAT('row-', MIN(row_number))
+                ) AS account_key,
+                JSON_UNQUOTE(JSON_EXTRACT(normalized, '$.account_name')) AS account_name,
+                JSON_UNQUOTE(JSON_EXTRACT(normalized, '$.account_code')) AS account_code,
+                JSON_UNQUOTE(JSON_EXTRACT(normalized, '$.account_type')) AS account_type,
+                COUNT(*) AS split_count
+            FROM acc_import_rows
+            WHERE batch_id = ?
+            GROUP BY account_key, account_name, account_code, account_type
+            ORDER BY account_name IS NULL, account_name";
+
+        $stmt = $conn->prepare($sql);
+        if (!$stmt) {
+            return [];
+        }
+        $stmt->bind_param('i', $batchId);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $accounts = [];
+        while ($row = $result->fetch_assoc()) {
+            $accounts[] = $row;
+        }
+        $stmt->close();
+        return $accounts;
+    }
+}
+
+if (!function_exists('accounting_imports_fetch_account_maps')) {
+    function accounting_imports_fetch_account_maps(mysqli $conn, string $sourceType): array
+    {
+        $stmt = $conn->prepare('SELECT * FROM acc_import_account_maps WHERE source_type = ?');
+        if (!$stmt) {
+            return [];
+        }
+        $stmt->bind_param('s', $sourceType);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $maps = [];
+        while ($row = $result->fetch_assoc()) {
+            $maps[$row['source_key']] = $row;
+        }
+        $stmt->close();
+        return $maps;
+    }
+}
+
+if (!function_exists('accounting_imports_save_account_map')) {
+    function accounting_imports_save_account_map(mysqli $conn, int $userId, string $sourceType, string $sourceKey, string $sourceLabel, int $ledgerAccountId): void
+    {
+        $sql = 'INSERT INTO acc_import_account_maps (source_type, source_key, source_label, ledger_account_id, created_by, updated_by, created_at, updated_at)
+                VALUES (?, ?, ?, ?, ?, ?, NOW(), NOW())
+                ON DUPLICATE KEY UPDATE source_label = VALUES(source_label), ledger_account_id = VALUES(ledger_account_id), updated_by = VALUES(updated_by), updated_at = NOW()';
+
+        $stmt = $conn->prepare($sql);
+        if (!$stmt) {
+            throw new RuntimeException('Unable to persist mapping definition.');
+        }
+        $stmt->bind_param('sssiii', $sourceType, $sourceKey, $sourceLabel, $ledgerAccountId, $userId, $userId);
+        if (!$stmt->execute()) {
+            $stmt->close();
+            throw new RuntimeException('Failed to save mapping: ' . $conn->error);
+        }
+        $stmt->close();
+    }
+}
+
+if (!function_exists('accounting_imports_delete_batch')) {
+    function accounting_imports_delete_batch(mysqli $conn, int $batchId, int $userId): void
+    {
+        $batch = accounting_imports_fetch_batch($conn, $batchId);
+        if (!$batch) {
+            throw new RuntimeException('Batch not found.');
+        }
+
+        $stmt = $conn->prepare('DELETE FROM acc_import_batches WHERE id = ?');
+        if (!$stmt) {
+            throw new RuntimeException('Unable to delete batch: ' . $conn->error);
+        }
+        $stmt->bind_param('i', $batchId);
+        if (!$stmt->execute()) {
+            $stmt->close();
+            throw new RuntimeException('Batch removal failed: ' . $conn->error);
+        }
+        $stmt->close();
+
+        if (function_exists('logActivity')) {
+            @logActivity($userId, 'accounting_import_batch_deleted', 'acc_import_batches', $batchId, 'Deleted staged batch ' . $batchId);
+        }
+    }
+}
+
+if (!function_exists('accounting_imports_extract_account_key')) {
+    function accounting_imports_extract_account_key(array $normalized, array $payload = []): string
+    {
+        foreach (['account_guid', 'account_id', 'account_key'] as $key) {
+            if (!empty($normalized[$key])) {
+                return (string)$normalized[$key];
+            }
+            if (!empty($payload[$key])) {
+                return (string)$payload[$key];
+            }
+        }
+        if (!empty($normalized['account_name'])) {
+            return (string)$normalized['account_name'];
+        }
+        if (!empty($payload['account_name'])) {
+            return (string)$payload['account_name'];
+        }
+        if (!empty($payload['transaction_guid'])) {
+            return (string)$payload['transaction_guid'];
+        }
+        return 'row-' . (string)(microtime(true) * 1000);
+    }
+}
+
+if (!function_exists('accounting_imports_post_batch')) {
+    function accounting_imports_post_batch(mysqli $conn, int $batchId, int $userId): array
+    {
+        $batch = accounting_imports_fetch_batch($conn, $batchId);
+        if (!$batch) {
+            throw new RuntimeException('Batch not found.');
+        }
+        if ($batch['status'] === 'committed') {
+            throw new RuntimeException('Batch already committed.');
+        }
+
+        $stmt = $conn->prepare('SELECT id, row_number, payload, normalized FROM acc_import_rows WHERE batch_id = ? ORDER BY row_number ASC');
+        if (!$stmt) {
+            throw new RuntimeException('Unable to read staged rows.');
+        }
+        $stmt->bind_param('i', $batchId);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        if (!$result || $result->num_rows === 0) {
+            $stmt->close();
+            throw new RuntimeException('Batch has no staged rows.');
+        }
+
+        $transactions = [];
+        $uniqueAccounts = [];
+        while ($row = $result->fetch_assoc()) {
+            $payload = json_decode($row['payload'] ?? '[]', true) ?: [];
+            $normalized = json_decode($row['normalized'] ?? '[]', true) ?: [];
+            $txnKey = $payload['transaction_guid'] ?? $payload['transaction_number'] ?? ('row-' . $row['row_number']);
+            if (!isset($transactions[$txnKey])) {
+                $transactions[$txnKey] = [
+                    'meta' => [
+                        'date' => $payload['date_posted'] ?? $normalized['date'] ?? date('Y-m-d'),
+                        'memo' => $payload['transaction_description'] ?? $payload['memo'] ?? ($normalized['description'] ?? ''),
+                        'number' => $payload['transaction_number'] ?? $payload['reference'] ?? null,
+                    ],
+                    'splits' => [],
+                ];
+            }
+
+            $accountKey = accounting_imports_extract_account_key($normalized, $payload);
+            $transactions[$txnKey]['splits'][] = [
+                'payload' => $payload,
+                'normalized' => $normalized,
+                'account_key' => $accountKey,
+            ];
+            $uniqueAccounts[$accountKey] = $payload['account_name'] ?? ($normalized['account_name'] ?? $accountKey);
+        }
+        $stmt->close();
+
+        if (empty($transactions)) {
+            throw new RuntimeException('No transactions ready for posting.');
+        }
+
+        $maps = accounting_imports_fetch_account_maps($conn, $batch['source_type']);
+        $missing = [];
+        foreach ($uniqueAccounts as $accountKey => $label) {
+            if (empty($maps[$accountKey])) {
+                $missing[] = $label . ' (' . $accountKey . ')';
+            }
+        }
+        if (!empty($missing)) {
+            throw new RuntimeException('Missing account mappings for: ' . implode(', ', array_slice($missing, 0, 5)) . (count($missing) > 5 ? '...' : ''));
+        }
+
+        $journalSql = 'INSERT INTO acc_journals (journal_date, memo, source, ref_no, created_by, posted_at, created_at, updated_at) VALUES (?, ?, ?, ?, ?, NOW(), NOW(), NOW())';
+        $journalStmt = $conn->prepare($journalSql);
+        if (!$journalStmt) {
+            throw new RuntimeException('Unable to prepare journal insert.');
+        }
+        $journalStmt->bind_param('ssssi', $journalDate, $journalMemo, $journalSource, $journalRef, $journalUser);
+        $journalSource = 'import:' . $batch['source_type'];
+        $journalUser = $userId;
+
+        $lineSql = 'INSERT INTO acc_journal_lines (journal_id, account_id, category_id, description, debit, credit, line_order, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, NOW())';
+        $lineStmt = $conn->prepare($lineSql);
+        if (!$lineStmt) {
+            $journalStmt->close();
+            throw new RuntimeException('Unable to prepare journal line insert.');
+        }
+        $lineStmt->bind_param('iiisddi', $lineJournalId, $lineAccountId, $lineCategoryId, $lineDescription, $lineDebit, $lineCredit, $lineOrder);
+
+        $journalCount = 0;
+        $lineCount = 0;
+
+        $conn->begin_transaction();
+        try {
+            foreach ($transactions as $txnKey => $txn) {
+                $journalDate = substr((string)$txn['meta']['date'], 0, 10) ?: date('Y-m-d');
+                $journalMemo = $txn['meta']['memo'] ?: ('Imported batch #' . $batchId);
+                $journalRef = $txn['meta']['number'] ?: $txnKey;
+
+                if (!$journalStmt->execute()) {
+                    throw new RuntimeException('Failed to insert journal entry: ' . $conn->error);
+                }
+                $journalId = (int)$conn->insert_id;
+                $journalCount++;
+
+                $lineSequence = 1;
+                foreach ($txn['splits'] as $split) {
+                    $map = $maps[$split['account_key']] ?? null;
+                    if (!$map) {
+                        throw new RuntimeException('Mapping vanished for ' . $split['account_key']);
+                    }
+                    $lineJournalId = $journalId;
+                    $lineAccountId = (int)$map['ledger_account_id'];
+                    $lineCategoryId = null;
+                    $lineDescription = $split['payload']['memo'] ?? $journalMemo;
+                    $normalized = $split['normalized'];
+                    $lineDebit = isset($normalized['debit']) ? (float)$normalized['debit'] : ((float)($normalized['amount'] ?? 0) >= 0 ? abs((float)($normalized['amount'] ?? 0)) : 0.0);
+                    $lineCredit = isset($normalized['credit']) ? (float)$normalized['credit'] : ((float)($normalized['amount'] ?? 0) < 0 ? abs((float)($normalized['amount'] ?? 0)) : 0.0);
+                    if (abs($lineDebit) < 0.00001 && abs($lineCredit) < 0.00001) {
+                        continue;
+                    }
+                    $lineOrder = $lineSequence++;
+                    if (!$lineStmt->execute()) {
+                        throw new RuntimeException('Failed to insert journal line: ' . $conn->error);
+                    }
+                    $lineCount++;
+                }
+            }
+
+            $status = 'committed';
+            $updateStmt = $conn->prepare('UPDATE acc_import_batches SET status = ?, ready_rows = total_rows, error_rows = 0, committed_at = NOW(), updated_at = NOW() WHERE id = ?');
+            if ($updateStmt) {
+                $updateStmt->bind_param('si', $status, $batchId);
+                $updateStmt->execute();
+                $updateStmt->close();
+            }
+            $conn->query('UPDATE acc_import_rows SET status = "committed", message = NULL WHERE batch_id = ' . (int)$batchId);
+
+            $commitStmt = $conn->prepare('INSERT INTO acc_import_batch_commits (batch_id, committed_by, journal_count, line_count, notes) VALUES (?, ?, ?, ?, ?)');
+            if ($commitStmt) {
+                $notes = 'Auto post from import wizard';
+                $commitStmt->bind_param('iiiis', $batchId, $userId, $journalCount, $lineCount, $notes);
+                $commitStmt->execute();
+                $commitStmt->close();
+            }
+
+            if (function_exists('logActivity')) {
+                @logActivity($userId, 'accounting_import_batch_committed', 'acc_import_batches', $batchId, sprintf('Posted %d journals / %d lines', $journalCount, $lineCount));
+            }
+
+            $conn->commit();
+        } catch (Throwable $ex) {
+            $conn->rollback();
+            $journalStmt->close();
+            $lineStmt->close();
+            throw $ex;
+        }
+
+        $journalStmt->close();
+        $lineStmt->close();
+
+        return [
+            'journals' => $journalCount,
+            'lines' => $lineCount,
+        ];
     }
 }
 

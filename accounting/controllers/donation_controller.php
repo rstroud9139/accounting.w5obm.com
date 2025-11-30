@@ -1,6 +1,9 @@
 <?php
 // /accounting/controllers/donation_controller.php
 
+require_once __DIR__ . '/../../include/dbconn.php';
+require_once __DIR__ . '/../lib/helpers.php';
+
     /**
      * Donation Controller
      * Handles all donation-related operations
@@ -11,11 +14,11 @@
      */
     function add_donation($contact_id, $amount, $donation_date, $description, $tax_deductible = true, $notes = '')
     {
-        global $conn;
+        $db = accounting_db_connection();
 
         $query = "INSERT INTO acc_donations (contact_id, amount, donation_date, description, tax_deductible, notes, created_at) 
               VALUES (?, ?, ?, ?, ?, ?, NOW())";
-        $stmt = $conn->prepare($query);
+        $stmt = $db->prepare($query);
         $tax_deductible_int = $tax_deductible ? 1 : 0;
         $stmt->bind_param('idssss', $contact_id, $amount, $donation_date, $description, $tax_deductible_int, $notes);
 
@@ -27,11 +30,11 @@
      */
     function update_donation($id, $contact_id, $amount, $donation_date, $description, $tax_deductible = true, $notes = '')
     {
-        global $conn;
+        $db = accounting_db_connection();
 
         $query = "UPDATE acc_donations SET contact_id = ?, amount = ?, donation_date = ?, description = ?, tax_deductible = ?, notes = ? 
               WHERE id = ?";
-        $stmt = $conn->prepare($query);
+        $stmt = $db->prepare($query);
         $tax_deductible_int = $tax_deductible ? 1 : 0;
         $stmt->bind_param('idssssi', $contact_id, $amount, $donation_date, $description, $tax_deductible_int, $notes, $id);
 
@@ -43,10 +46,10 @@
      */
     function delete_donation($id)
     {
-        global $conn;
+        $db = accounting_db_connection();
 
         $query = "DELETE FROM acc_donations WHERE id = ?";
-        $stmt = $conn->prepare($query);
+        $stmt = $db->prepare($query);
         $stmt->bind_param('i', $id);
 
         return $stmt->execute();
@@ -57,13 +60,13 @@
      */
     function fetch_donation_by_id($id)
     {
-        global $conn;
+        $db = accounting_db_connection();
 
         $query = "SELECT d.*, c.name as contact_name, c.email as contact_email, c.tax_id as contact_tax_id 
               FROM acc_donations d
               LEFT JOIN acc_contacts c ON d.contact_id = c.id
               WHERE d.id = ?";
-        $stmt = $conn->prepare($query);
+        $stmt = $db->prepare($query);
         $stmt->bind_param('i', $id);
         $stmt->execute();
         $result = $stmt->get_result();
@@ -98,14 +101,14 @@
      */
     function mark_receipt_sent($id, $receipt_date = null)
     {
-        global $conn;
+        $db = accounting_db_connection();
 
         if ($receipt_date === null) {
             $receipt_date = date('Y-m-d');
         }
 
         $query = "UPDATE acc_donations SET receipt_sent = 1, receipt_date = ? WHERE id = ?";
-        $stmt = $conn->prepare($query);
+        $stmt = $db->prepare($query);
         $stmt->bind_param('si', $receipt_date, $id);
 
         return $stmt->execute();
@@ -114,10 +117,10 @@
     /**
      * Calculate the total donations for a given time period.
      */
-    function calculate_total_donations($conn = null, $start_date = null, $end_date = null)
+    function calculate_total_donations($dbConn = null, $start_date = null, $end_date = null)
     {
-        if ($conn === null) {
-            global $conn;
+        if ($dbConn === null) {
+            $dbConn = accounting_db_connection();
         }
 
         $query = "SELECT SUM(amount) AS total FROM acc_donations";
@@ -131,7 +134,7 @@
             $types .= 'ss';
         }
 
-        $stmt = $conn->prepare($query);
+        $stmt = $dbConn->prepare($query);
 
         if (!empty($params)) {
             $stmt->bind_param($types, ...$params);
@@ -149,7 +152,7 @@
      */
     function get_donations(array $filters = [], array $options = [])
     {
-        global $conn;
+        $db = accounting_db_connection();
 
         $query = "SELECT d.*, c.name AS contact_name, c.email AS contact_email, c.phone AS contact_phone, c.tax_id AS contact_tax_id
               FROM acc_donations d
@@ -231,7 +234,7 @@
             $query .= " LIMIT " . (int)$options['limit'];
         }
 
-        $stmt = $conn->prepare($query);
+        $stmt = $db->prepare($query);
 
         if (!empty($params)) {
             $stmt->bind_param($types, ...$params);

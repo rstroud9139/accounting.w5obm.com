@@ -16,6 +16,7 @@ require_once __DIR__ . '/../lib/helpers.php';
 require_once __DIR__ . '/../controllers/donation_controller.php';
 require_once __DIR__ . '/../controllers/transactionController.php';
 require_once __DIR__ . '/../utils/csrf.php';
+$db = accounting_db_connection();
 
 // Authentication check
 if (!isAuthenticated()) {
@@ -76,7 +77,7 @@ try {
     }
 
     // Verify the deposit account exists and is active
-    $stmt = $conn->prepare("SELECT id, name, account_type FROM acc_ledger_accounts WHERE id = ? AND active = 1");
+    $stmt = $db->prepare("SELECT id, name, account_type FROM acc_ledger_accounts WHERE id = ? AND active = 1");
     $stmt->bind_param('i', $deposit_account_id);
     $stmt->execute();
     $account = $stmt->get_result()->fetch_assoc();
@@ -88,7 +89,7 @@ try {
 
     // Create anonymous contact entry for "Cash - Event Collections"
     // Check if anonymous contact exists
-    $stmt = $conn->prepare("SELECT id FROM acc_contacts WHERE name = 'Anonymous - Cash Collections' LIMIT 1");
+    $stmt = $db->prepare("SELECT id FROM acc_contacts WHERE name = 'Anonymous - Cash Collections' LIMIT 1");
     $stmt->execute();
     $result = $stmt->get_result();
     $anonymousContact = $result->fetch_assoc();
@@ -96,12 +97,12 @@ try {
 
     if (!$anonymousContact) {
         // Create the anonymous contact
-        $stmt = $conn->prepare("
+        $stmt = $db->prepare("\
             INSERT INTO acc_contacts (name, email, notes, created_at) 
             VALUES ('Anonymous - Cash Collections', NULL, 'System-generated contact for quick-post cash donations', NOW())
         ");
         $stmt->execute();
-        $contact_id = $conn->insert_id;
+        $contact_id = $db->insert_id;
         $stmt->close();
     } else {
         $contact_id = $anonymousContact['id'];
@@ -121,11 +122,11 @@ try {
         throw new Exception('Failed to record donation. Please try again.');
     }
 
-    $donation_id = $conn->insert_id;
+    $donation_id = $db->insert_id;
 
     // Create corresponding transaction to credit the deposit account
     // Determine income category for donations
-    $stmt = $conn->prepare("
+    $stmt = $db->prepare("\
         SELECT id FROM acc_transaction_categories 
         WHERE type = 'Income' 
           AND (name LIKE '%Donation%' OR name LIKE '%Contribution%' OR name LIKE '%Gift%')
@@ -143,12 +144,12 @@ try {
 
     if (!$category_id) {
         // Create default donation category if none exists
-        $stmt = $conn->prepare("
+        $stmt = $db->prepare("\
             INSERT INTO acc_transaction_categories (name, type, description, created_at) 
             VALUES ('Donations', 'Income', 'Charitable donations and contributions', NOW())
         ");
         $stmt->execute();
-        $category_id = $conn->insert_id;
+        $category_id = $db->insert_id;
         $stmt->close();
     }
 
@@ -187,7 +188,6 @@ try {
     );
     header('Location: /accounting/dashboard.php?quick_post=success');
     exit();
-
 } catch (Exception $e) {
     setToastMessage('danger', 'Quick Post Failed', $e->getMessage(), 'club-logo');
     logError("Quick post cash donation error: " . $e->getMessage(), 'accounting');

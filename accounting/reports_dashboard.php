@@ -21,9 +21,13 @@ require_once __DIR__ . '/lib/report_filters.php';
 require_once __DIR__ . '/../include/premium_hero.php';
 require_once __DIR__ . '/report_catalog.php';
 
-// Prefer the accounting ledger connection for all acc_* tables, but fall back to the
-// shared auth connection if the dedicated handle is unavailable (e.g. local dev).
-$accountingConn = ($accConn instanceof mysqli) ? $accConn : $conn;
+try {
+    $accountingConn = accounting_db_connection();
+} catch (Exception $e) {
+    setToastMessage('danger', 'Database Error', 'Accounting database connection is unavailable.', 'fas fa-plug');
+    header('Location: /accounting/dashboard.php');
+    exit();
+}
 
 if (!function_exists('accounting_report_type_icon')) {
     function accounting_report_type_icon(string $type): string

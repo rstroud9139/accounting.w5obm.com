@@ -4,12 +4,12 @@ class DashboardController extends BaseController
     public function index()
     {
         // Sample KPIs (replace with real queries later)
-        global $conn;
+        $db = accounting_db_connection();
         $totalIncome = 0.0;
         $totalExpense = 0.0;
         try {
             $yr = date('Y');
-            $stmt = $conn->prepare("SELECT 
+            $stmt = $db->prepare("SELECT 
                 SUM(CASE WHEN type='Income' THEN amount ELSE 0 END) AS inc,
                 SUM(CASE WHEN type='Expense' THEN amount ELSE 0 END) AS exp
               FROM acc_transactions WHERE YEAR(transaction_date)=?");

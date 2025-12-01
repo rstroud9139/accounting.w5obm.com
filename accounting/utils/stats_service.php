@@ -14,7 +14,7 @@ require_once __DIR__ . '/../lib/helpers.php';
  */
 function get_transaction_totals(string $start_date, string $end_date): array
 {
-    global $conn;
+    $db = accounting_db_connection();
 
     $totals = [
         'income' => 0.0,
@@ -24,7 +24,7 @@ function get_transaction_totals(string $start_date, string $end_date): array
     ];
 
     // Income
-    $stmt = $conn->prepare("SELECT COALESCE(SUM(amount),0) AS total FROM acc_transactions WHERE type = 'Income' AND transaction_date BETWEEN ? AND ?");
+    $stmt = $db->prepare("SELECT COALESCE(SUM(amount),0) AS total FROM acc_transactions WHERE type = 'Income' AND transaction_date BETWEEN ? AND ?");
     $stmt->bind_param('ss', $start_date, $end_date);
     $stmt->execute();
     $row = $stmt->get_result()->fetch_assoc();
@@ -32,7 +32,7 @@ function get_transaction_totals(string $start_date, string $end_date): array
     $stmt->close();
 
     // Expenses
-    $stmt = $conn->prepare("SELECT COALESCE(SUM(amount),0) AS total FROM acc_transactions WHERE type = 'Expense' AND transaction_date BETWEEN ? AND ?");
+    $stmt = $db->prepare("SELECT COALESCE(SUM(amount),0) AS total FROM acc_transactions WHERE type = 'Expense' AND transaction_date BETWEEN ? AND ?");
     $stmt->bind_param('ss', $start_date, $end_date);
     $stmt->execute();
     $row = $stmt->get_result()->fetch_assoc();
@@ -40,7 +40,7 @@ function get_transaction_totals(string $start_date, string $end_date): array
     $stmt->close();
 
     // Count
-    $stmt = $conn->prepare("SELECT COUNT(*) AS cnt FROM acc_transactions WHERE transaction_date BETWEEN ? AND ?");
+    $stmt = $db->prepare("SELECT COUNT(*) AS cnt FROM acc_transactions WHERE transaction_date BETWEEN ? AND ?");
     $stmt->bind_param('ss', $start_date, $end_date);
     $stmt->execute();
     $row = $stmt->get_result()->fetch_assoc();
@@ -57,9 +57,9 @@ function get_transaction_totals(string $start_date, string $end_date): array
  */
 function get_cash_balance(): float
 {
-    global $conn;
+    $db = accounting_db_connection();
 
-    $stmt = $conn->prepare("SELECT COALESCE(SUM(CASE WHEN type='Income' THEN amount ELSE 0 END) - SUM(CASE WHEN type='Expense' THEN amount ELSE 0 END),0) AS cash_balance FROM acc_transactions");
+    $stmt = $db->prepare("SELECT COALESCE(SUM(CASE WHEN type='Income' THEN amount ELSE 0 END) - SUM(CASE WHEN type='Expense' THEN amount ELSE 0 END),0) AS cash_balance FROM acc_transactions");
     $stmt->execute();
     $row = $stmt->get_result()->fetch_assoc();
     $stmt->close();
@@ -71,12 +71,12 @@ function get_cash_balance(): float
  */
 function get_asset_value(): float
 {
-    global $conn;
+    $db = accounting_db_connection();
 
     if (!function_exists('tableExists') || !tableExists('acc_assets')) {
         return 0.0;
     }
-    $stmt = $conn->prepare("SELECT COALESCE(SUM(value),0) AS total FROM acc_assets");
+    $stmt = $db->prepare("SELECT COALESCE(SUM(value),0) AS total FROM acc_assets");
     $stmt->execute();
     $row = $stmt->get_result()->fetch_assoc();
     $stmt->close();
@@ -90,10 +90,10 @@ function get_asset_value(): float
  */
 function get_cash_flow_statement(string $start_date, string $end_date): array
 {
-    global $conn;
+    $db = accounting_db_connection();
 
     // Beginning balance
-    $stmt = $conn->prepare("SELECT 
+    $stmt = $db->prepare("SELECT 
                 SUM(CASE WHEN type = 'Income' THEN amount ELSE 0 END) - 
                 SUM(CASE WHEN type = 'Expense' THEN amount ELSE 0 END) AS balance
               FROM acc_transactions 
@@ -103,8 +103,8 @@ function get_cash_flow_statement(string $start_date, string $end_date): array
     $beginning_balance = (float)($stmt->get_result()->fetch_assoc()['balance'] ?? 0);
     $stmt->close();
 
-    $aggregate = function (string $groupType) use ($conn, $start_date, $end_date) {
-        $stmt = $conn->prepare("SELECT 
+    $aggregate = function (string $groupType) use ($db, $start_date, $end_date) {
+        $stmt = $db->prepare("SELECT 
                 SUM(CASE WHEN type = 'Income' THEN amount ELSE 0 END) AS income,
                 SUM(CASE WHEN type = 'Expense' THEN amount ELSE 0 END) AS expense
               FROM acc_transactions 
@@ -144,12 +144,12 @@ function get_cash_flow_statement(string $start_date, string $end_date): array
  */
 function get_income_by_category(string $start_date, string $end_date, ?int $limit = null): array
 {
-    global $conn;
+    $db = accounting_db_connection();
     $sql = "SELECT c.name, SUM(t.amount) AS total FROM acc_transactions t JOIN acc_transaction_categories c ON t.category_id=c.id WHERE t.type='Income' AND t.transaction_date BETWEEN ? AND ? GROUP BY c.name ORDER BY total DESC";
     if ($limit && $limit > 0) {
         $sql .= " LIMIT " . (int)$limit;
     }
-    $stmt = $conn->prepare($sql);
+    $stmt = $db->prepare($sql);
     $stmt->bind_param('ss', $start_date, $end_date);
     $stmt->execute();
     $res = $stmt->get_result();
@@ -168,12 +168,12 @@ function get_income_by_category(string $start_date, string $end_date, ?int $limi
  */
 function get_expenses_by_category(string $start_date, string $end_date, ?int $limit = null): array
 {
-    global $conn;
+    $db = accounting_db_connection();
     $sql = "SELECT c.name, SUM(t.amount) AS total FROM acc_transactions t JOIN acc_transaction_categories c ON t.category_id=c.id WHERE t.type='Expense' AND t.transaction_date BETWEEN ? AND ? GROUP BY c.name ORDER BY total DESC";
     if ($limit && $limit > 0) {
         $sql .= " LIMIT " . (int)$limit;
     }
-    $stmt = $conn->prepare($sql);
+    $stmt = $db->prepare($sql);
     $stmt->bind_param('ss', $start_date, $end_date);
     $stmt->execute();
     $res = $stmt->get_result();

@@ -15,6 +15,8 @@ require_once __DIR__ . '/utils/csrf.php';
 require_once __DIR__ . '/utils/quick_post.php';
 require_once __DIR__ . '/lib/dashboard_metrics.php';
 
+$db = accounting_db_connection();
+
 $cash_balance = 0.00;
 $asset_value = 0.00;
 $asset_current_value = 0.00;
@@ -33,7 +35,7 @@ $page_title = 'Accounting Dashboard - W5OBM';
 $user_id = function_exists('getCurrentUserId') ? getCurrentUserId() : ($_SESSION['user_id'] ?? null);
 csrf_ensure_token();
 
-$metrics = accounting_collect_dashboard_metrics($accConn ?? null, $accConn ?? null, 25);
+$metrics = accounting_collect_dashboard_metrics($db, $db, 25);
 $cash_balance = $metrics['cash_balance'];
 $asset_value = $metrics['asset_value'];
 $asset_summary = $metrics['asset_summary'] ?? $asset_summary;
@@ -68,7 +70,7 @@ $month_trend_badge_class = $month_trend_positive ? 'bg-success' : 'bg-danger';
 $month_trend_badge_label = $month_trend_positive ? 'Running Surplus' : 'Watch Burn';
 $operating_margin_label = $operating_margin_percent !== null ? number_format($operating_margin_percent, 1) . '%' : 'N/A';
 $operating_margin_badge_class = ($operating_margin_percent ?? 0.0) >= 0 ? 'bg-success' : 'bg-danger';
-$quickPostContext = accounting_quick_cash_resolve_context($conn);
+$quickPostContext = accounting_quick_cash_resolve_context($db);
 $quickPostCategories = $quickPostContext['categories'] ?? [];
 $quickPostAccounts = $quickPostContext['accounts'] ?? [];
 $quickPostDefaultCategoryId = (int)($quickPostContext['default_category_id'] ?? 0);

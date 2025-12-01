@@ -18,6 +18,8 @@ require_once __DIR__ . '/../views/transactionList.php';
 require_once __DIR__ . '/../../include/premium_hero.php';
 require_once __DIR__ . '/../include/accounting_nav_helpers.php';
 
+$db = accounting_db_connection();
+
 // Authentication gate
 if (!isAuthenticated()) {
     header('Location: /authentication/login.php');
@@ -188,7 +190,7 @@ try {
 // Supporting dropdown data
 // -----------------------------------------------------------------------------
 try {
-    $stmt = $conn->prepare('SELECT id, name, type, description FROM acc_transaction_categories ORDER BY type, name');
+    $stmt = $db->prepare('SELECT id, name, type, description FROM acc_transaction_categories ORDER BY type, name');
     $stmt->execute();
     $categories = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
     $stmt->close();
@@ -198,7 +200,7 @@ try {
 }
 
 try {
-    $stmt = $conn->prepare('SELECT id, account_number, name, account_type FROM acc_ledger_accounts ORDER BY account_type, name');
+    $stmt = $db->prepare('SELECT id, account_number, name, account_type FROM acc_ledger_accounts ORDER BY account_type, name');
     $stmt->execute();
     $accounts = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
     $stmt->close();
@@ -208,7 +210,7 @@ try {
 }
 
 try {
-    $stmt = $conn->prepare('SELECT id, name FROM acc_vendors ORDER BY name');
+    $stmt = $db->prepare('SELECT id, name FROM acc_vendors ORDER BY name');
     $stmt->execute();
     $vendors = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
     $stmt->close();
@@ -365,88 +367,88 @@ $transactionHeroActions = array_values(array_filter([
             </section>
         <?php endif; ?>
 
-    <div class="row mb-3 hero-summary-row">
-        <div class="col-md-3 col-sm-6 mb-3">
-            <div class="border rounded p-3 h-100 bg-light hero-summary-card">
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                    <span class="text-muted small">Total Income</span>
-                    <i class="fas fa-arrow-trend-up text-success"></i>
+        <div class="row mb-3 hero-summary-row">
+            <div class="col-md-3 col-sm-6 mb-3">
+                <div class="border rounded p-3 h-100 bg-light hero-summary-card">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="text-muted small">Total Income</span>
+                        <i class="fas fa-arrow-trend-up text-success"></i>
+                    </div>
+                    <h4 class="mb-0">$<?= number_format($heroTotals['income'], 2) ?></h4>
+                    <small class="text-muted">Across all filters</small>
                 </div>
-                <h4 class="mb-0">$<?= number_format($heroTotals['income'], 2) ?></h4>
-                <small class="text-muted">Across all filters</small>
+            </div>
+            <div class="col-md-3 col-sm-6 mb-3">
+                <div class="border rounded p-3 h-100 bg-light hero-summary-card">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="text-muted small">Total Expenses</span>
+                        <i class="fas fa-arrow-trend-down text-danger"></i>
+                    </div>
+                    <h4 class="mb-0">$<?= number_format($heroTotals['expenses'], 2) ?></h4>
+                    <small class="text-muted">Operational + capital</small>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6 mb-3">
+                <div class="border rounded p-3 h-100 bg-light hero-summary-card">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="text-muted small">Net Position</span>
+                        <i class="fas fa-scale-balanced text-primary"></i>
+                    </div>
+                    <h4 class="mb-0 text-<?= $heroTotals['net'] >= 0 ? 'success' : 'danger' ?>">
+                        $<?= number_format($heroTotals['net'], 2) ?>
+                    </h4>
+                    <small class="text-muted">Income minus expenses</small>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6 mb-3">
+                <div class="border rounded p-3 h-100 bg-light hero-summary-card">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="text-muted small">Total Entries</span>
+                        <i class="fas fa-list text-info"></i>
+                    </div>
+                    <h4 class="mb-0"><?= number_format($heroTotals['count']) ?></h4>
+                    <small class="text-muted">Filter-adjusted count</small>
+                </div>
             </div>
         </div>
-        <div class="col-md-3 col-sm-6 mb-3">
-            <div class="border rounded p-3 h-100 bg-light hero-summary-card">
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                    <span class="text-muted small">Total Expenses</span>
-                    <i class="fas fa-arrow-trend-down text-danger"></i>
-                </div>
-                <h4 class="mb-0">$<?= number_format($heroTotals['expenses'], 2) ?></h4>
-                <small class="text-muted">Operational + capital</small>
+
+        <?php if (function_exists('displayToastMessage')): ?>
+            <?php displayToastMessage(); ?>
+        <?php endif; ?>
+
+        <div class="row">
+            <div class="col-lg-3 mb-4">
+                <?php if (function_exists('accounting_render_workspace_nav')): ?>
+                    <?php accounting_render_workspace_nav('transactions', [
+                        'user_id' => $user_id,
+                        'can_manage' => $can_manage_transactions,
+                        'can_add' => $can_add_transactions,
+                    ]); ?>
+                <?php endif; ?>
             </div>
-        </div>
-        <div class="col-md-3 col-sm-6 mb-3">
-            <div class="border rounded p-3 h-100 bg-light hero-summary-card">
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                    <span class="text-muted small">Net Position</span>
-                    <i class="fas fa-scale-balanced text-primary"></i>
-                </div>
-                <h4 class="mb-0 text-<?= $heroTotals['net'] >= 0 ? 'success' : 'danger' ?>">
-                    $<?= number_format($heroTotals['net'], 2) ?>
-                </h4>
-                <small class="text-muted">Income minus expenses</small>
-            </div>
-        </div>
-        <div class="col-md-3 col-sm-6 mb-3">
-            <div class="border rounded p-3 h-100 bg-light hero-summary-card">
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                    <span class="text-muted small">Total Entries</span>
-                    <i class="fas fa-list text-info"></i>
-                </div>
-                <h4 class="mb-0"><?= number_format($heroTotals['count']) ?></h4>
-                <small class="text-muted">Filter-adjusted count</small>
+
+            <div class="col-lg-9 mb-4">
+                <?php
+                renderTransactionList(
+                    $transactions,
+                    $filters,
+                    $categories,
+                    $accounts,
+                    $vendors,
+                    $totals,
+                    $pagination,
+                    $can_add_transactions,
+                    $can_manage_transactions
+                );
+                ?>
             </div>
         </div>
     </div>
-
-    <?php if (function_exists('displayToastMessage')): ?>
-        <?php displayToastMessage(); ?>
-    <?php endif; ?>
-
-    <div class="row">
-        <div class="col-lg-3 mb-4">
-            <?php if (function_exists('accounting_render_workspace_nav')): ?>
-                <?php accounting_render_workspace_nav('transactions', [
-                    'user_id' => $user_id,
-                    'can_manage' => $can_manage_transactions,
-                    'can_add' => $can_add_transactions,
-                ]); ?>
-            <?php endif; ?>
-        </div>
-
-        <div class="col-lg-9 mb-4">
-            <?php
-            renderTransactionList(
-                $transactions,
-                $filters,
-                $categories,
-                $accounts,
-                $vendors,
-                $totals,
-                $pagination,
-                $can_add_transactions,
-                $can_manage_transactions
-            );
-            ?>
-        </div>
-    </div>
-</div>
 
     <?php include __DIR__ . '/../../include/footer.php'; ?>
     <?php if ($shouldLaunchAddModal): ?>
         <script>
-            document.addEventListener('DOMContentLoaded', function () {
+            document.addEventListener('DOMContentLoaded', function() {
                 var modalElement = document.getElementById('addTransactionModal');
                 if (!modalElement || typeof bootstrap === 'undefined') {
                     return;

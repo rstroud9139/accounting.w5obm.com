@@ -1,5 +1,6 @@
 <?php
 
+require_once __DIR__ . '/../../include/dbconn.php';
 require_once __DIR__ . '/../lib/helpers.php';
 
 /**
@@ -12,7 +13,7 @@ function ensureDoubleEntryRulesTable(): void
         return;
     }
 
-    global $conn;
+    $db = accounting_db_connection();
 
     $createSql = "
         CREATE TABLE IF NOT EXISTS acc_double_entry_rules (
@@ -28,12 +29,12 @@ function ensureDoubleEntryRulesTable(): void
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_unicode_ci;
     ";
 
-    if (!$conn->query($createSql)) {
-        logError('Failed creating acc_double_entry_rules: ' . $conn->error, 'accounting');
+    if (!$db->query($createSql)) {
+        logError('Failed creating acc_double_entry_rules: ' . $db->error, 'accounting');
         return;
     }
 
-    $countRes = $conn->query('SELECT COUNT(*) AS total FROM acc_double_entry_rules');
+    $countRes = $db->query('SELECT COUNT(*) AS total FROM acc_double_entry_rules');
     $total = 0;
     if ($countRes) {
         $row = $countRes->fetch_assoc();
@@ -42,7 +43,7 @@ function ensureDoubleEntryRulesTable(): void
     }
 
     if ($total === 0) {
-        seedDefaultDoubleEntryRules();
+        seedDefaultDoubleEntryRules($db);
     }
 
     $initialized = true;
@@ -51,9 +52,9 @@ function ensureDoubleEntryRulesTable(): void
 /**
  * Seed default GAAP-aligned rules for common treasurer workflows.
  */
-function seedDefaultDoubleEntryRules(): void
+function seedDefaultDoubleEntryRules($db = null): void
 {
-    global $conn;
+    $db = $db ?? accounting_db_connection();
 
     $defaults = [
         [
@@ -138,9 +139,9 @@ function seedDefaultDoubleEntryRules(): void
         ],
     ];
 
-    $stmt = $conn->prepare('INSERT INTO acc_double_entry_rules (rule_name, debit_account_type, credit_account_type, description, example, gaap_reference) VALUES (?, ?, ?, ?, ?, ?)');
+    $stmt = $db->prepare('INSERT INTO acc_double_entry_rules (rule_name, debit_account_type, credit_account_type, description, example, gaap_reference) VALUES (?, ?, ?, ?, ?, ?)');
     if (!$stmt) {
-        logError('Failed preparing insert for acc_double_entry_rules: ' . $conn->error, 'accounting');
+        logError('Failed preparing insert for acc_double_entry_rules: ' . $db->error, 'accounting');
         return;
     }
 
@@ -161,10 +162,10 @@ function getDoubleEntryRules(): array
 {
     ensureDoubleEntryRulesTable();
 
-    global $conn;
+    $db = accounting_db_connection();
     $rules = [];
 
-    $result = $conn->query('SELECT id, rule_name, debit_account_type, credit_account_type, description, example, gaap_reference FROM acc_double_entry_rules ORDER BY rule_name ASC');
+    $result = $db->query('SELECT id, rule_name, debit_account_type, credit_account_type, description, example, gaap_reference FROM acc_double_entry_rules ORDER BY rule_name ASC');
     if ($result) {
         while ($row = $result->fetch_assoc()) {
             $rules[] = $row;

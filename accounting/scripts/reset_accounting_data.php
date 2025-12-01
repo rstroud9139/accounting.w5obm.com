@@ -5,7 +5,7 @@ require_once __DIR__ . '/../../include/dbconn.php';
 require_once __DIR__ . '/../lib/helpers.php';
 require_once __DIR__ . '/../utils/csrf.php';
 
-/** @var mysqli $accConn */
+$db = accounting_db_connection();
 
 csrf_ensure_token();
 
@@ -93,7 +93,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $tablesToClear = [];
         foreach ($tableGroups as $groupTables) {
             foreach ($groupTables as $table) {
-                if (accounting_reset_table_exists($accConn, $table)) {
+                if (accounting_reset_table_exists($db, $table)) {
                     $tablesToClear[] = $table;
                 }
             }
@@ -101,7 +101,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if ($wipeChart) {
             foreach ($chartTables as $table) {
-                if (accounting_reset_table_exists($accConn, $table)) {
+                if (accounting_reset_table_exists($db, $table)) {
                     $tablesToClear[] = $table;
                 }
             }
@@ -110,21 +110,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (empty($tablesToClear)) {
             $errors[] = 'No matching tables were found in accounting_w5obm. Nothing to reset.';
         } else {
-            $accConn->query('SET FOREIGN_KEY_CHECKS=0');
+            $db->query('SET FOREIGN_KEY_CHECKS=0');
             foreach ($tablesToClear as $table) {
-                if ($accConn->query("TRUNCATE TABLE `{$table}`")) {
+                if ($db->query("TRUNCATE TABLE `{$table}`")) {
                     $results[] = "Cleared {$table}";
                 } else {
-                    $errors[] = "Failed to truncate {$table}: " . $accConn->error;
+                    $errors[] = "Failed to truncate {$table}: " . $db->error;
                 }
             }
-            $accConn->query('SET FOREIGN_KEY_CHECKS=1');
+            $db->query('SET FOREIGN_KEY_CHECKS=1');
         }
 
         if (empty($errors)) {
-            ensureResetAuditTable($accConn);
+            ensureResetAuditTable($db);
             $clearedJson = json_encode($tablesToClear, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
-            $stmt = $accConn->prepare('INSERT INTO acc_admin_resets (run_by, include_chart_of_accounts, note, cleared_tables) VALUES (?, ?, ?, ?)');
+            $stmt = $db->prepare('INSERT INTO acc_admin_resets (run_by, include_chart_of_accounts, note, cleared_tables) VALUES (?, ?, ?, ?)');
             if ($stmt) {
                 $includeCoa = $wipeChart ? 1 : 0;
                 $stmt->bind_param('iiss', $userId, $includeCoa, $note, $clearedJson);
@@ -145,85 +145,88 @@ $pageTitle = 'Accounting Data Reset Utility';
 ?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <title><?= htmlspecialchars($pageTitle, ENT_QUOTES, 'UTF-8'); ?></title>
     <?php include __DIR__ . '/../../include/header.php'; ?>
 </head>
+
 <body class="accounting-app bg-light">
-<?php include __DIR__ . '/../../include/menu.php'; ?>
+    <?php include __DIR__ . '/../../include/menu.php'; ?>
 
-<div class="page-container accounting-app bg-light">
-    <div class="container py-4">
-        <div class="mb-4">
-            <h1 class="h4 mb-1"><i class="fas fa-broom text-danger me-2"></i><?= htmlspecialchars($pageTitle) ?></h1>
-            <p class="text-muted mb-0">Purge transactional data while optionally preserving the chart of accounts.</p>
-        </div>
-
-        <?php if ($didReset): ?>
-            <div class="alert alert-success shadow-sm">
-                <h5 class="alert-heading"><i class="fas fa-check-circle me-2"></i>Reset Complete</h5>
-                <p class="mb-2">Cleared <?= count($results) ?> tables successfully.</p>
-                <ul class="mb-2">
-                    <?php foreach ($results as $line): ?>
-                        <li><?= htmlspecialchars($line) ?></li>
-                    <?php endforeach; ?>
-                </ul>
-                <a href="/accounting/dashboard.php" class="btn btn-success btn-sm"><i class="fas fa-arrow-left me-1"></i>Back to Dashboard</a>
-            </div>
-        <?php endif; ?>
-
-        <?php if (!empty($errors)): ?>
-            <div class="alert alert-danger shadow-sm">
-                <h5 class="alert-heading"><i class="fas fa-times-circle me-2"></i>Issues Encountered</h5>
-                <ul class="mb-0">
-                    <?php foreach ($errors as $error): ?>
-                        <li><?= htmlspecialchars($error) ?></li>
-                    <?php endforeach; ?>
-                </ul>
-            </div>
-        <?php endif; ?>
-
-        <?php if (!$didReset): ?>
-            <div class="card shadow-sm border-0 mb-4">
-                <div class="card-body">
-                    <h5 class="card-title text-danger"><i class="fas fa-exclamation-triangle me-2"></i>Destructive Operation</h5>
-                    <p class="card-text">This will permanently delete transactions, journals, imports, and related records from <code>accounting_w5obm</code>. Back up the database first. The chart of accounts and categories are preserved unless you check the optional box.</p>
-                    <p class="small text-muted mb-0">Tip: Run this during maintenance windows and notify leadership beforehand.</p>
-                </div>
+    <div class="page-container accounting-app bg-light">
+        <div class="container py-4">
+            <div class="mb-4">
+                <h1 class="h4 mb-1"><i class="fas fa-broom text-danger me-2"></i><?= htmlspecialchars($pageTitle) ?></h1>
+                <p class="text-muted mb-0">Purge transactional data while optionally preserving the chart of accounts.</p>
             </div>
 
-            <form method="POST" class="card shadow-sm border-0 mb-4">
-                <div class="card-body">
-                    <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(csrf_token()) ?>">
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold">Tables that will be truncated</label>
-                        <?php foreach ($tableGroups as $group => $tables): ?>
-                            <div class="mb-2">
-                                <span class="text-uppercase text-muted small d-block mb-1"><?= htmlspecialchars($group) ?></span>
-                                <div class="small bg-light rounded p-2">
-                                    <?= htmlspecialchars(implode(', ', $tables)) ?>
-                                </div>
-                            </div>
+            <?php if ($didReset): ?>
+                <div class="alert alert-success shadow-sm">
+                    <h5 class="alert-heading"><i class="fas fa-check-circle me-2"></i>Reset Complete</h5>
+                    <p class="mb-2">Cleared <?= count($results) ?> tables successfully.</p>
+                    <ul class="mb-2">
+                        <?php foreach ($results as $line): ?>
+                            <li><?= htmlspecialchars($line) ?></li>
                         <?php endforeach; ?>
-                    </div>
-                    <div class="form-check form-switch mb-3">
-                        <input class="form-check-input" type="checkbox" role="switch" id="wipeCoa" name="wipe_coa" value="1">
-                        <label class="form-check-label" for="wipeCoa">Also truncate Chart of Accounts (<?= htmlspecialchars(implode(', ', $chartTables)) ?>)</label>
-                        <div class="form-text text-danger">Only enable if you plan to immediately reseed the chart.</div>
-                    </div>
-                    <div class="mb-3">
-                        <label for="note" class="form-label">Maintenance note (optional)</label>
-                        <input type="text" class="form-control" id="note" name="note" maxlength="200" placeholder="e.g., Reset before 2026 migration">
-                    </div>
-                    <button type="submit" class="btn btn-danger"><i class="fas fa-trash-alt me-1"></i>Yes, purge selected data</button>
-                    <a href="/accounting/admin/utilities.php" class="btn btn-outline-secondary ms-2">Cancel</a>
+                    </ul>
+                    <a href="/accounting/dashboard.php" class="btn btn-success btn-sm"><i class="fas fa-arrow-left me-1"></i>Back to Dashboard</a>
                 </div>
-            </form>
-        <?php endif; ?>
-    </div>
-</div>
+            <?php endif; ?>
 
-<?php include __DIR__ . '/../../include/footer.php'; ?>
+            <?php if (!empty($errors)): ?>
+                <div class="alert alert-danger shadow-sm">
+                    <h5 class="alert-heading"><i class="fas fa-times-circle me-2"></i>Issues Encountered</h5>
+                    <ul class="mb-0">
+                        <?php foreach ($errors as $error): ?>
+                            <li><?= htmlspecialchars($error) ?></li>
+                        <?php endforeach; ?>
+                    </ul>
+                </div>
+            <?php endif; ?>
+
+            <?php if (!$didReset): ?>
+                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title text-danger"><i class="fas fa-exclamation-triangle me-2"></i>Destructive Operation</h5>
+                        <p class="card-text">This will permanently delete transactions, journals, imports, and related records from <code>accounting_w5obm</code>. Back up the database first. The chart of accounts and categories are preserved unless you check the optional box.</p>
+                        <p class="small text-muted mb-0">Tip: Run this during maintenance windows and notify leadership beforehand.</p>
+                    </div>
+                </div>
+
+                <form method="POST" class="card shadow-sm border-0 mb-4">
+                    <div class="card-body">
+                        <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(csrf_token()) ?>">
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Tables that will be truncated</label>
+                            <?php foreach ($tableGroups as $group => $tables): ?>
+                                <div class="mb-2">
+                                    <span class="text-uppercase text-muted small d-block mb-1"><?= htmlspecialchars($group) ?></span>
+                                    <div class="small bg-light rounded p-2">
+                                        <?= htmlspecialchars(implode(', ', $tables)) ?>
+                                    </div>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
+                        <div class="form-check form-switch mb-3">
+                            <input class="form-check-input" type="checkbox" role="switch" id="wipeCoa" name="wipe_coa" value="1">
+                            <label class="form-check-label" for="wipeCoa">Also truncate Chart of Accounts (<?= htmlspecialchars(implode(', ', $chartTables)) ?>)</label>
+                            <div class="form-text text-danger">Only enable if you plan to immediately reseed the chart.</div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="note" class="form-label">Maintenance note (optional)</label>
+                            <input type="text" class="form-control" id="note" name="note" maxlength="200" placeholder="e.g., Reset before 2026 migration">
+                        </div>
+                        <button type="submit" class="btn btn-danger"><i class="fas fa-trash-alt me-1"></i>Yes, purge selected data</button>
+                        <a href="/accounting/admin/utilities.php" class="btn btn-outline-secondary ms-2">Cancel</a>
+                    </div>
+                </form>
+            <?php endif; ?>
+        </div>
+    </div>
+
+    <?php include __DIR__ . '/../../include/footer.php'; ?>
 </body>
+
 </html>

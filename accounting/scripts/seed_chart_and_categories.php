@@ -5,7 +5,7 @@ require_once __DIR__ . '/../../include/dbconn.php';
 require_once __DIR__ . '/../lib/helpers.php';
 require_once __DIR__ . '/../utils/csrf.php';
 
-/** @var mysqli $accConn */
+$db = accounting_db_connection();
 
 csrf_ensure_token();
 
@@ -188,25 +188,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $truncateFirst = isset($_POST['truncate_first']) && $_POST['truncate_first'] === '1';
 
         if ($truncateFirst) {
-            $accConn->query('SET FOREIGN_KEY_CHECKS=0');
-            $accConn->query('TRUNCATE TABLE acc_ledger_accounts');
-            $accConn->query('TRUNCATE TABLE acc_categories');
-            $accConn->query('SET FOREIGN_KEY_CHECKS=1');
+            $db->query('SET FOREIGN_KEY_CHECKS=0');
+            $db->query('TRUNCATE TABLE acc_ledger_accounts');
+            $db->query('TRUNCATE TABLE acc_categories');
+            $db->query('SET FOREIGN_KEY_CHECKS=1');
             $resultMessages[] = 'Existing chart of accounts and categories cleared.';
         }
 
         foreach ($accountsSeed as $account) {
-            upsertLedgerAccount($accConn, $account, $userId);
+            upsertLedgerAccount($db, $account, $userId);
         }
         $resultMessages[] = 'Chart of accounts synchronized (' . count($accountsSeed) . ' templates).';
 
         foreach ($categoriesSeed as $category) {
-            upsertCategory($accConn, $category);
+            upsertCategory($db, $category);
         }
         $resultMessages[] = 'Categories synchronized (' . count($categoriesSeed) . ' templates).';
 
-        seedCoaTemplates($accConn, $accountsSeed);
-        seedCategoryTemplates($accConn, $categoriesSeed);
+        seedCoaTemplates($db, $accountsSeed);
+        seedCategoryTemplates($db, $categoriesSeed);
         $resultMessages[] = 'Template tables updated for future provisioning.';
 
         if (function_exists('logActivity')) {
@@ -223,71 +223,74 @@ $pageTitle = 'Seed Chart of Accounts & Categories';
 ?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <title><?= htmlspecialchars($pageTitle, ENT_QUOTES, 'UTF-8'); ?></title>
     <?php include __DIR__ . '/../../include/header.php'; ?>
 </head>
+
 <body class="accounting-app bg-light">
-<?php include __DIR__ . '/../../include/menu.php'; ?>
+    <?php include __DIR__ . '/../../include/menu.php'; ?>
 
-<div class="page-container accounting-app bg-light">
-    <div class="container py-4">
-        <div class="mb-4">
-            <h1 class="h4 mb-1"><i class="fas fa-sitemap text-primary me-2"></i><?= htmlspecialchars($pageTitle) ?></h1>
-            <p class="text-muted mb-0">Load the industry-standard template set for ledger accounts and reporting categories.</p>
-        </div>
-
-        <?php if ($didSeed && empty($errorMessages)): ?>
-            <div class="alert alert-success shadow-sm">
-                <h5 class="alert-heading"><i class="fas fa-check-circle me-2"></i>Seed Complete</h5>
-                <ul class="mb-2">
-                    <?php foreach ($resultMessages as $line): ?>
-                        <li><?= htmlspecialchars($line) ?></li>
-                    <?php endforeach; ?>
-                </ul>
-                <a href="/accounting/ledger/" class="btn btn-success btn-sm"><i class="fas fa-book me-1"></i>View Chart of Accounts</a>
+    <div class="page-container accounting-app bg-light">
+        <div class="container py-4">
+            <div class="mb-4">
+                <h1 class="h4 mb-1"><i class="fas fa-sitemap text-primary me-2"></i><?= htmlspecialchars($pageTitle) ?></h1>
+                <p class="text-muted mb-0">Load the industry-standard template set for ledger accounts and reporting categories.</p>
             </div>
-        <?php endif; ?>
 
-        <?php if (!empty($errorMessages)): ?>
-            <div class="alert alert-danger shadow-sm">
-                <h5 class="alert-heading"><i class="fas fa-times-circle me-2"></i>Issues Encountered</h5>
-                <ul class="mb-0">
-                    <?php foreach ($errorMessages as $error): ?>
-                        <li><?= htmlspecialchars($error) ?></li>
-                    <?php endforeach; ?>
-                </ul>
-            </div>
-        <?php endif; ?>
+            <?php if ($didSeed && empty($errorMessages)): ?>
+                <div class="alert alert-success shadow-sm">
+                    <h5 class="alert-heading"><i class="fas fa-check-circle me-2"></i>Seed Complete</h5>
+                    <ul class="mb-2">
+                        <?php foreach ($resultMessages as $line): ?>
+                            <li><?= htmlspecialchars($line) ?></li>
+                        <?php endforeach; ?>
+                    </ul>
+                    <a href="/accounting/ledger/" class="btn btn-success btn-sm"><i class="fas fa-book me-1"></i>View Chart of Accounts</a>
+                </div>
+            <?php endif; ?>
 
-        <?php if (!$didSeed): ?>
-            <div class="card shadow-sm border-0 mb-4">
-                <div class="card-body">
-                    <p class="mb-2">Template coverage:</p>
+            <?php if (!empty($errorMessages)): ?>
+                <div class="alert alert-danger shadow-sm">
+                    <h5 class="alert-heading"><i class="fas fa-times-circle me-2"></i>Issues Encountered</h5>
                     <ul class="mb-0">
-                        <li><?= number_format(count($accountsSeed)) ?> ledger accounts</li>
-                        <li><?= number_format(count($categoriesSeed)) ?> reporting categories</li>
+                        <?php foreach ($errorMessages as $error): ?>
+                            <li><?= htmlspecialchars($error) ?></li>
+                        <?php endforeach; ?>
                     </ul>
                 </div>
-            </div>
+            <?php endif; ?>
 
-            <form method="POST" class="card shadow-sm border-0">
-                <div class="card-body">
-                    <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(csrf_token()) ?>">
-                    <div class="form-check form-switch mb-3">
-                        <input class="form-check-input" type="checkbox" role="switch" id="truncateFirst" name="truncate_first" value="1">
-                        <label class="form-check-label" for="truncateFirst">Truncate existing chart and categories before seeding</label>
-                        <div class="form-text text-danger">Recommended when resetting the ledger or after major migrations.</div>
+            <?php if (!$didSeed): ?>
+                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card-body">
+                        <p class="mb-2">Template coverage:</p>
+                        <ul class="mb-0">
+                            <li><?= number_format(count($accountsSeed)) ?> ledger accounts</li>
+                            <li><?= number_format(count($categoriesSeed)) ?> reporting categories</li>
+                        </ul>
                     </div>
-                    <button type="submit" class="btn btn-primary"><i class="fas fa-cloud-download-alt me-1"></i>Seed Templates</button>
-                    <a href="/accounting/admin/utilities.php" class="btn btn-outline-secondary ms-2">Cancel</a>
                 </div>
-            </form>
-        <?php endif; ?>
-    </div>
-</div>
 
-<?php include __DIR__ . '/../../include/footer.php'; ?>
+                <form method="POST" class="card shadow-sm border-0">
+                    <div class="card-body">
+                        <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(csrf_token()) ?>">
+                        <div class="form-check form-switch mb-3">
+                            <input class="form-check-input" type="checkbox" role="switch" id="truncateFirst" name="truncate_first" value="1">
+                            <label class="form-check-label" for="truncateFirst">Truncate existing chart and categories before seeding</label>
+                            <div class="form-text text-danger">Recommended when resetting the ledger or after major migrations.</div>
+                        </div>
+                        <button type="submit" class="btn btn-primary"><i class="fas fa-cloud-download-alt me-1"></i>Seed Templates</button>
+                        <a href="/accounting/admin/utilities.php" class="btn btn-outline-secondary ms-2">Cancel</a>
+                    </div>
+                </form>
+            <?php endif; ?>
+        </div>
+    </div>
+
+    <?php include __DIR__ . '/../../include/footer.php'; ?>
 </body>
+
 </html>

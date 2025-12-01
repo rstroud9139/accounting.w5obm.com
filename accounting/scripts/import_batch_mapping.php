@@ -7,7 +7,7 @@ require_once __DIR__ . '/../lib/helpers.php';
 require_once __DIR__ . '/../lib/import_helpers.php';
 require_once __DIR__ . '/../utils/csrf.php';
 
-/** @var mysqli $accConn */
+$db = accounting_db_connection();
 
 try {
     csrf_verify_post_or_throw();
@@ -38,14 +38,14 @@ if ($batchId <= 0) {
 }
 
 try {
-    $batch = accounting_imports_fetch_batch($accConn, $batchId);
+    $batch = accounting_imports_fetch_batch($db, $batchId);
     if (!$batch) {
         throw new RuntimeException('Batch not found.');
     }
 
     $validLedgerIds = [];
-    if ($accConn) {
-        $validResult = $accConn->query('SELECT id FROM acc_ledger_accounts');
+    if ($db instanceof mysqli) {
+        $validResult = $db->query('SELECT id FROM acc_ledger_accounts');
         if ($validResult) {
             while ($row = $validResult->fetch_assoc()) {
                 $validLedgerIds[(int)$row['id']] = true;
@@ -62,7 +62,7 @@ try {
         if ($sourceKey === '' || $ledgerId <= 0 || empty($validLedgerIds[$ledgerId])) {
             continue;
         }
-        accounting_imports_save_account_map($accConn, $userId, $batch['source_type'], $sourceKey, $sourceKey, $ledgerId);
+        accounting_imports_save_account_map($db, $userId, $batch['source_type'], $sourceKey, $sourceKey, $ledgerId);
         $saved++;
     }
 

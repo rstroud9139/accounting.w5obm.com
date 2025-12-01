@@ -245,10 +245,8 @@ if (!function_exists('accounting_quick_cash_resolve_context')) {
      */
     function accounting_quick_cash_resolve_context($conn = null): array
     {
-        if (!$conn) {
-            global $conn;
-        }
-        
+        $db = $conn instanceof mysqli ? $conn : accounting_db_connection();
+
         $context = [
             'contact_id' => null,
             'contact_name' => accounting_quick_cash_contact_name(),
@@ -258,14 +256,14 @@ if (!function_exists('accounting_quick_cash_resolve_context')) {
             'default_account_id' => null,
         ];
 
-        if (!$conn instanceof mysqli) {
+        if (!$db instanceof mysqli) {
             return $context;
         }
 
         try {
             // Ensure anonymous contact exists
             $contactName = $context['contact_name'];
-            $stmt = $conn->prepare("SELECT id FROM acc_contacts WHERE name = ? LIMIT 1");
+            $stmt = $db->prepare("SELECT id FROM acc_contacts WHERE name = ? LIMIT 1");
             $stmt->bind_param('s', $contactName);
             $stmt->execute();
             $result = $stmt->get_result();
@@ -276,19 +274,19 @@ if (!function_exists('accounting_quick_cash_resolve_context')) {
                 $context['contact_id'] = (int)$row['id'];
             } else {
                 // Create the anonymous contact
-                $stmt = $conn->prepare("
+                $stmt = $db->prepare("\
                     INSERT INTO acc_contacts (name, email, notes, created_at) 
                     VALUES (?, NULL, 'System-generated contact for quick-post cash donations', NOW())
                 ");
                 $stmt->bind_param('s', $contactName);
                 if ($stmt->execute()) {
-                    $context['contact_id'] = (int)$conn->insert_id;
+                    $context['contact_id'] = (int)$db->insert_id;
                 }
                 $stmt->close();
             }
 
             // Fetch income categories
-            $stmt = $conn->prepare("
+            $stmt = $db->prepare("\
                 SELECT id, name, type, description 
                 FROM acc_transaction_categories 
                 WHERE type = 'Income'
@@ -302,8 +300,10 @@ if (!function_exists('accounting_quick_cash_resolve_context')) {
             $result = $stmt->get_result();
             while ($row = $result->fetch_assoc()) {
                 $context['categories'][] = $row;
-                if (!$context['default_category_id'] && 
-                    (stripos($row['name'], 'Donation') !== false || stripos($row['name'], 'Contribution') !== false)) {
+                if (
+                    !$context['default_category_id'] &&
+                    (stripos($row['name'], 'Donation') !== false || stripos($row['name'], 'Contribution') !== false)
+                ) {
                     $context['default_category_id'] = (int)$row['id'];
                 }
             }
@@ -315,7 +315,7 @@ if (!function_exists('accounting_quick_cash_resolve_context')) {
             }
 
             // Fetch cash/checking accounts
-            $stmt = $conn->prepare("
+            $stmt = $db->prepare("\
                 SELECT id, name, account_number, account_type 
                 FROM acc_ledger_accounts 
                 WHERE active = 1 
@@ -336,7 +336,6 @@ if (!function_exists('accounting_quick_cash_resolve_context')) {
                 }
             }
             $stmt->close();
-
         } catch (Exception $e) {
             error_log("Error resolving quick-post context: " . $e->getMessage());
         }

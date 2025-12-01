@@ -12,6 +12,7 @@ session_start();
 require_once __DIR__ . '/../../include/dbconn.php';
 require_once __DIR__ . '/../lib/helpers.php';
 require_once __DIR__ . '/../controllers/categoryController.php';
+$db = accounting_db_connection();
 
 // Only allow POST requests
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -57,7 +58,7 @@ try {
 
     // Get category details before deletion (for logging and validation)
     // Load basic category details
-    $stmt = $conn->prepare('SELECT id, name, type FROM acc_transaction_categories WHERE id = ?');
+    $stmt = $db->prepare('SELECT id, name, type FROM acc_transaction_categories WHERE id = ?');
     $stmt->bind_param('i', $category_id);
     $stmt->execute();
     $category = $stmt->get_result()->fetch_assoc();
@@ -74,7 +75,7 @@ try {
 
     // Check if category has transactions
     // Count transactions using this category
-    $tc_stmt = $conn->prepare('SELECT COUNT(*) AS c FROM acc_transactions WHERE category_id = ?');
+    $tc_stmt = $db->prepare('SELECT COUNT(*) AS c FROM acc_transactions WHERE category_id = ?');
     $tc_stmt->bind_param('i', $category_id);
     $tc_stmt->execute();
     $tc = $tc_stmt->get_result()->fetch_assoc();
@@ -88,7 +89,7 @@ try {
 
     // Optional reassignment of transactions
     if ($transaction_count > 0 && $reassign_to_id) {
-        $rs = $conn->prepare('UPDATE acc_transactions SET category_id = ? WHERE category_id = ?');
+        $rs = $db->prepare('UPDATE acc_transactions SET category_id = ? WHERE category_id = ?');
         $rs->bind_param('ii', $reassign_to_id, $category_id);
         if (!$rs->execute()) {
             throw new Exception('Failed to reassign transactions.');

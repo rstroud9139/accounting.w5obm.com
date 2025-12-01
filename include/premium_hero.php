@@ -121,13 +121,37 @@ if (!function_exists('renderPremiumHero')) {
                     margin-bottom: 1.5rem;
                 }
 
-                .premium-hero__actions .btn {
+                .premium-hero__actions .premium-hero__btn {
                     min-width: 160px;
                     font-weight: 600;
-                    box-shadow: 0 10px 30px rgba(0, 0, 0, .25);
+                    border-radius: 999px;
+                    padding: 0.65rem 1.5rem;
+                    box-shadow: 0 18px 35px rgba(0, 0, 0, .3);
+                    border: 1px solid rgba(255, 255, 255, .55);
+                    background: rgba(255, 255, 255, .15);
+                    color: #fff !important;
+                    transition: transform .2s ease, box-shadow .2s ease, background .2s ease;
                 }
 
-                .premium-hero__actions .btn.btn-link {
+                .premium-hero__actions .premium-hero__btn:hover,
+                .premium-hero__actions .premium-hero__btn:focus {
+                    transform: translateY(-1px);
+                    box-shadow: 0 20px 35px rgba(0, 0, 0, .35);
+                }
+
+                .premium-hero__btn--solid {
+                    background: rgba(255, 255, 255, .25);
+                    border-color: rgba(255, 255, 255, .7);
+                }
+
+                .premium-hero__btn--outline {
+                    background: transparent;
+                    border-color: rgba(255, 255, 255, .75);
+                }
+
+                .premium-hero__btn--ghost {
+                    background: transparent;
+                    border-color: transparent;
                     box-shadow: none;
                     padding-left: 0;
                     padding-right: 0;
@@ -360,29 +384,26 @@ if (!function_exists('renderPremiumHero')) {
                 $icon = $action['icon'] ?? '';
                 $target = !empty($action['external']) ? ' target="_blank" rel="noopener"' : '';
                 $launchAttr = !empty($action['data_report_launch']) ? ' data-report-launch="true"' : '';
+
+                $variantClass = 'premium-hero__btn--solid';
+                $extraClass = '';
                 switch ($variant) {
                     case 'outline':
                     case 'outline-light':
-                        $btnClass = 'btn btn-outline-light text-white border-2';
-                        break;
-                    case 'dark':
-                        $btnClass = 'btn btn-dark text-white fw-semibold';
-                        break;
-                    case 'primary':
-                        $btnClass = 'btn btn-primary text-white fw-semibold';
-                        break;
-                    case 'secondary':
-                        $btnClass = 'btn btn-secondary text-white fw-semibold';
+                        $variantClass = 'premium-hero__btn--outline';
                         break;
                     case 'ghost':
                     case 'link':
-                        $btnClass = 'btn btn-link text-white text-decoration-none fw-semibold';
+                        $variantClass = 'premium-hero__btn--ghost';
+                        $extraClass = ' btn-link text-decoration-none';
                         break;
-                    case 'solid':
                     default:
-                        $btnClass = 'btn btn-light text-dark fw-semibold';
+                        $variantClass = 'premium-hero__btn--solid';
                         break;
                 }
+
+                $btnClass = trim('btn premium-hero__btn ' . $variantClass . $extraClass);
+
                 echo '<a class="' . $btnClass . '" href="' . $url . '"' . $target . $launchAttr . '>';
                 if ($icon) {
                     echo '<i class="fas ' . htmlspecialchars($icon, ENT_QUOTES, 'UTF-8') . ' me-2"></i>';

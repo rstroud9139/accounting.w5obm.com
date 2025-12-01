@@ -381,12 +381,17 @@ function getReportById($id)
             return false;
         }
 
-        $stmt = $db->prepare("\
+        $query = "
             SELECT r.*, u.username AS generated_by_username
             FROM acc_reports r
             LEFT JOIN auth_users u ON r.generated_by = u.id
             WHERE r.id = ?
-        ");
+        ";
+
+        $stmt = $db->prepare($query);
+        if (!$stmt) {
+            throw new Exception('Failed to prepare report lookup: ' . $db->error);
+        }
 
         $stmt->bind_param('i', $id);
         $stmt->execute();
@@ -399,7 +404,7 @@ function getReportById($id)
 
         return $result;
     } catch (Exception $e) {
-        logError("Error getting report by ID: " . $e->getMessage(), 'accounting');
+        logError('Error getting report by ID: ' . $e->getMessage(), 'accounting');
         return false;
     }
 }
@@ -412,50 +417,52 @@ function getReportById($id)
  */
 function getAllReports($filters = [], $limit = null)
 {
-    \$db = accounting_db_connection();
+    $db = accounting_db_connection();
 
     try {
-        $where_conditions = [];
+        $whereConditions = [];
         $params = [];
         $types = '';
 
-        // Build WHERE clause
         if (!empty($filters['report_type'])) {
-            $where_conditions[] = "r.report_type = ?";
+            $whereConditions[] = 'r.report_type = ?';
             $params[] = $filters['report_type'];
             $types .= 's';
         }
 
         if (!empty($filters['start_date']) && !empty($filters['end_date'])) {
-            $where_conditions[] = "r.generated_at BETWEEN ? AND ?";
+            $whereConditions[] = 'r.generated_at BETWEEN ? AND ?';
             $params[] = $filters['start_date'] . ' 00:00:00';
             $params[] = $filters['end_date'] . ' 23:59:59';
             $types .= 'ss';
         }
 
         if (!empty($filters['generated_by'])) {
-            $where_conditions[] = "r.generated_by = ?";
+            $whereConditions[] = 'r.generated_by = ?';
             $params[] = $filters['generated_by'];
             $types .= 'i';
         }
 
-        $where_clause = empty($where_conditions) ? '' : 'WHERE ' . implode(' AND ', $where_conditions);
+        $whereClause = empty($whereConditions) ? '' : 'WHERE ' . implode(' AND ', $whereConditions);
 
         $query = "
             SELECT r.*, u.username AS generated_by_username
             FROM acc_reports r
             LEFT JOIN auth_users u ON r.generated_by = u.id
-            $where_clause
+            $whereClause
             ORDER BY r.generated_at DESC
         ";
 
         if ($limit) {
-            $query .= " LIMIT ?";
-            $params[] = $limit;
+            $query .= ' LIMIT ?';
+            $params[] = (int)$limit;
             $types .= 'i';
         }
 
-        $stmt = \$db->prepare($query);
+        $stmt = $db->prepare($query);
+        if (!$stmt) {
+            throw new Exception('Failed to prepare report list query: ' . $db->error);
+        }
 
         if (!empty($params)) {
             $stmt->bind_param($types, ...$params);
@@ -475,7 +482,7 @@ function getAllReports($filters = [], $limit = null)
         $stmt->close();
         return $reports;
     } catch (Exception $e) {
-        logError("Error getting all reports: " . $e->getMessage(), 'accounting');
+        logError('Error getting all reports: ' . $e->getMessage(), 'accounting');
         return [];
     }
 }
@@ -487,39 +494,39 @@ function getAllReports($filters = [], $limit = null)
  */
 function deleteReport($id)
 {
-    \$db = accounting_db_connection();
+    $db = accounting_db_connection();
 
     try {
         if (!$id || !is_numeric($id)) {
-            throw new Exception("Invalid report ID");
+            throw new Exception('Invalid report ID');
         }
 
-        // Get report details for logging
         $report = getReportById($id);
         if (!$report) {
-            throw new Exception("Report not found");
+            throw new Exception('Report not found');
         }
 
-        // Check permissions
-        $user_id = getCurrentUserId();
-        if (!isAdmin($user_id) && $report['generated_by'] != $user_id) {
-            throw new Exception("Insufficient permissions to delete this report");
+        $userId = getCurrentUserId();
+        if (!isAdmin($userId) && $report['generated_by'] != $userId) {
+            throw new Exception('Insufficient permissions to delete this report');
         }
 
-        // Delete file if it exists
         if (!empty($report['file_path']) && file_exists($report['file_path'])) {
             unlink($report['file_path']);
         }
 
-        $stmt = \$db->prepare("DELETE FROM acc_reports WHERE id = ?");
+        $stmt = $db->prepare('DELETE FROM acc_reports WHERE id = ?');
+        if (!$stmt) {
+            throw new Exception('Failed to prepare delete statement: ' . $db->error);
+        }
+
         $stmt->bind_param('i', $id);
 
         if ($stmt->execute()) {
             $stmt->close();
 
-            // Log activity
             logActivity(
-                $user_id,
+                $userId,
                 'report_deleted',
                 'acc_reports',
                 $id,
@@ -527,11 +534,11 @@ function deleteReport($id)
             );
 
             return true;
-        } else {
-            throw new Exception("Database execute failed: " . $stmt->error);
         }
+
+        throw new Exception('Database execute failed: ' . $stmt->error);
     } catch (Exception $e) {
-        logError("Error deleting report: " . $e->getMessage(), 'accounting');
+        logError('Error deleting report: ' . $e->getMessage(), 'accounting');
         return false;
     }
 }
@@ -544,20 +551,24 @@ function deleteReport($id)
  */
 function getExpenseBreakdown($start_date, $end_date)
 {
-    \$db = accounting_db_connection();
+    $db = accounting_db_connection();
 
     try {
-        $stmt = \$db->prepare("
-            SELECT c.id, c.name, 
+        $stmt = $db->prepare('
+            SELECT c.id, c.name,
                    SUM(t.amount) AS total_amount,
                    COUNT(t.id) AS transaction_count,
                    AVG(t.amount) AS average_amount
             FROM acc_transactions t
             JOIN acc_transaction_categories c ON t.category_id = c.id
-            WHERE t.type = 'Expense' AND t.transaction_date BETWEEN ? AND ?
+            WHERE t.type = \'Expense\' AND t.transaction_date BETWEEN ? AND ?
             GROUP BY c.id, c.name
             ORDER BY total_amount DESC
-        ");
+        ');
+
+        if (!$stmt) {
+            throw new Exception('Failed to prepare expense breakdown query: ' . $db->error);
+        }
 
         $stmt->bind_param('ss', $start_date, $end_date);
         $stmt->execute();
@@ -567,22 +578,23 @@ function getExpenseBreakdown($start_date, $end_date)
         $total_expenses = 0;
 
         while ($row = $result->fetch_assoc()) {
-            $amount = floatval($row['total_amount']);
+            $amount = (float)$row['total_amount'];
             $breakdown[] = [
                 'category_id' => $row['id'],
                 'category_name' => $row['name'],
                 'total_amount' => $amount,
-                'transaction_count' => intval($row['transaction_count']),
-                'average_amount' => floatval($row['average_amount'])
+                'transaction_count' => (int)$row['transaction_count'],
+                'average_amount' => (float)$row['average_amount'],
             ];
             $total_expenses += $amount;
         }
 
-        // Calculate percentages
         foreach ($breakdown as &$category) {
-            $category['percentage'] = $total_expenses > 0 ?
-                round(($category['total_amount'] / $total_expenses) * 100, 1) : 0;
+            $category['percentage'] = $total_expenses > 0
+                ? round(($category['total_amount'] / $total_expenses) * 100, 1)
+                : 0;
         }
+        unset($category);
 
         $stmt->close();
 
@@ -591,15 +603,15 @@ function getExpenseBreakdown($start_date, $end_date)
             'total_expenses' => $total_expenses,
             'period' => [
                 'start_date' => $start_date,
-                'end_date' => $end_date
-            ]
+                'end_date' => $end_date,
+            ],
         ];
     } catch (Exception $e) {
-        logError("Error getting expense breakdown: " . $e->getMessage(), 'accounting');
+        logError('Error getting expense breakdown: ' . $e->getMessage(), 'accounting');
         return [
             'categories' => [],
             'total_expenses' => 0,
-            'period' => ['start_date' => $start_date, 'end_date' => $end_date]
+            'period' => ['start_date' => $start_date, 'end_date' => $end_date],
         ];
     }
 }

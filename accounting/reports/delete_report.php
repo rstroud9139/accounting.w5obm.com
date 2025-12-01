@@ -16,6 +16,7 @@ if (session_status() === PHP_SESSION_NONE) {
 require_once __DIR__ . '/../../include/session_init.php';
 require_once __DIR__ . '/../../include/dbconn.php';
 require_once __DIR__ . '/../lib/helpers.php';
+$db = accounting_db_connection();
 
 // Check authentication using consolidated functions
 if (!isAuthenticated()) {
@@ -50,7 +51,7 @@ if (!$report_id) {
 }
 
 // Fetch report details
-$stmt = $conn->prepare("SELECT * FROM acc_reports WHERE id = ?");
+$stmt = $db->prepare("SELECT * FROM acc_reports WHERE id = ?");
 $stmt->bind_param('i', $report_id);
 $stmt->execute();
 $report = $stmt->get_result()->fetch_assoc();
@@ -68,7 +69,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm_delete'])) {
     $error_message = '';
 
     // Start transaction
-    $conn->begin_transaction();
+    $db->begin_transaction();
 
     try {
         // Delete physical file if it exists
@@ -100,7 +101,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm_delete'])) {
 
         // Delete database record
         if ($success) {
-            $stmt = $conn->prepare("DELETE FROM acc_reports WHERE id = ?");
+            $stmt = $db->prepare("DELETE FROM acc_reports WHERE id = ?");
             $stmt->bind_param('i', $report_id);
 
             if (!$stmt->execute()) {
@@ -112,7 +113,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm_delete'])) {
 
         if ($success) {
             // Commit transaction
-            $conn->commit();
+            $db->commit();
 
             // Log the action
             logActivity($user_id, 'report_deleted', 'auth_activity_log', $report_id, "Deleted report: {$report['report_type']}");
@@ -122,12 +123,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm_delete'])) {
             exit();
         } else {
             // Rollback transaction
-            $conn->rollback();
+            $db->rollback();
             setToastMessage('danger', 'Deletion Failed', $error_message, 'fas fa-exclamation-triangle');
         }
     } catch (Exception $e) {
         // Rollback transaction
-        $conn->rollback();
+        $db->rollback();
         setToastMessage('danger', 'Deletion Failed', 'An error occurred while deleting the report.', 'fas fa-exclamation-triangle');
         error_log("Report deletion error: " . $e->getMessage());
     }

@@ -49,8 +49,8 @@ header("X-Frame-Options: DENY");
 // Supports both legacy `redirect` (path-only) and new absolute `return_url` usage.
 function resolvePostLoginRedirectPath($user_id, $requested = '', $absoluteReturnUrl = '')
 {
-    // Default destination is the Authorization (User) Dashboard
-    $default = '/authentication/dashboard.php';
+    // Default destination is the Accounting Dashboard
+    $default = '/accounting/dashboard.php';
 
     // When an absolute return_url is provided (e.g., from accounting.w5obm.com),
     // prefer it if it is a well-formed HTTP(S) URL. This enables cross-subdomain

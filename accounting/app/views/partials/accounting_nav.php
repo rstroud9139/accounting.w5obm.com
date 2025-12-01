@@ -9,6 +9,8 @@ if (!function_exists('route')) {
 
 $currentRoute = $currentRoute ?? ($_GET['route'] ?? 'dashboard');
 $requestUri = $_SERVER['REQUEST_URI'] ?? '';
+$requestPath = $requestUri ? (parse_url($requestUri, PHP_URL_PATH) ?: '') : '';
+$isLegacyDashboard = $requestPath === '/accounting/dashboard.php';
 $reportsActive = strpos($requestUri, '/accounting/reports/') !== false;
 $toolsRoutes = ['import', 'import_upload', 'import_commit', 'import_last', 'category_map', 'category_map_save', 'category_map_save_inline'];
 $batchRoutes = ['batch_reports', 'batch_reports_run'];
@@ -26,7 +28,7 @@ $dbLabel = $_ENV['LOCAL_ACC_DB_NAME'] ?? $_ENV['ACC_DB_NAME'] ?? 'accounting_w5o
 ?>
 <nav class="accounting-nav navbar navbar-expand-lg navbar-dark no-print" role="navigation" aria-label="Accounting navigation">
 	<div class="container-fluid">
-		<a class="navbar-brand d-flex align-items-center" href="<?= route('dashboard'); ?>">
+		<a class="navbar-brand d-flex align-items-center" href="/accounting/dashboard.php">
 			<img src="/accounting/images/badges/club_logo.png" alt="W5OBM logo" width="40" height="40" class="me-2 rounded shadow-sm">
 			<span class="fw-semibold">W5OBM Accounting</span>
 		</a>
@@ -36,8 +38,13 @@ $dbLabel = $_ENV['LOCAL_ACC_DB_NAME'] ?? $_ENV['ACC_DB_NAME'] ?? 'accounting_w5o
 		<div class="collapse navbar-collapse" id="accountingNav">
 			<ul class="navbar-nav me-auto mb-2 mb-lg-0">
 				<li class="nav-item">
-					<a class="nav-link <?= $navIsActive('dashboard') ? 'active' : ''; ?>" href="<?= route('dashboard'); ?>">
+					<a class="nav-link <?= $isLegacyDashboard ? 'active' : ''; ?>" href="/accounting/dashboard.php">
 						<i class="fas fa-chart-line me-1"></i>Dashboard
+					</a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link <?= !$isLegacyDashboard && $navIsActive('dashboard') ? 'active' : ''; ?>" href="<?= route('dashboard'); ?>">
+						<i class="fas fa-compass me-1"></i>Command Center
 					</a>
 				</li>
 				<li class="nav-item">

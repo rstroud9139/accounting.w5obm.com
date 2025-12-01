@@ -7,7 +7,7 @@ require_once __DIR__ . '/../lib/helpers.php';
 require_once __DIR__ . '/../lib/import_helpers.php';
 require_once __DIR__ . '/../utils/csrf.php';
 
-/** @var mysqli $accConn */
+$db = accounting_db_connection();
 
 try {
     csrf_verify_post_or_throw();
@@ -38,7 +38,7 @@ if ($batchId <= 0) {
 }
 
 try {
-    accounting_imports_delete_batch($accConn, $batchId, $userId);
+    accounting_imports_delete_batch($db, $batchId, $userId);
     setToastMessage('success', 'Batch Removed', 'The staged batch and its rows were deleted.', 'fas fa-trash-alt');
 } catch (Exception $ex) {
     setToastMessage('danger', 'Delete Failed', $ex->getMessage(), 'fas fa-bug');

@@ -12,10 +12,12 @@ require_once __DIR__ . '/../include/dbconn.php';
 require_once __DIR__ . '/../include/helper_functions.php';
 require_once __DIR__ . '/lib/import_helpers.php';
 
+$db = accounting_db_connection();
+
 echo "=== Import Parser Test ===\n\n";
 
 // Ensure tables exist
-accounting_imports_ensure_tables($accConn);
+accounting_imports_ensure_tables($db);
 echo "[OK] Import tables ensured\n";
 
 // Test 1: GnuCash import
@@ -31,21 +33,21 @@ if (!file_exists($gnucashFile)) {
         'size' => filesize($gnucashFile),
         'checksum' => hash_file('sha256', $gnucashFile),
     ];
-    
+
     try {
-        $batchId = accounting_imports_create_batch($accConn, 1, 'gnucash_file', $fileMeta);
+        $batchId = accounting_imports_create_batch($db, 1, 'gnucash_file', $fileMeta);
         echo "[OK] Created batch #$batchId\n";
-        
-        accounting_imports_populate_gnucash_batch($accConn, $batchId, $fileMeta);
+
+        accounting_imports_populate_gnucash_batch($db, $batchId, $fileMeta);
         echo "[OK] Populated GnuCash batch\n";
-        
+
         // Check results
-        $result = $accConn->query("SELECT COUNT(*) as cnt FROM acc_import_rows WHERE batch_id = $batchId");
+        $result = $db->query("SELECT COUNT(*) as cnt FROM acc_import_rows WHERE batch_id = $batchId");
         $row = $result->fetch_assoc();
         echo "[OK] Staged {$row['cnt']} rows from GnuCash file\n";
-        
+
         // Show sample row
-        $result = $accConn->query("SELECT * FROM acc_import_rows WHERE batch_id = $batchId LIMIT 1");
+        $result = $db->query("SELECT * FROM acc_import_rows WHERE batch_id = $batchId LIMIT 1");
         if ($sampleRow = $result->fetch_assoc()) {
             echo "[OK] Sample normalized data:\n";
             $normalized = json_decode($sampleRow['normalized'], true);
@@ -53,7 +55,6 @@ if (!file_exists($gnucashFile)) {
                 echo "    $key: " . json_encode($value) . "\n";
             }
         }
-        
     } catch (Exception $e) {
         echo "[ERROR] GnuCash import failed: " . $e->getMessage() . "\n";
     }
@@ -72,21 +73,21 @@ if (!file_exists($qfxFile)) {
         'size' => filesize($qfxFile),
         'checksum' => hash_file('sha256', $qfxFile),
     ];
-    
+
     try {
-        $batchId = accounting_imports_create_batch($accConn, 1, 'quicken_qfx', $fileMeta);
+        $batchId = accounting_imports_create_batch($db, 1, 'quicken_qfx', $fileMeta);
         echo "[OK] Created batch #$batchId\n";
-        
-        accounting_imports_populate_quicken_batch($accConn, $batchId, $fileMeta);
+
+        accounting_imports_populate_quicken_batch($db, $batchId, $fileMeta);
         echo "[OK] Populated Quicken batch\n";
-        
+
         // Check results
-        $result = $accConn->query("SELECT COUNT(*) as cnt FROM acc_import_rows WHERE batch_id = $batchId");
+        $result = $db->query("SELECT COUNT(*) as cnt FROM acc_import_rows WHERE batch_id = $batchId");
         $row = $result->fetch_assoc();
         echo "[OK] Staged {$row['cnt']} rows from QFX file\n";
-        
+
         // Show sample row
-        $result = $accConn->query("SELECT * FROM acc_import_rows WHERE batch_id = $batchId LIMIT 1");
+        $result = $db->query("SELECT * FROM acc_import_rows WHERE batch_id = $batchId LIMIT 1");
         if ($sampleRow = $result->fetch_assoc()) {
             echo "[OK] Sample normalized data:\n";
             $normalized = json_decode($sampleRow['normalized'], true);
@@ -94,7 +95,6 @@ if (!file_exists($qfxFile)) {
                 echo "    $key: " . json_encode($value) . "\n";
             }
         }
-        
     } catch (Exception $e) {
         echo "[ERROR] Quicken import failed: " . $e->getMessage() . "\n";
     }

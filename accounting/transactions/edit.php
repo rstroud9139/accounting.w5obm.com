@@ -20,6 +20,8 @@ require_once __DIR__ . '/../controllers/transactionController.php';
 require_once __DIR__ . '/../utils/csrf.php';
 require_once __DIR__ . '/../../include/premium_hero.php';
 
+$db = accounting_db_connection();
+
 // Check authentication using consolidated functions
 if (!isAuthenticated()) {
     setToastMessage('info', 'Login Required', 'Please login to access the transaction system.', 'fas fa-calculator');
@@ -129,7 +131,7 @@ $vendors = [];
 try {
     // Get categories
     $cat_query = "SELECT id, name, type FROM acc_transaction_categories ORDER BY name";
-    $cat_result = $conn->query($cat_query);
+    $cat_result = $db->query($cat_query);
     if ($cat_result) {
         while ($row = $cat_result->fetch_assoc()) {
             $categories[] = $row;
@@ -138,7 +140,7 @@ try {
 
     // Get ledger accounts
     $acc_query = "SELECT id, name FROM acc_ledger_accounts ORDER BY name";
-    $acc_result = $conn->query($acc_query);
+    $acc_result = $db->query($acc_query);
     if ($acc_result) {
         while ($row = $acc_result->fetch_assoc()) {
             $accounts[] = $row;
@@ -147,7 +149,7 @@ try {
 
     // Get vendors
     $ven_query = "SELECT id, name FROM acc_vendors ORDER BY name";
-    $ven_result = $conn->query($ven_query);
+    $ven_result = $db->query($ven_query);
     if ($ven_result) {
         while ($row = $ven_result->fetch_assoc()) {
             $vendors[] = $row;
@@ -267,217 +269,217 @@ $transactionHeroChips = array_filter([
         <div class="container mt-4">
             <!-- Current Transaction Info -->
             <div class="card shadow mb-4">
-            <div class="card-header bg-info text-white">
-                <h6 class="mb-0">
-                    <i class="fas fa-info-circle me-2"></i>Current Transaction Information
-                </h6>
-            </div>
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-md-3">
-                        <strong>Type:</strong><br>
-                        <span class="badge <?php
-                                            switch ($transaction['type']) {
-                                                case 'Income':
-                                                    echo 'bg-success';
-                                                    break;
-                                                case 'Expense':
-                                                    echo 'bg-danger';
-                                                    break;
-                                                case 'Asset':
-                                                    echo 'bg-primary';
-                                                    break;
-                                                case 'Transfer':
-                                                    echo 'bg-warning';
-                                                    break;
-                                                default:
-                                                    echo 'bg-secondary';
-                                            }
-                                            ?>"><?= htmlspecialchars($transaction['type']) ?></span>
-                    </div>
-                    <div class="col-md-3">
-                        <strong>Amount:</strong><br>
-                        <span class="h5 <?= $transaction['type'] === 'Income' ? 'text-success' : 'text-danger' ?>">
-                            $<?= number_format($transaction['amount'], 2) ?>
-                        </span>
-                    </div>
-                    <div class="col-md-3">
-                        <strong>Date:</strong><br>
-                        <?= date('M j, Y', strtotime($transaction['transaction_date'])) ?>
-                    </div>
-                    <div class="col-md-3">
-                        <strong>Category:</strong><br>
-                        <?= htmlspecialchars($transaction['category_name'] ?? 'Uncategorized') ?>
+                <div class="card-header bg-info text-white">
+                    <h6 class="mb-0">
+                        <i class="fas fa-info-circle me-2"></i>Current Transaction Information
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <strong>Type:</strong><br>
+                            <span class="badge <?php
+                                                switch ($transaction['type']) {
+                                                    case 'Income':
+                                                        echo 'bg-success';
+                                                        break;
+                                                    case 'Expense':
+                                                        echo 'bg-danger';
+                                                        break;
+                                                    case 'Asset':
+                                                        echo 'bg-primary';
+                                                        break;
+                                                    case 'Transfer':
+                                                        echo 'bg-warning';
+                                                        break;
+                                                    default:
+                                                        echo 'bg-secondary';
+                                                }
+                                                ?>"><?= htmlspecialchars($transaction['type']) ?></span>
+                        </div>
+                        <div class="col-md-3">
+                            <strong>Amount:</strong><br>
+                            <span class="h5 <?= $transaction['type'] === 'Income' ? 'text-success' : 'text-danger' ?>">
+                                $<?= number_format($transaction['amount'], 2) ?>
+                            </span>
+                        </div>
+                        <div class="col-md-3">
+                            <strong>Date:</strong><br>
+                            <?= date('M j, Y', strtotime($transaction['transaction_date'])) ?>
+                        </div>
+                        <div class="col-md-3">
+                            <strong>Category:</strong><br>
+                            <?= htmlspecialchars($transaction['category_name'] ?? 'Uncategorized') ?>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
 
             <!-- Edit Form -->
             <div class="card shadow">
-            <div class="card-header bg-light">
-                <h5 class="mb-0">
-                    <i class="fas fa-file-invoice-dollar me-2"></i>Edit Transaction Details
-                </h5>
-            </div>
-            <div class="card-body">
-                <form method="POST" action="edit.php?id=<?= $transaction_id ?>" id="editTransactionForm">
-                    <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">
+                        <i class="fas fa-file-invoice-dollar me-2"></i>Edit Transaction Details
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="edit.php?id=<?= $transaction_id ?>" id="editTransactionForm">
+                        <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
 
-                    <div class="row">
-                        <!-- Transaction Type -->
-                        <div class="col-md-6 mb-3">
-                            <label for="type" class="form-label">
-                                <i class="fas fa-tag me-1"></i>Transaction Type *
-                            </label>
-                            <select id="type" name="type" class="form-control form-control-lg shadow-sm" required>
-                                <option value="">Select transaction type</option>
-                                <option value="Income" <?= $transaction['type'] === 'Income' ? 'selected' : '' ?>>Income</option>
-                                <option value="Expense" <?= $transaction['type'] === 'Expense' ? 'selected' : '' ?>>Expense</option>
-                                <option value="Asset" <?= $transaction['type'] === 'Asset' ? 'selected' : '' ?>>Asset Purchase</option>
-                                <option value="Transfer" <?= $transaction['type'] === 'Transfer' ? 'selected' : '' ?>>Transfer</option>
-                            </select>
-                        </div>
-
-                        <!-- Amount -->
-                        <div class="col-md-6 mb-3">
-                            <label for="amount" class="form-label">
-                                <i class="fas fa-dollar-sign me-1"></i>Amount *
-                            </label>
-                            <div class="input-group shadow-sm">
-                                <span class="input-group-text bg-light">$</span>
-                                <input type="number" step="0.01" min="0.01" max="999999.99"
-                                    id="amount" name="amount" class="form-control form-control-lg"
-                                    value="<?= htmlspecialchars($transaction['amount']) ?>" required>
+                        <div class="row">
+                            <!-- Transaction Type -->
+                            <div class="col-md-6 mb-3">
+                                <label for="type" class="form-label">
+                                    <i class="fas fa-tag me-1"></i>Transaction Type *
+                                </label>
+                                <select id="type" name="type" class="form-control form-control-lg shadow-sm" required>
+                                    <option value="">Select transaction type</option>
+                                    <option value="Income" <?= $transaction['type'] === 'Income' ? 'selected' : '' ?>>Income</option>
+                                    <option value="Expense" <?= $transaction['type'] === 'Expense' ? 'selected' : '' ?>>Expense</option>
+                                    <option value="Asset" <?= $transaction['type'] === 'Asset' ? 'selected' : '' ?>>Asset Purchase</option>
+                                    <option value="Transfer" <?= $transaction['type'] === 'Transfer' ? 'selected' : '' ?>>Transfer</option>
+                                </select>
                             </div>
-                        </div>
-                    </div>
 
-                    <div class="row">
-                        <!-- Transaction Date -->
-                        <div class="col-md-6 mb-3">
-                            <label for="transaction_date" class="form-label">
-                                <i class="fas fa-calendar me-1"></i>Transaction Date *
-                            </label>
-                            <input type="date" id="transaction_date" name="transaction_date"
-                                class="form-control form-control-lg shadow-sm"
-                                value="<?= htmlspecialchars($transaction['transaction_date']) ?>" required>
-                        </div>
-
-                        <!-- Category -->
-                        <div class="col-md-6 mb-3">
-                            <label for="category_id" class="form-label">
-                                <i class="fas fa-folder me-1"></i>Category *
-                            </label>
-                            <select id="category_id" name="category_id" class="form-control form-control-lg shadow-sm" required>
-                                <option value="">Select a category</option>
-                                <?php foreach ($categories as $category): ?>
-                                    <option value="<?= $category['id'] ?>"
-                                        <?= $transaction['category_id'] == $category['id'] ? 'selected' : '' ?>>
-                                        <?= htmlspecialchars($category['name']) ?>
-                                        <?php if (!empty($category['type'])): ?>
-                                            <small>(<?= htmlspecialchars($category['type']) ?>)</small>
-                                        <?php endif; ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <!-- Ledger Account -->
-                        <div class="col-md-6 mb-3">
-                            <label for="account_id" class="form-label">
-                                <i class="fas fa-university me-1"></i>Ledger Account
-                            </label>
-                            <select id="account_id" name="account_id" class="form-control form-control-lg shadow-sm">
-                                <option value="">Select an account (optional)</option>
-                                <?php foreach ($accounts as $account): ?>
-                                    <option value="<?= $account['id'] ?>"
-                                        <?= $transaction['account_id'] == $account['id'] ? 'selected' : '' ?>>
-                                        <?= htmlspecialchars($account['name']) ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
-                        </div>
-
-                        <!-- Vendor -->
-                        <div class="col-md-6 mb-3">
-                            <label for="vendor_id" class="form-label">
-                                <i class="fas fa-building me-1"></i>Vendor
-                            </label>
-                            <select id="vendor_id" name="vendor_id" class="form-control form-control-lg shadow-sm">
-                                <option value="">Select a vendor (optional)</option>
-                                <?php foreach ($vendors as $vendor): ?>
-                                    <option value="<?= $vendor['id'] ?>"
-                                        <?= $transaction['vendor_id'] == $vendor['id'] ? 'selected' : '' ?>>
-                                        <?= htmlspecialchars($vendor['name']) ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <!-- Reference Number -->
-                        <div class="col-md-6 mb-3">
-                            <label for="reference_number" class="form-label">
-                                <i class="fas fa-hashtag me-1"></i>Reference Number
-                            </label>
-                            <input type="text" id="reference_number" name="reference_number"
-                                class="form-control form-control-lg shadow-sm"
-                                value="<?= htmlspecialchars($transaction['reference_number'] ?? '') ?>"
-                                placeholder="Check #, Invoice #, etc.">
-                        </div>
-
-                        <!-- Description -->
-                        <div class="col-md-6 mb-3">
-                            <label for="description" class="form-label">
-                                <i class="fas fa-comment me-1"></i>Description *
-                            </label>
-                            <input type="text" id="description" name="description"
-                                class="form-control form-control-lg shadow-sm"
-                                value="<?= htmlspecialchars($transaction['description']) ?>"
-                                placeholder="Brief description of transaction"
-                                maxlength="500" required>
-                        </div>
-                    </div>
-
-                    <!-- Notes -->
-                    <div class="mb-4">
-                        <label for="notes" class="form-label">
-                            <i class="fas fa-sticky-note me-1"></i>Additional Notes
-                        </label>
-                        <textarea id="notes" name="notes" class="form-control form-control-lg shadow-sm"
-                            rows="3" placeholder="Optional additional details or notes..."><?= htmlspecialchars($transaction['notes'] ?? '') ?></textarea>
-                    </div>
-
-                    <!-- Action Buttons -->
-                    <div class="action-area bg-light border-top p-3 rounded-bottom">
-                        <div class="row align-items-center">
-                            <div class="col-md-6">
-                                <small class="text-muted">
-                                    <i class="fas fa-info-circle me-1"></i>
-                                    Last updated: <?= $transaction['updated_at'] ? date('M j, Y g:i A', strtotime($transaction['updated_at'])) : 'Never' ?>
-                                </small>
-                            </div>
-                            <div class="col-md-6 text-end">
-                                <div class="btn-group shadow" role="group">
-                                    <a href="list.php" class="btn btn-secondary btn-lg">
-                                        <i class="fas fa-times me-1"></i>Cancel
-                                    </a>
-                                    <button type="submit" class="btn btn-warning btn-lg">
-                                        <i class="fas fa-save me-1"></i>Update Transaction
-                                    </button>
+                            <!-- Amount -->
+                            <div class="col-md-6 mb-3">
+                                <label for="amount" class="form-label">
+                                    <i class="fas fa-dollar-sign me-1"></i>Amount *
+                                </label>
+                                <div class="input-group shadow-sm">
+                                    <span class="input-group-text bg-light">$</span>
+                                    <input type="number" step="0.01" min="0.01" max="999999.99"
+                                        id="amount" name="amount" class="form-control form-control-lg"
+                                        value="<?= htmlspecialchars($transaction['amount']) ?>" required>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                </form>
+
+                        <div class="row">
+                            <!-- Transaction Date -->
+                            <div class="col-md-6 mb-3">
+                                <label for="transaction_date" class="form-label">
+                                    <i class="fas fa-calendar me-1"></i>Transaction Date *
+                                </label>
+                                <input type="date" id="transaction_date" name="transaction_date"
+                                    class="form-control form-control-lg shadow-sm"
+                                    value="<?= htmlspecialchars($transaction['transaction_date']) ?>" required>
+                            </div>
+
+                            <!-- Category -->
+                            <div class="col-md-6 mb-3">
+                                <label for="category_id" class="form-label">
+                                    <i class="fas fa-folder me-1"></i>Category *
+                                </label>
+                                <select id="category_id" name="category_id" class="form-control form-control-lg shadow-sm" required>
+                                    <option value="">Select a category</option>
+                                    <?php foreach ($categories as $category): ?>
+                                        <option value="<?= $category['id'] ?>"
+                                            <?= $transaction['category_id'] == $category['id'] ? 'selected' : '' ?>>
+                                            <?= htmlspecialchars($category['name']) ?>
+                                            <?php if (!empty($category['type'])): ?>
+                                                <small>(<?= htmlspecialchars($category['type']) ?>)</small>
+                                            <?php endif; ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <!-- Ledger Account -->
+                            <div class="col-md-6 mb-3">
+                                <label for="account_id" class="form-label">
+                                    <i class="fas fa-university me-1"></i>Ledger Account
+                                </label>
+                                <select id="account_id" name="account_id" class="form-control form-control-lg shadow-sm">
+                                    <option value="">Select an account (optional)</option>
+                                    <?php foreach ($accounts as $account): ?>
+                                        <option value="<?= $account['id'] ?>"
+                                            <?= $transaction['account_id'] == $account['id'] ? 'selected' : '' ?>>
+                                            <?= htmlspecialchars($account['name']) ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+
+                            <!-- Vendor -->
+                            <div class="col-md-6 mb-3">
+                                <label for="vendor_id" class="form-label">
+                                    <i class="fas fa-building me-1"></i>Vendor
+                                </label>
+                                <select id="vendor_id" name="vendor_id" class="form-control form-control-lg shadow-sm">
+                                    <option value="">Select a vendor (optional)</option>
+                                    <?php foreach ($vendors as $vendor): ?>
+                                        <option value="<?= $vendor['id'] ?>"
+                                            <?= $transaction['vendor_id'] == $vendor['id'] ? 'selected' : '' ?>>
+                                            <?= htmlspecialchars($vendor['name']) ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <!-- Reference Number -->
+                            <div class="col-md-6 mb-3">
+                                <label for="reference_number" class="form-label">
+                                    <i class="fas fa-hashtag me-1"></i>Reference Number
+                                </label>
+                                <input type="text" id="reference_number" name="reference_number"
+                                    class="form-control form-control-lg shadow-sm"
+                                    value="<?= htmlspecialchars($transaction['reference_number'] ?? '') ?>"
+                                    placeholder="Check #, Invoice #, etc.">
+                            </div>
+
+                            <!-- Description -->
+                            <div class="col-md-6 mb-3">
+                                <label for="description" class="form-label">
+                                    <i class="fas fa-comment me-1"></i>Description *
+                                </label>
+                                <input type="text" id="description" name="description"
+                                    class="form-control form-control-lg shadow-sm"
+                                    value="<?= htmlspecialchars($transaction['description']) ?>"
+                                    placeholder="Brief description of transaction"
+                                    maxlength="500" required>
+                            </div>
+                        </div>
+
+                        <!-- Notes -->
+                        <div class="mb-4">
+                            <label for="notes" class="form-label">
+                                <i class="fas fa-sticky-note me-1"></i>Additional Notes
+                            </label>
+                            <textarea id="notes" name="notes" class="form-control form-control-lg shadow-sm"
+                                rows="3" placeholder="Optional additional details or notes..."><?= htmlspecialchars($transaction['notes'] ?? '') ?></textarea>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="action-area bg-light border-top p-3 rounded-bottom">
+                            <div class="row align-items-center">
+                                <div class="col-md-6">
+                                    <small class="text-muted">
+                                        <i class="fas fa-info-circle me-1"></i>
+                                        Last updated: <?= $transaction['updated_at'] ? date('M j, Y g:i A', strtotime($transaction['updated_at'])) : 'Never' ?>
+                                    </small>
+                                </div>
+                                <div class="col-md-6 text-end">
+                                    <div class="btn-group shadow" role="group">
+                                        <a href="list.php" class="btn btn-secondary btn-lg">
+                                            <i class="fas fa-times me-1"></i>Cancel
+                                        </a>
+                                        <button type="submit" class="btn btn-warning btn-lg">
+                                            <i class="fas fa-save me-1"></i>Update Transaction
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {

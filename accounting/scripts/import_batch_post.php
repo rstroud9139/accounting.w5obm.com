@@ -7,7 +7,7 @@ require_once __DIR__ . '/../lib/helpers.php';
 require_once __DIR__ . '/../lib/import_helpers.php';
 require_once __DIR__ . '/../utils/csrf.php';
 
-/** @var mysqli $accConn */
+$db = accounting_db_connection();
 
 try {
     csrf_verify_post_or_throw();
@@ -38,7 +38,7 @@ if ($batchId <= 0) {
 }
 
 try {
-    $result = accounting_imports_post_batch($accConn, $batchId, $userId);
+    $result = accounting_imports_post_batch($db, $batchId, $userId);
     $journals = (is_array($result) && isset($result['journals'])) ? (int)$result['journals'] : 0;
     $lines = (is_array($result) && isset($result['lines'])) ? (int)$result['lines'] : 0;
     setToastMessage('success', 'Batch Posted', sprintf('Created %d journal%s and %d line%s.', $journals, $journals === 1 ? '' : 's', $lines, $lines === 1 ? '' : 's'), 'fas fa-check-circle');

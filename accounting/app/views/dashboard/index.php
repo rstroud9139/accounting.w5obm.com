@@ -1,3 +1,15 @@
+<div class="alert alert-info d-flex flex-column flex-md-row align-items-md-center justify-content-between shadow-sm border-0">
+    <div class="me-md-3">
+        <strong>Need the full Accounting Dashboard?</strong>
+        <span class="ms-md-2 text-muted">Jump back to the legacy dashboard for cash, assets, and quick-post tools.</span>
+    </div>
+    <div class="mt-3 mt-md-0">
+        <a class="btn btn-primary" href="/accounting/dashboard.php">
+            <i class="fas fa-chart-line me-1"></i>Open Dashboard
+        </a>
+    </div>
+</div>
+
 <div class="row g-4">
     <div class="col-md-4">
         <div class="card shadow-sm h-100">

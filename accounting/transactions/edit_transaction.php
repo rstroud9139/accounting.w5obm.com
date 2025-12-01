@@ -18,6 +18,8 @@ require_once __DIR__ . '/../views/transactionForm.php';
 require_once __DIR__ . '/../utils/csrf.php';
 require_once __DIR__ . '/../../include/premium_hero.php';
 
+$db = accounting_db_connection();
+
 // Authentication check
 if (!isAuthenticated()) {
     header('Location: /authentication/login.php');
@@ -148,7 +150,7 @@ try {
 
 // Get vendors for dropdown
 try {
-    $stmt = $conn->prepare("SELECT id, name FROM acc_vendors ORDER BY name");
+    $stmt = $db->prepare("SELECT id, name FROM acc_vendors ORDER BY name");
     $stmt->execute();
     $vendors = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
     $stmt->close();

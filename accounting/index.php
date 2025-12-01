@@ -42,6 +42,9 @@ if (!file_exists($accountingNavHelper)) {
 require_once $accountingNavHelper;
 require_once __DIR__ . '/../include/premium_hero.php';
 
+$mainSiteBase = defined('BASE_URL') ? BASE_URL : '/';
+$mainSiteBase = rtrim($mainSiteBase, '/') . '/';
+
 if (!function_exists('route')) {
     function route(string $name, array $params = []): string
     {
@@ -220,10 +223,10 @@ accounting_head_assets();
                             <p class="text-white-50 mb-0 small"><?= htmlspecialchars($APP_DESCRIPTION); ?></p>
                         </div>
                         <div class="d-flex gap-2">
-                            <a href="transactions/new.php" class="btn btn-success btn-sm">
+                            <a href="/accounting/transactions/add.php" class="btn btn-success btn-sm">
                                 <i class="fas fa-plus-circle me-1"></i>New Transaction
                             </a>
-                            <a href="reports/" class="btn btn-outline-light btn-sm">
+                            <a href="/accounting/reports/" class="btn btn-outline-light btn-sm">
                                 <i class="fas fa-chart-line me-1"></i>Quick Reports
                             </a>
                         </div>
@@ -233,118 +236,122 @@ accounting_head_assets();
         <?php endif; ?>
 
         <div class="container mt-4">
-        <div class="row">
-            <!-- Left Column: Activity & Maintenance Navigation -->
-            <div class="col-md-3 mb-4">
-                <nav class="bg-light border rounded h-100 p-0 shadow-sm">
-                    <div class="px-3 py-2 border-bottom">
-                        <span class="text-muted text-uppercase small">Workspace</span>
-                    </div>
-                    <div class="list-group list-group-flush">
-                        <a href="transactions/" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
-                            <span><i class="fas fa-exchange-alt me-2 text-primary"></i>Transactions</span>
-                            <i class="fas fa-chevron-right small text-muted"></i>
-                        </a>
-                        <a href="reports/" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
-                            <span><i class="fas fa-chart-bar me-2 text-success"></i>Reports</span>
-                            <i class="fas fa-chevron-right small text-muted"></i>
-                        </a>
-                        <a href="assets/" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
-                            <span><i class="fas fa-boxes me-2 text-info"></i>Assets</span>
-                            <i class="fas fa-chevron-right small text-muted"></i>
-                        </a>
-                        <a href="donations/" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
-                            <span><i class="fas fa-heart me-2 text-danger"></i>Donations</span>
-                            <i class="fas fa-chevron-right small text-muted"></i>
-                        </a>
-                        <div class="list-group-item small text-muted text-uppercase">
-                            Maintenance
+            <div class="row">
+                <!-- Left Column: Activity & Maintenance Navigation -->
+                <div class="col-md-3 mb-4">
+                    <nav class="bg-light border rounded h-100 p-0 shadow-sm">
+                        <div class="px-3 py-2 border-bottom">
+                            <span class="text-muted text-uppercase small">Workspace</span>
                         </div>
-                        <a href="maintenance/categories.php" class="list-group-item list-group-item-action">
-                            <i class="fas fa-tags me-2"></i>Categories
-                        </a>
-                        <a href="maintenance/accounts.php" class="list-group-item list-group-item-action">
-                            <i class="fas fa-book me-2"></i>Chart of Accounts
-                        </a>
-                        <a href="maintenance/settings.php" class="list-group-item list-group-item-action">
-                            <i class="fas fa-cog me-2"></i>Accounting Settings
-                        </a>
-                    </div>
-                    <div class="px-3 py-2 border-top text-center">
-                        <a href="<?= $mainSiteBase ?>authentication/dashboard.php" class="btn btn-outline-secondary btn-sm w-100">
-                            <i class="fas fa-arrow-left me-1"></i>Back to Site Dashboard
-                        </a>
-                    </div>
-                </nav>
-            </div>
-
-            <!-- Right Column: Main Transactional / Reporting Area -->
-            <div class="col-md-9 mb-4">
-                <div class="card shadow-sm mb-4">
-                    <div class="card-body">
-                        <div class="row mb-3">
-                            <div class="col-md-4 mb-3">
-                                <div class="border rounded p-3 h-100 bg-light">
-                                    <div class="d-flex justify-content-between align-items-center mb-2">
-                                        <span class="text-muted small">Current Balance</span>
-                                        <i class="fas fa-wallet text-success"></i>
-                                    </div>
-                                    <h4 class="mb-0">$0.00</h4>
-                                    <small class="text-muted">Updated when transactions are posted</small>
-                                </div>
+                        <div class="list-group list-group-flush">
+                            <a href="/accounting/transactions/" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                                <span><i class="fas fa-exchange-alt me-2 text-primary"></i>Transactions</span>
+                                <i class="fas fa-chevron-right small text-muted"></i>
+                            </a>
+                            <a href="/accounting/reports/" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                                <span><i class="fas fa-chart-bar me-2 text-success"></i>Reports</span>
+                                <i class="fas fa-chevron-right small text-muted"></i>
+                            </a>
+                            <a href="/accounting/assets/" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                                <span><i class="fas fa-boxes me-2 text-info"></i>Assets</span>
+                                <i class="fas fa-chevron-right small text-muted"></i>
+                            </a>
+                            <a href="/accounting/budgets/" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                                <span><i class="fas fa-wallet me-2 text-warning"></i>Budgets</span>
+                                <i class="fas fa-chevron-right small text-muted"></i>
+                            </a>
+                            <a href="/accounting/donations/" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                                <span><i class="fas fa-heart me-2 text-danger"></i>Donations</span>
+                                <i class="fas fa-chevron-right small text-muted"></i>
+                            </a>
+                            <div class="list-group-item small text-muted text-uppercase">
+                                Maintenance
                             </div>
-                            <div class="col-md-4 mb-3">
-                                <div class="border rounded p-3 h-100 bg-light">
-                                    <div class="d-flex justify-content-between align-items-center mb-2">
-                                        <span class="text-muted small">This Month - Income</span>
-                                        <i class="fas fa-arrow-circle-down text-primary"></i>
-                                    </div>
-                                    <h4 class="mb-0">$0.00</h4>
-                                    <small class="text-muted">Placeholder until reporting is wired</small>
-                                </div>
-                            </div>
-                            <div class="col-md-4 mb-3">
-                                <div class="border rounded p-3 h-100 bg-light">
-                                    <div class="d-flex justify-content-between align-items-center mb-2">
-                                        <span class="text-muted small">This Month - Expenses</span>
-                                        <i class="fas fa-arrow-circle-up text-danger"></i>
-                                    </div>
-                                    <h4 class="mb-0">$0.00</h4>
-                                    <small class="text-muted">Placeholder until reporting is wired</small>
-                                </div>
-                            </div>
+                            <a href="/accounting/categories/" class="list-group-item list-group-item-action">
+                                <i class="fas fa-tags me-2"></i>Categories
+                            </a>
+                            <a href="/accounting/ledger/" class="list-group-item list-group-item-action">
+                                <i class="fas fa-book me-2"></i>Chart of Accounts
+                            </a>
+                            <a href="/accounting/admin/utilities.php" class="list-group-item list-group-item-action">
+                                <i class="fas fa-cog me-2"></i>Admin Utilities
+                            </a>
                         </div>
+                        <div class="px-3 py-2 border-top text-center">
+                            <a href="<?= $mainSiteBase ?>authentication/dashboard.php" class="btn btn-outline-secondary btn-sm w-100">
+                                <i class="fas fa-arrow-left me-1"></i>Back to Site Dashboard
+                            </a>
+                        </div>
+                    </nav>
+                </div>
 
-                        <hr>
+                <!-- Right Column: Main Transactional / Reporting Area -->
+                <div class="col-md-9 mb-4">
+                    <div class="card shadow-sm mb-4">
+                        <div class="card-body">
+                            <div class="row mb-3">
+                                <div class="col-md-4 mb-3">
+                                    <div class="border rounded p-3 h-100 bg-light">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <span class="text-muted small">Current Balance</span>
+                                            <i class="fas fa-wallet text-success"></i>
+                                        </div>
+                                        <h4 class="mb-0">$0.00</h4>
+                                        <small class="text-muted">Updated when transactions are posted</small>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <div class="border rounded p-3 h-100 bg-light">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <span class="text-muted small">This Month - Income</span>
+                                            <i class="fas fa-arrow-circle-down text-primary"></i>
+                                        </div>
+                                        <h4 class="mb-0">$0.00</h4>
+                                        <small class="text-muted">Placeholder until reporting is wired</small>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <div class="border rounded p-3 h-100 bg-light">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <span class="text-muted small">This Month - Expenses</span>
+                                            <i class="fas fa-arrow-circle-up text-danger"></i>
+                                        </div>
+                                        <h4 class="mb-0">$0.00</h4>
+                                        <small class="text-muted">Placeholder until reporting is wired</small>
+                                    </div>
+                                </div>
+                            </div>
 
-                        <h6 class="mb-3">Recent Activity</h6>
-                        <div class="table-responsive">
-                            <table class="table table-sm align-middle mb-0">
-                                <thead class="table-light">
-                                    <tr>
-                                        <th scope="col">Date</th>
-                                        <th scope="col">Description</th>
-                                        <th scope="col" class="text-end">Amount</th>
-                                        <th scope="col">Type</th>
-                                        <th scope="col">Status</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td colspan="5" class="text-muted text-center py-4">
-                                            No recent transactions to display yet.
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                            <hr>
+
+                            <h6 class="mb-3">Recent Activity</h6>
+                            <div class="table-responsive">
+                                <table class="table table-sm align-middle mb-0">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th scope="col">Date</th>
+                                            <th scope="col">Description</th>
+                                            <th scope="col" class="text-end">Amount</th>
+                                            <th scope="col">Type</th>
+                                            <th scope="col">Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td colspan="5" class="text-muted text-center py-4">
+                                                No recent transactions to display yet.
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <?php include __DIR__ . '/../include/footer.php'; ?>
+        <?php include __DIR__ . '/../include/footer.php'; ?>
 </body>
 
 </html>

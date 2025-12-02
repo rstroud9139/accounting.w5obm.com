@@ -37,13 +37,44 @@ $routeNames = [
 ];
 
 $friendlyRoute = $routeNames[$currentRoute] ?? ucwords(str_replace('_', ' ', $currentRoute));
-$heroTheme = in_array($currentRoute, ['accounts', 'account_register'], true)
-    ? 'emerald'
-    : (in_array($currentRoute, ['import', 'import_upload', 'import_commit', 'import_last', 'migrations', 'category_map'], true)
-        ? 'cobalt'
-        : 'midnight');
+$heroTheme = in_array($currentRoute, ['import', 'import_upload', 'import_commit', 'import_last', 'migrations', 'category_map'], true)
+    ? 'cobalt'
+    : 'midnight';
 
 $heroOverrides = [
+    'accounts' => [
+        'eyebrow' => 'Chart of Accounts',
+        'subtitle' => 'Manage the midnight-themed ledger shell so every module references the same structured account tree.',
+        'chips' => [
+            'Theme: Midnight Standard',
+            'Module: Chart Manager',
+        ],
+        'highlights' => [
+            [
+                'label' => 'Accounts Loaded',
+                'value' => isset($accounts) && is_array($accounts) ? number_format(count($accounts)) : '—',
+                'meta' => 'Live dataset'
+            ],
+            [
+                'label' => 'Badge Types',
+                'value' => 'Income · Expense · Asset · Liability · Equity',
+                'meta' => 'Color-coded'
+            ],
+            [
+                'label' => 'Search Tools',
+                'value' => 'Instant filter',
+                'meta' => 'Client-side'
+            ],
+        ],
+    ],
+    'account_register' => [
+        'eyebrow' => 'Chart of Accounts',
+        'subtitle' => 'Drill into any account register while keeping the midnight hero styling consistent.',
+        'chips' => [
+            'Theme: Midnight Standard',
+            'View: Register Detail',
+        ],
+    ],
     'import' => [
         'eyebrow' => 'Ledger Data Builder',
         'subtitle' => 'Stage external CSV/QIF/OFX/IIF/GnuCash files to seed your chart of accounts and historical ledger.',

@@ -14,25 +14,44 @@ class ImportController extends BaseController
 
     private function getAccounts()
     {
-        // Try to load accounts from either acc_chart_of_accounts or acc_ledger_accounts
         $db = accounting_db_connection();
+        $table = $this->resolveAccountTable($db);
+        if (!$table) {
+            return array();
+        }
         try {
-            // Prefer acc_ledger_accounts if present
-            $res = $db->query("SHOW TABLES LIKE 'acc_ledger_accounts'");
-            if ($res && $res->num_rows > 0) {
-                $res2 = $db->query("SELECT id, name, type FROM acc_ledger_accounts ORDER BY type, name");
-                return $res2 ? $res2->fetch_all(MYSQLI_ASSOC) : array();
-            }
-            // Fallback to chart of accounts
-            $res = $db->query("SHOW TABLES LIKE 'acc_chart_of_accounts'");
-            if ($res && $res->num_rows > 0) {
-                $res2 = $db->query("SELECT id, name, type FROM acc_chart_of_accounts ORDER BY type, name");
-                return $res2 ? $res2->fetch_all(MYSQLI_ASSOC) : array();
-            }
+            $res = $db->query("SELECT id, name, type FROM {$table} ORDER BY type, name");
+            return $res ? $res->fetch_all(MYSQLI_ASSOC) : array();
         } catch (Throwable $e) {
             // ignore
         }
         return array();
+    }
+
+    private function resolveAccountTable($db)
+    {
+        try {
+            $res = $db->query("SHOW TABLES LIKE 'acc_ledger_accounts'");
+            if ($res && $res->num_rows > 0) {
+                return 'acc_ledger_accounts';
+            }
+            $res = $db->query("SHOW TABLES LIKE 'acc_chart_of_accounts'");
+            if ($res && $res->num_rows > 0) {
+                return 'acc_chart_of_accounts';
+            }
+        } catch (Throwable $e) {
+        }
+        return null;
+    }
+
+    private function tableHasColumn($db, $table, $column)
+    {
+        try {
+            $res = $db->query("SHOW COLUMNS FROM {$table} LIKE '" . $db->real_escape_string($column) . "'");
+            return $res && $res->num_rows > 0;
+        } catch (Throwable $e) {
+        }
+        return false;
     }
 
     public function index()
@@ -78,7 +97,7 @@ class ImportController extends BaseController
         }
 
         $normalized = $svc->parseFile($type, $tmp);
-        if (!is_array($normalized)) {
+        if (!is_array($normalized) || empty($normalized['transactions']) || !is_array($normalized['transactions'])) {
             $this->render('import/index', array(
                 'page_title' => 'Import Transactions',
                 'categories' => $this->getCategories(),
@@ -87,6 +106,11 @@ class ImportController extends BaseController
             ));
             return;
         }
+
+        $transactions = $normalized['transactions'];
+        $seedCategories = isset($normalized['categories']) && is_array($normalized['categories']) ? $normalized['categories'] : array();
+        $seedAccounts = isset($normalized['accounts']) && is_array($normalized['accounts']) ? $normalized['accounts'] : array();
+        $importMeta = isset($normalized['meta']) && is_array($normalized['meta']) ? $normalized['meta'] : array();
 
         // Precompute likely duplicates for preview (date + abs(amount) + description)
         $dupFlags = array();
@@ -97,7 +121,7 @@ class ImportController extends BaseController
         } catch (Throwable $e) {
             $stmt = null;
         }
-        foreach ($normalized as $row) {
+        foreach ($transactions as $row) {
             $d = isset($row['date']) ? $row['date'] : date('Y-m-d');
             $a = isset($row['amount']) ? (float)$row['amount'] : 0.0;
             $desc = isset($row['description']) ? $row['description'] : (isset($row['payee']) ? $row['payee'] : '');
@@ -126,7 +150,10 @@ class ImportController extends BaseController
         $_SESSION['import_preview'] = array(
             'type' => $type,
             'filename' => $filename,
-            'items' => $normalized,
+            'items' => $transactions,
+            'category_seed' => $seedCategories,
+            'account_seed' => $seedAccounts,
+            'meta' => $importMeta,
             'defaults' => array(
                 'income_cat' => $default_income_cat,
                 'expense_cat' => $default_expense_cat,
@@ -135,13 +162,17 @@ class ImportController extends BaseController
 
         $this->render('import/preview', array(
             'page_title' => 'Preview Import',
-            'items' => $normalized,
+            'items' => $transactions,
             'categories' => $this->getCategories(),
             'accounts' => $this->getAccounts(),
             'category_map' => $this->loadCategoryMap(),
             'defaults' => $_SESSION['import_preview']['defaults'],
             'duplicates' => $dupFlags,
             'dup_count' => $dupCount,
+            'seed_categories' => $seedCategories,
+            'seed_accounts' => $seedAccounts,
+            'import_meta' => $importMeta,
+            'preview_context' => $_SESSION['import_preview'],
             'csrf' => getCsrfToken()
         ));
     }
@@ -152,6 +183,139 @@ class ImportController extends BaseController
         $db = accounting_db_connection();
         $svc = new MappingService($db);
         return $svc->getMap();
+    }
+
+    private function seedCategories(array $seeds)
+    {
+        if (empty($seeds)) {
+            return array('created' => 0);
+        }
+        $db = accounting_db_connection();
+        try {
+            $res = $db->query("SHOW TABLES LIKE 'acc_transaction_categories'");
+            if (!$res || $res->num_rows === 0) {
+                return array('created' => 0);
+            }
+        } catch (Throwable $e) {
+            return array('created' => 0);
+        }
+
+        $existing = array();
+        try {
+            $res = $db->query("SELECT id, name FROM acc_transaction_categories");
+            if ($res) {
+                while ($row = $res->fetch_assoc()) {
+                    $existing[strtolower($row['name'])] = (int)$row['id'];
+                }
+            }
+        } catch (Throwable $e) {
+        }
+
+        $hasType = $this->tableHasColumn($db, 'acc_transaction_categories', 'type');
+        $stmt = $hasType
+            ? $db->prepare('INSERT INTO acc_transaction_categories (name, type) VALUES (?, ?)')
+            : $db->prepare('INSERT INTO acc_transaction_categories (name) VALUES (?)');
+        if (!$stmt) {
+            return array('created' => 0);
+        }
+
+        if ($hasType) {
+            $nameParam = '';
+            $typeParam = '';
+            $stmt->bind_param('ss', $nameParam, $typeParam);
+        } else {
+            $nameParam = '';
+            $stmt->bind_param('s', $nameParam);
+        }
+
+        $created = 0;
+        foreach ($seeds as $seed) {
+            $name = trim((string)($seed['name'] ?? ''));
+            if ($name === '') {
+                continue;
+            }
+            $key = strtolower($name);
+            if (isset($existing[$key])) {
+                continue;
+            }
+            try {
+                $nameParam = $name;
+                if ($hasType) {
+                    $typeParam = isset($seed['type']) ? (string)$seed['type'] : '';
+                }
+                $stmt->execute();
+                if ($stmt->affected_rows > 0) {
+                    $created++;
+                    $existing[$key] = (int)$db->insert_id;
+                }
+            } catch (Throwable $e) {
+            }
+        }
+        $stmt->close();
+
+        return array('created' => $created);
+    }
+
+    private function seedAccounts(array $seeds)
+    {
+        if (empty($seeds)) {
+            return array('created' => 0);
+        }
+        $db = accounting_db_connection();
+        $table = $this->resolveAccountTable($db);
+        if (!$table) {
+            return array('created' => 0);
+        }
+        $existing = array();
+        try {
+            $res = $db->query("SELECT id, name FROM {$table}");
+            if ($res) {
+                while ($row = $res->fetch_assoc()) {
+                    $existing[strtolower($row['name'])] = (int)$row['id'];
+                }
+            }
+        } catch (Throwable $e) {
+        }
+        $hasType = $this->tableHasColumn($db, $table, 'type');
+        $stmt = $hasType
+            ? $db->prepare("INSERT INTO {$table} (name, type) VALUES (?, ?)")
+            : $db->prepare("INSERT INTO {$table} (name) VALUES (?)");
+        if (!$stmt) {
+            return array('created' => 0);
+        }
+        if ($hasType) {
+            $accNameParam = '';
+            $accTypeParam = '';
+            $stmt->bind_param('ss', $accNameParam, $accTypeParam);
+        } else {
+            $accNameParam = '';
+            $stmt->bind_param('s', $accNameParam);
+        }
+        $created = 0;
+        foreach ($seeds as $seed) {
+            $name = trim((string)($seed['name'] ?? ''));
+            if ($name === '') {
+                continue;
+            }
+            $key = strtolower($name);
+            if (isset($existing[$key])) {
+                continue;
+            }
+            try {
+                $accNameParam = $name;
+                if ($hasType) {
+                    $accTypeParam = isset($seed['type']) ? (string)$seed['type'] : '';
+                }
+                $stmt->execute();
+                if ($stmt->affected_rows > 0) {
+                    $created++;
+                    $existing[$key] = (int)$db->insert_id;
+                }
+            } catch (Throwable $e) {
+            }
+        }
+        $stmt->close();
+        return array('created' => $created);
     }
 
     public function commit()
@@ -167,6 +331,8 @@ class ImportController extends BaseController
             header('Location: ' . route('import'));
             return;
         }
+        $categorySeedResult = $this->seedCategories($data['category_seed'] ?? array());
+        $accountSeedResult = $this->seedAccounts($data['account_seed'] ?? array());
         $income_cat = isset($_POST['income_cat']) ? (int)$_POST['income_cat'] : ($data['defaults']['income_cat'] ?? 0);
         $expense_cat = isset($_POST['expense_cat']) ? (int)$_POST['expense_cat'] : ($data['defaults']['expense_cat'] ?? 0);
         $cash_account_id = isset($_POST['cash_account_id']) ? (int)$_POST['cash_account_id'] : 0;
@@ -193,6 +359,10 @@ class ImportController extends BaseController
                 'category_map' => $this->loadCategoryMap(),
                 'defaults' => $data['defaults'],
                 'errors' => array('Default cash/bank account cannot equal default offset account.'),
+                'seed_categories' => $data['category_seed'] ?? array(),
+                'seed_accounts' => $data['account_seed'] ?? array(),
+                'import_meta' => $data['meta'] ?? array(),
+                'preview_context' => $data,
                 'csrf' => getCsrfToken()
             ));
             return;
@@ -305,6 +475,10 @@ class ImportController extends BaseController
                 'category_map' => $this->loadCategoryMap(),
                 'defaults' => $defaults,
                 'errors' => array_values($rowErrors),
+                'seed_categories' => $data['category_seed'] ?? array(),
+                'seed_accounts' => $data['account_seed'] ?? array(),
+                'import_meta' => $data['meta'] ?? array(),
+                'preview_context' => $data,
                 'csrf' => getCsrfToken()
             ));
             return;
@@ -315,6 +489,16 @@ class ImportController extends BaseController
         $msg = $created . ' transactions imported.';
         if ($duplicatesSkipped > 0) {
             $msg .= ' ' . $duplicatesSkipped . ' duplicate(s) skipped.';
+        }
+        $seedSummary = array();
+        if (!empty($categorySeedResult['created'])) {
+            $seedSummary[] = $categorySeedResult['created'] . ' category' . ($categorySeedResult['created'] === 1 ? '' : 'ies');
+        }
+        if (!empty($accountSeedResult['created'])) {
+            $seedSummary[] = $accountSeedResult['created'] . ' ledger account' . ($accountSeedResult['created'] === 1 ? '' : 's');
+        }
+        if (!empty($seedSummary)) {
+            $msg .= ' Seeded ' . implode(' and ', $seedSummary) . '.';
         }
         // Log import summary if table exists
         try {

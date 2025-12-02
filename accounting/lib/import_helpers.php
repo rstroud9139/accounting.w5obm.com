@@ -9,7 +9,7 @@ if (!function_exists('accounting_imports_ensure_tables')) {
             "CREATE TABLE IF NOT EXISTS acc_import_batches (\n                id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,\n                source_type VARCHAR(40) NOT NULL,\n                status VARCHAR(40) NOT NULL DEFAULT 'draft',\n                original_filename VARCHAR(255) NULL,\n                stored_path VARCHAR(255) NULL,\n                checksum CHAR(64) NULL,\n                total_rows INT UNSIGNED NOT NULL DEFAULT 0,\n                ready_rows INT UNSIGNED NOT NULL DEFAULT 0,\n                error_rows INT UNSIGNED NOT NULL DEFAULT 0,\n                created_by INT NULL,\n                created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,\n                updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\n                committed_at DATETIME NULL,\n                INDEX idx_status (status),\n                INDEX idx_created_by (created_by)\n            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4",
             "CREATE TABLE IF NOT EXISTS acc_import_rows (\n                id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,\n                batch_id INT UNSIGNED NOT NULL,\n                `row_number` INT UNSIGNED NOT NULL,\n                payload LONGTEXT NULL,\n                normalized LONGTEXT NULL,\n                status VARCHAR(40) NOT NULL DEFAULT 'pending',\n                message TEXT NULL,\n                created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,\n                updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\n                UNIQUE KEY idx_batch_row (batch_id, `row_number`),\n                INDEX idx_status (status),\n                CONSTRAINT fk_import_rows_batch FOREIGN KEY (batch_id) REFERENCES acc_import_batches(id) ON DELETE CASCADE\n            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4",
             "CREATE TABLE IF NOT EXISTS acc_import_row_errors (\n                id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,\n                batch_id INT UNSIGNED NOT NULL,\n                row_id BIGINT UNSIGNED NULL,\n                `row_number` INT UNSIGNED NULL,\n                error_code VARCHAR(60) NULL,\n                error_message TEXT NOT NULL,\n                created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,\n                INDEX idx_batch (batch_id),\n                INDEX idx_row (row_id),\n                CONSTRAINT fk_import_errors_batch FOREIGN KEY (batch_id) REFERENCES acc_import_batches(id) ON DELETE CASCADE\n            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4",
-            "CREATE TABLE IF NOT EXISTS acc_import_account_maps (\n                id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,\n                source_type VARCHAR(40) NOT NULL,\n                source_key VARCHAR(160) NOT NULL,\n                source_label VARCHAR(255) NULL,\n                ledger_account_id INT UNSIGNED NOT NULL,\n                created_by INT NULL,\n                updated_by INT NULL,\n                created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,\n                updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\n                UNIQUE KEY uk_account_map_source (source_type, source_key),\n                CONSTRAINT fk_account_map_ledger FOREIGN KEY (ledger_account_id) REFERENCES acc_ledger_accounts(id) ON DELETE CASCADE\n            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4",
+            "CREATE TABLE IF NOT EXISTS acc_import_account_maps (\n                id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,\n                source_type VARCHAR(40) NOT NULL,\n                source_key VARCHAR(160) NOT NULL,\n                source_label VARCHAR(255) NULL,\n                ledger_account_id INT NOT NULL,\n                created_by INT NULL,\n                updated_by INT NULL,\n                created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,\n                updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\n                UNIQUE KEY uk_account_map_source (source_type, source_key),\n                CONSTRAINT fk_account_map_ledger FOREIGN KEY (ledger_account_id) REFERENCES acc_ledger_accounts(id) ON DELETE CASCADE\n            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4",
             "CREATE TABLE IF NOT EXISTS acc_import_batch_commits (\n                id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,\n                batch_id INT UNSIGNED NOT NULL,\n                committed_by INT NULL,\n                journal_count INT UNSIGNED NOT NULL DEFAULT 0,\n                line_count INT UNSIGNED NOT NULL DEFAULT 0,\n                notes VARCHAR(255) NULL,\n                created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,\n                CONSTRAINT fk_batch_commit_batch FOREIGN KEY (batch_id) REFERENCES acc_import_batches(id) ON DELETE CASCADE\n            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4",
         ];
 
@@ -190,6 +190,21 @@ if (!function_exists('accounting_imports_absolute_path')) {
     }
 }
 
+if (!function_exists('accounting_imports_resolve_file_path')) {
+    function accounting_imports_resolve_file_path(array $fileMeta, string $descriptor): string
+    {
+        $absolutePath = $fileMeta['stored_path'] ?? null;
+        if (!$absolutePath && !empty($fileMeta['relative_path'])) {
+            $absolutePath = accounting_imports_absolute_path($fileMeta['relative_path']);
+        }
+        if (!$absolutePath || !is_file($absolutePath)) {
+            throw new RuntimeException('Unable to locate staged ' . $descriptor . ' file.');
+        }
+
+        return $absolutePath;
+    }
+}
+
 if (!function_exists('accounting_imports_fraction_to_decimal')) {
     function accounting_imports_fraction_to_decimal(string $value): float
     {
@@ -223,17 +238,10 @@ if (!function_exists('accounting_imports_populate_batch')) {
     }
 }
 
-if (!function_exists('accounting_imports_populate_gnucash_batch')) {
-    function accounting_imports_populate_gnucash_batch(mysqli $conn, int $batchId, array $fileMeta): void
+if (!function_exists('accounting_imports_parse_gnucash_rows')) {
+    function accounting_imports_parse_gnucash_rows(array $fileMeta): array
     {
-        $absolutePath = $fileMeta['stored_path'] ?? null;
-        if (!$absolutePath && !empty($fileMeta['relative_path'])) {
-            $absolutePath = accounting_imports_absolute_path($fileMeta['relative_path']);
-        }
-        if (!$absolutePath || !is_file($absolutePath)) {
-            throw new RuntimeException('Unable to locate staged GnuCash file.');
-        }
-
+        $absolutePath = accounting_imports_resolve_file_path($fileMeta, 'GnuCash');
         $xmlPayload = accounting_imports_read_gnucash_xml($absolutePath);
         $dom = new DOMDocument();
         if (!$dom->loadXML($xmlPayload, LIBXML_NOERROR | LIBXML_NOWARNING | LIBXML_PARSEHUGE)) {
@@ -268,13 +276,8 @@ if (!function_exists('accounting_imports_populate_gnucash_batch')) {
             ];
         }
 
-        $splitStmt = $conn->prepare('INSERT INTO acc_import_rows (batch_id, `row_number`, payload, normalized, status, message) VALUES (?, ?, ?, ?, ?, NULL)');
-        if (!$splitStmt) {
-            throw new RuntimeException('Unable to prepare staging insert: ' . $conn->error);
-        }
-
+        $rows = [];
         $rowNumber = 1;
-        $totalRows = 0;
         $transactions = $xpath->query('//gnc:transaction');
         foreach ($transactions ?: [] as $txnNode) {
             $txnGuid = trim($xpath->evaluate('string(trn:id)', $txnNode));
@@ -321,23 +324,46 @@ if (!function_exists('accounting_imports_populate_gnucash_batch')) {
                     'reconciled_state' => $reconciled,
                 ];
 
-                $payloadJson = json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
-                $normalizedJson = json_encode($normalized, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
-                if ($payloadJson === false || $normalizedJson === false) {
-                    $splitStmt->close();
-                    throw new RuntimeException('Failed to encode staging payload.');
-                }
-
-                $status = 'pending';
-                $splitStmt->bind_param('iisss', $batchId, $rowNumber, $payloadJson, $normalizedJson, $status);
-                if (!$splitStmt->execute()) {
-                    $splitStmt->close();
-                    throw new RuntimeException('Failed to stage split row: ' . $conn->error);
-                }
-
-                $rowNumber++;
-                $totalRows++;
+                $rows[] = [
+                    'row_number' => $rowNumber++,
+                    'payload' => $payload,
+                    'normalized' => $normalized,
+                ];
             }
+        }
+
+        return $rows;
+    }
+}
+
+if (!function_exists('accounting_imports_populate_gnucash_batch')) {
+    function accounting_imports_populate_gnucash_batch(mysqli $conn, int $batchId, array $fileMeta): void
+    {
+        $rows = accounting_imports_parse_gnucash_rows($fileMeta);
+
+        $splitStmt = $conn->prepare('INSERT INTO acc_import_rows (batch_id, `row_number`, payload, normalized, status, message) VALUES (?, ?, ?, ?, ?, NULL)');
+        if (!$splitStmt) {
+            throw new RuntimeException('Unable to prepare staging insert: ' . $conn->error);
+        }
+
+        $totalRows = 0;
+        foreach ($rows as $index => $row) {
+            $rowNumber = isset($row['row_number']) ? (int)$row['row_number'] : ($index + 1);
+            $payloadJson = json_encode($row['payload'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+            $normalizedJson = json_encode($row['normalized'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+            if ($payloadJson === false || $normalizedJson === false) {
+                $splitStmt->close();
+                throw new RuntimeException('Failed to encode staging payload.');
+            }
+
+            $status = 'pending';
+            $splitStmt->bind_param('iisss', $batchId, $rowNumber, $payloadJson, $normalizedJson, $status);
+            if (!$splitStmt->execute()) {
+                $splitStmt->close();
+                throw new RuntimeException('Failed to stage split row: ' . $conn->error);
+            }
+
+            $totalRows++;
         }
 
         $splitStmt->close();
@@ -372,37 +398,22 @@ if (!function_exists('accounting_imports_read_gnucash_xml')) {
     }
 }
 
-if (!function_exists('accounting_imports_populate_quicken_batch')) {
-    function accounting_imports_populate_quicken_batch(mysqli $conn, int $batchId, array $fileMeta): void
+if (!function_exists('accounting_imports_parse_quicken_rows')) {
+    function accounting_imports_parse_quicken_rows(array $fileMeta): array
     {
-        $absolutePath = $fileMeta['stored_path'] ?? null;
-        if (!$absolutePath && !empty($fileMeta['relative_path'])) {
-            $absolutePath = accounting_imports_absolute_path($fileMeta['relative_path']);
-        }
-        if (!$absolutePath || !is_file($absolutePath)) {
-            throw new RuntimeException('Unable to locate staged Quicken file.');
-        }
-
+        $absolutePath = accounting_imports_resolve_file_path($fileMeta, 'Quicken');
         $contents = @file_get_contents($absolutePath);
         if ($contents === false) {
             throw new RuntimeException('Unable to read uploaded file.');
         }
 
-        // Parse OFX/QFX using simple line-by-line parsing
         $transactions = accounting_imports_parse_ofx_transactions($contents);
-        
         if (empty($transactions)) {
             throw new RuntimeException('No transactions found in OFX/QFX file.');
         }
 
-        $stmt = $conn->prepare('INSERT INTO acc_import_rows (batch_id, `row_number`, payload, normalized, status, message) VALUES (?, ?, ?, ?, ?, NULL)');
-        if (!$stmt) {
-            throw new RuntimeException('Unable to prepare staging insert: ' . $conn->error);
-        }
-
+        $rows = [];
         $rowNumber = 1;
-        $totalRows = 0;
-        
         foreach ($transactions as $txn) {
             $type = $txn['TRNTYPE'] ?? '';
             $date = $txn['DTPOSTED'] ?? '';
@@ -411,8 +422,7 @@ if (!function_exists('accounting_imports_populate_quicken_batch')) {
             $name = $txn['NAME'] ?? '';
             $memo = $txn['MEMO'] ?? '';
             $checkNum = $txn['CHECKNUM'] ?? '';
-            
-            // Parse date (YYYYMMDDHHMMSS format)
+
             if (strlen($date) >= 8) {
                 $parsedDate = substr($date, 0, 4) . '-' . substr($date, 4, 2) . '-' . substr($date, 6, 2);
             } else {
@@ -429,18 +439,40 @@ if (!function_exists('accounting_imports_populate_quicken_batch')) {
                 'check_number' => $checkNum,
             ];
 
-            $normalized = [
-                'date' => $parsedDate,
-                'description' => $name ?: $memo ?: 'Transaction',
-                'amount' => round($amount, 2),
-                'debit' => $amount > 0 ? round($amount, 2) : 0.0,
-                'credit' => $amount < 0 ? round(abs($amount), 2) : 0.0,
-                'reference' => $checkNum ?: $fitid,
-                'type' => $type,
+            $rows[] = [
+                'row_number' => $rowNumber++,
+                'payload' => $payload,
+                'normalized' => [
+                    'date' => $parsedDate,
+                    'description' => $name ?: $memo ?: 'Transaction',
+                    'amount' => round($amount, 2),
+                    'debit' => $amount > 0 ? round($amount, 2) : 0.0,
+                    'credit' => $amount < 0 ? round(abs($amount), 2) : 0.0,
+                    'reference' => $checkNum ?: $fitid,
+                    'type' => $type,
+                ],
             ];
+        }
 
-            $payloadJson = json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
-            $normalizedJson = json_encode($normalized, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        return $rows;
+    }
+}
+
+if (!function_exists('accounting_imports_populate_quicken_batch')) {
+    function accounting_imports_populate_quicken_batch(mysqli $conn, int $batchId, array $fileMeta): void
+    {
+        $rows = accounting_imports_parse_quicken_rows($fileMeta);
+
+        $stmt = $conn->prepare('INSERT INTO acc_import_rows (batch_id, `row_number`, payload, normalized, status, message) VALUES (?, ?, ?, ?, ?, NULL)');
+        if (!$stmt) {
+            throw new RuntimeException('Unable to prepare staging insert: ' . $conn->error);
+        }
+
+        $totalRows = 0;
+        foreach ($rows as $index => $row) {
+            $rowNumber = isset($row['row_number']) ? (int)$row['row_number'] : ($index + 1);
+            $payloadJson = json_encode($row['payload'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+            $normalizedJson = json_encode($row['normalized'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
             if ($payloadJson === false || $normalizedJson === false) {
                 $stmt->close();
                 throw new RuntimeException('Failed to encode staging payload.');
@@ -453,7 +485,6 @@ if (!function_exists('accounting_imports_populate_quicken_batch')) {
                 throw new RuntimeException('Failed to stage transaction row: ' . $conn->error);
             }
 
-            $rowNumber++;
             $totalRows++;
         }
 
@@ -480,35 +511,35 @@ if (!function_exists('accounting_imports_ofx_to_xml')) {
                 break;
             }
         }
-        
+
         $xmlContent = implode("\n", array_slice($lines, $xmlStart));
-        
+
         // Convert SGML-style tags to proper XML with closing tags
         // Match opening tags and add closing tags if they don't exist
-        $xmlContent = preg_replace_callback('/<([A-Z][A-Z0-9]*?)>([^<]*)/s', function($matches) {
+        $xmlContent = preg_replace_callback('/<([A-Z][A-Z0-9]*?)>([^<]*)/s', function ($matches) {
             $tag = $matches[1];
             $content = $matches[2];
-            
+
             // If content contains another opening tag, this is a container - don't close yet
             if (preg_match('/<[A-Z]/', $content)) {
                 return $matches[0];
             }
-            
+
             // If already has closing tag, leave it
             if (preg_match('/<\/' . preg_quote($tag, '/') . '>/i', $content)) {
                 return $matches[0];
             }
-            
+
             // Add closing tag
             $trimmedContent = trim($content);
             return "<{$tag}>{$trimmedContent}</{$tag}>";
         }, $xmlContent);
-        
+
         // Wrap in XML declaration
         if (stripos($xmlContent, '<?xml') === false) {
             $xmlContent = '<?xml version="1.0" encoding="UTF-8"?>' . "\n" . $xmlContent;
         }
-        
+
         return $xmlContent;
     }
 }
@@ -518,20 +549,20 @@ if (!function_exists('accounting_imports_parse_ofx_transactions')) {
     {
         $transactions = [];
         $lines = explode("\n", $ofxContent);
-        
+
         $currentTxn = null;
         $inTransaction = false;
-        
+
         foreach ($lines as $line) {
             $line = trim($line);
-            
+
             // Start of transaction
             if (stripos($line, '<STMTTRN>') !== false || stripos($line, '<INVBANKTRAN>') !== false) {
                 $inTransaction = true;
                 $currentTxn = [];
                 continue;
             }
-            
+
             // End of transaction
             if (stripos($line, '</STMTTRN>') !== false || stripos($line, '</INVBANKTRAN>') !== false) {
                 if ($currentTxn !== null) {
@@ -541,22 +572,22 @@ if (!function_exists('accounting_imports_parse_ofx_transactions')) {
                 $currentTxn = null;
                 continue;
             }
-            
+
             // Parse transaction fields
             if ($inTransaction && $currentTxn !== null) {
                 // Match <TAG>value or <TAG>value</TAG>
                 if (preg_match('/<([A-Z0-9]+)>([^<]*)/i', $line, $matches)) {
                     $tag = strtoupper($matches[1]);
                     $value = trim($matches[2]);
-                    
+
                     // Remove closing tag if present
                     $value = preg_replace('/<\/' . preg_quote($tag, '/') . '>$/i', '', $value);
-                    
+
                     $currentTxn[$tag] = $value;
                 }
             }
         }
-        
+
         return $transactions;
     }
 }
@@ -861,5 +892,3 @@ if (!function_exists('accounting_imports_post_batch')) {
         ];
     }
 }
-
-?>

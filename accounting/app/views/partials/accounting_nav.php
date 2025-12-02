@@ -53,7 +53,7 @@ $dbLabel = $_ENV['LOCAL_ACC_DB_NAME'] ?? $_ENV['ACC_DB_NAME'] ?? 'accounting_w5o
 					</a>
 				</li>
 				<li class="nav-item">
-					<a class="nav-link <?= $navIsActive(['transactions', 'transaction_new', 'transaction_create']) ? 'active' : ''; ?>" href="<?= route('transactions'); ?>">
+					<a class="nav-link <?= $navIsActive(['account_register', 'account_register_export_csv']) ? 'active' : ''; ?>" href="<?= route('account_register'); ?>">
 						<i class="fas fa-table me-1"></i>Ledger
 					</a>
 				</li>

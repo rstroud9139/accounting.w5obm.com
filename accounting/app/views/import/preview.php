@@ -4,6 +4,10 @@
 /** @var array $categories */
 /** @var array $accounts */
 /** @var array $defaults */
+/** @var array $seed_categories */
+/** @var array $seed_accounts */
+/** @var array $import_meta */
+/** @var array $preview_context */
 ?>
 <div class="card">
     <div class="card-header d-flex align-items-center justify-content-between">
@@ -31,6 +35,75 @@
         <?php if (!empty($success)): ?>
             <div class="alert alert-success mt-2"><i class="fas fa-check me-2"></i><?= htmlspecialchars($success) ?></div>
         <?php endif; ?>
+
+        <div class="row g-3 mb-4">
+            <div class="col-lg-4">
+                <div class="border rounded p-3 bg-light h-100">
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <h6 class="text-uppercase text-muted small mb-0">Suggested Accounts</h6>
+                        <span class="badge bg-secondary"><?= isset($seed_accounts) && is_array($seed_accounts) ? count($seed_accounts) : 0 ?></span>
+                    </div>
+                    <?php if (!empty($seed_accounts) && is_array($seed_accounts)): ?>
+                        <ul class="list-unstyled mb-0 small">
+                            <?php foreach (array_slice($seed_accounts, 0, 5) as $acc): ?>
+                                <li class="d-flex justify-content-between">
+                                    <span><?= htmlspecialchars($acc['name'] ?? 'Unknown') ?></span>
+                                    <span class="text-muted ms-2"><?= htmlspecialchars($acc['type'] ?? '') ?></span>
+                                </li>
+                            <?php endforeach; ?>
+                        </ul>
+                        <?php if (count($seed_accounts) > 5): ?>
+                            <p class="text-muted small mb-0 mt-1">+<?= count($seed_accounts) - 5 ?> more detected</p>
+                        <?php endif; ?>
+                    <?php else: ?>
+                        <p class="text-muted small mb-0">No new ledger accounts detected in this file.</p>
+                    <?php endif; ?>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="border rounded p-3 bg-light h-100">
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <h6 class="text-uppercase text-muted small mb-0">Suggested Categories</h6>
+                        <span class="badge bg-secondary"><?= isset($seed_categories) && is_array($seed_categories) ? count($seed_categories) : 0 ?></span>
+                    </div>
+                    <?php if (!empty($seed_categories) && is_array($seed_categories)): ?>
+                        <ul class="list-unstyled mb-0 small">
+                            <?php foreach (array_slice($seed_categories, 0, 5) as $cat): ?>
+                                <li class="d-flex justify-content-between">
+                                    <span><?= htmlspecialchars($cat['name'] ?? 'Unnamed') ?></span>
+                                    <span class="text-muted ms-2"><?= htmlspecialchars($cat['type'] ?? '') ?></span>
+                                </li>
+                            <?php endforeach; ?>
+                        </ul>
+                        <?php if (count($seed_categories) > 5): ?>
+                            <p class="text-muted small mb-0 mt-1">+<?= count($seed_categories) - 5 ?> more detected</p>
+                        <?php endif; ?>
+                    <?php else: ?>
+                        <p class="text-muted small mb-0">No new categories were inferred—defaults below will be used.</p>
+                    <?php endif; ?>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="border rounded p-3 bg-light h-100">
+                    <h6 class="text-uppercase text-muted small mb-2">Import Metadata</h6>
+                    <ul class="list-unstyled mb-2 small">
+                        <li><strong>File:</strong> <?= htmlspecialchars($preview_context['filename'] ?? 'N/A') ?></li>
+                        <li><strong>Format:</strong> <?= htmlspecialchars(strtoupper($preview_context['type'] ?? '')) ?></li>
+                        <li><strong>Rows Parsed:</strong> <?= count($items) ?></li>
+                        <li><strong>Duplicates Flagged:</strong> <?= (int)($dup_count ?? 0) ?></li>
+                    </ul>
+                    <?php if (!empty($import_meta)): ?>
+                        <ul class="list-unstyled mb-0 small text-muted">
+                            <?php foreach ($import_meta as $key => $value): ?>
+                                <li><?= htmlspecialchars(is_string($key) ? $key : 'Meta') ?>: <?= htmlspecialchars(is_scalar($value) ? (string)$value : json_encode($value)) ?></li>
+                            <?php endforeach; ?>
+                        </ul>
+                    <?php else: ?>
+                        <p class="text-muted small mb-0">No extra metadata provided by the parser.</p>
+                    <?php endif; ?>
+                </div>
+            </div>
+        </div>
 
         <form action="<?= route('import_commit') ?>" method="post">
             <?= csrf_input() ?>

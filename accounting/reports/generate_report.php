@@ -12,6 +12,7 @@ session_start();
 require_once __DIR__ . '/../../include/dbconn.php';
 require_once __DIR__ . '/../lib/helpers.php';
 require_once __DIR__ . '/../controllers/reportController.php';
+require_once __DIR__ . '/../app/repositories/TransactionRepository.php';
 
 // Authentication check
 if (!isAuthenticated()) {
@@ -89,6 +90,57 @@ $available_reports = [
     ]
 ];
 
+function report_transactions_repo(): TransactionRepository
+{
+    static $repo = null;
+    if ($repo instanceof TransactionRepository) {
+        return $repo;
+    }
+    global $conn;
+    $db = ($conn instanceof mysqli) ? $conn : accounting_db_connection();
+    $repo = new TransactionRepository($db);
+    return $repo;
+}
+
+function report_fetch_transactions(array $filters = []): array
+{
+    return report_transactions_repo()->findAll($filters);
+}
+
+function report_calculate_transaction_totals(array $filters = []): array
+{
+    $rows = report_fetch_transactions($filters);
+    $totals = [
+        'income' => 0.0,
+        'expense' => 0.0,
+        'transfer' => 0.0,
+        'asset' => 0.0,
+        'net' => 0.0,
+        'count' => 0,
+    ];
+    foreach ($rows as $tx) {
+        $amount = isset($tx['amount']) ? (float)$tx['amount'] : 0.0;
+        $type = $tx['type'] ?? 'Expense';
+        $totals['count']++;
+        switch ($type) {
+            case 'Income':
+                $totals['income'] += $amount;
+                break;
+            case 'Transfer':
+                $totals['transfer'] += $amount;
+                break;
+            case 'Asset':
+                $totals['asset'] += $amount;
+                break;
+            default:
+                $totals['expense'] += $amount;
+                break;
+        }
+    }
+    $totals['net'] = $totals['income'] - $totals['expense'];
+    return $totals;
+}
+
 // Handle report generation
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($report_type)) {
     try {
@@ -134,8 +186,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($report_type)) {
                         'category_id' => $params['category_id'],
                         'type' => 'Expense'
                     ];
-                    require_once __DIR__ . '/../controllers/transactionController.php';
-                    $report_data['transactions'] = getAllTransactions($filters);
+                    $report_data['transactions'] = report_fetch_transactions($filters);
                 }
                 break;
 
@@ -149,10 +200,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($report_type)) {
                 if (!empty($params['category_id'])) {
                     $filters['category_id'] = $params['category_id'];
                 }
-                require_once __DIR__ . '/../controllers/transactionController.php';
                 $report_data = [
-                    'transactions' => getAllTransactions($filters),
-                    'totals' => calculateTransactionTotals($filters),
+                    'transactions' => report_fetch_transactions($filters),
+                    'totals' => report_calculate_transaction_totals($filters),
                     'period' => [
                         'start_date' => $params['start_date'],
                         'end_date' => $params['end_date']
@@ -166,8 +216,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($report_type)) {
                 $start_date = sprintf("%04d-%02d-01", $params['year'], $params['month']);
                 $end_date = date('Y-m-t', strtotime($start_date));
                 $filters = ['start_date' => $start_date, 'end_date' => $end_date];
-                require_once __DIR__ . '/../controllers/transactionController.php';
-                $report_data['summary'] = calculateTransactionTotals($filters);
+                $report_data['summary'] = report_calculate_transaction_totals($filters);
                 break;
 
             case 'cash_flow':
@@ -176,11 +225,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($report_type)) {
                     'start_date' => $params['start_date'],
                     'end_date' => $params['end_date']
                 ];
-                require_once __DIR__ . '/../controllers/transactionController.php';
                 $report_data = [
-                    'cash_inflows' => getAllTransactions(array_merge($filters, ['type' => 'Income'])),
-                    'cash_outflows' => getAllTransactions(array_merge($filters, ['type' => 'Expense'])),
-                    'totals' => calculateTransactionTotals($filters),
+                    'cash_inflows' => report_fetch_transactions(array_merge($filters, ['type' => 'Income'])),
+                    'cash_outflows' => report_fetch_transactions(array_merge($filters, ['type' => 'Expense'])),
+                    'totals' => report_calculate_transaction_totals($filters),
                     'period' => [
                         'start_date' => $params['start_date'],
                         'end_date' => $params['end_date']

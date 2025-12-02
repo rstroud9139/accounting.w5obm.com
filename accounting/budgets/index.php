@@ -12,7 +12,7 @@ $userId = getCurrentUserId();
 $canManage = hasPermission($userId, 'accounting_manage') || hasPermission($userId, 'accounting_add');
 if (!$canManage && !hasPermission($userId, 'accounting_view')) {
     setToastMessage('danger', 'Access Denied', 'You do not have permission to view budgets.', 'fas fa-ban');
-    header('Location: /accounting/dashboard.php');
+    header('Location: ' . route('dashboard'));
     exit();
 }
 
@@ -66,6 +66,8 @@ foreach ($budgets as $budget) {
     $statusCounts[$budget['status']] = ($statusCounts[$budget['status']] ?? 0) + 1;
 }
 
+$budgetFilterCollapseId = 'budgetFilterCollapse';
+
 $page_title = 'Budgets - W5OBM Accounting';
 include __DIR__ . '/../../include/header.php';
 ?>
@@ -93,7 +95,7 @@ include __DIR__ . '/../../include/header.php';
             ],
             'actions' => $canManage ? [
                 ['label' => 'New Budget', 'url' => '/accounting/budgets/manage.php', 'icon' => 'fa-plus-circle'],
-                ['label' => 'Chart of Accounts', 'url' => '/accounting/ledger/', 'variant' => 'outline', 'icon' => 'fa-sitemap'],
+                ['label' => 'Chart of Accounts', 'url' => route('accounts'), 'variant' => 'outline', 'icon' => 'fa-sitemap'],
             ] : [
                 ['label' => 'View Reports', 'url' => '/accounting/reports_dashboard.php', 'variant' => 'outline', 'icon' => 'fa-chart-line'],
             ],
@@ -114,48 +116,68 @@ include __DIR__ . '/../../include/header.php';
                 </div>
                 <div class="col-lg-9">
                     <div class="card shadow-sm border-0 mb-4">
-                        <div class="card-header bg-light border-0">
-                            <div class="row g-3 align-items-end">
-                                <div class="col-lg-3 col-md-4 col-sm-6">
-                                    <form method="GET">
-                                        <label class="form-label text-muted text-uppercase small">Status</label>
-                                        <select name="status" class="form-select" onchange="this.form.submit()">
-                                            <option value="all" <?= $statusFilter === 'all' ? 'selected' : '' ?>>All statuses</option>
-                                            <?php foreach ($statuses as $key => $label): ?>
-                                                <option value="<?= htmlspecialchars($key) ?>" <?= $statusFilter === $key ? 'selected' : '' ?>><?= htmlspecialchars($label) ?></option>
-                                            <?php endforeach; ?>
-                                        </select>
-                                        <input type="hidden" name="year" value="<?= htmlspecialchars($yearFilter) ?>">
-                                        <input type="hidden" name="search" value="<?= htmlspecialchars($searchFilter) ?>">
-                                    </form>
+                        <div class="card-header bg-primary text-white border-0 d-flex flex-wrap justify-content-between align-items-center gap-2">
+                            <h5 class="mb-0"><i class="fas fa-filter me-2"></i>Filter Budgets</h5>
+                            <div class="d-flex flex-wrap gap-2">
+                                <a href="index.php" class="btn btn-outline-light btn-sm">
+                                    <i class="fas fa-times me-1"></i>Reset
+                                </a>
+                                <button type="button" class="btn btn-light btn-sm text-primary" data-bs-toggle="collapse" data-bs-target="#<?= $budgetFilterCollapseId ?>" aria-expanded="true" aria-controls="<?= $budgetFilterCollapseId ?>">
+                                    <i class="fas fa-chevron-down me-1"></i>Toggle Filters
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body p-0 collapse show" id="<?= $budgetFilterCollapseId ?>">
+                            <div class="row g-0 flex-column flex-lg-row">
+                                <div class="col-12 col-lg-3 border-bottom border-lg-bottom-0 border-lg-end bg-light-subtle p-3">
+                                    <h6 class="text-uppercase small text-muted fw-bold mb-2">Quick Filters</h6>
+                                    <p class="text-muted small mb-3">Jump to approval states or focus on active years.</p>
+                                    <div class="d-grid gap-2">
+                                        <button type="button" class="btn btn-outline-secondary btn-sm budget-chip text-start" data-budget-status="draft">Drafts</button>
+                                        <button type="button" class="btn btn-outline-secondary btn-sm budget-chip text-start" data-budget-status="approved">Approved</button>
+                                        <button type="button" class="btn btn-outline-secondary btn-sm budget-chip text-start" data-budget-status="archived">Archived</button>
+                                        <button type="button" class="btn btn-outline-secondary btn-sm budget-chip text-start" data-budget-status="all">All Statuses</button>
+                                        <button type="button" class="btn btn-outline-secondary btn-sm budget-chip text-start" data-budget-year="<?= $currentYear ?>">Current Year</button>
+                                        <button type="button" class="btn btn-outline-secondary btn-sm budget-chip text-start" data-budget-year="<?= $currentYear + 1 ?>">Next Year</button>
+                                    </div>
                                 </div>
-                                <div class="col-lg-3 col-md-4 col-sm-6">
-                                    <form method="GET">
-                                        <label class="form-label text-muted text-uppercase small">Fiscal Year</label>
-                                        <select name="year" class="form-select" onchange="this.form.submit()">
-                                            <?php for ($yr = $currentYear - 2; $yr <= $currentYear + 3; $yr++): ?>
-                                                <option value="<?= $yr ?>" <?= $yearFilter === $yr ? 'selected' : '' ?>><?= $yr ?></option>
-                                            <?php endfor; ?>
-                                        </select>
-                                        <input type="hidden" name="status" value="<?= htmlspecialchars($statusFilter) ?>">
-                                        <input type="hidden" name="search" value="<?= htmlspecialchars($searchFilter) ?>">
-                                    </form>
-                                </div>
-                                <div class="col-lg-4 col-md-4">
-                                    <form method="GET" class="d-flex gap-2">
-                                        <div class="flex-grow-1">
-                                            <label class="form-label text-muted text-uppercase small">Search</label>
-                                            <input type="search" name="search" class="form-control" value="<?= htmlspecialchars($searchFilter) ?>" placeholder="Search name or notes">
+                                <div class="col-12 col-lg-9 p-3 p-lg-4">
+                                    <form method="GET" id="budgetFilterForm">
+                                        <div class="row g-3 align-items-end">
+                                            <div class="col-12 col-md-4">
+                                                <label class="form-label text-muted text-uppercase small">Status</label>
+                                                <select name="status" class="form-select">
+                                                    <option value="all" <?= $statusFilter === 'all' ? 'selected' : '' ?>>All statuses</option>
+                                                    <?php foreach ($statuses as $key => $label): ?>
+                                                        <option value="<?= htmlspecialchars($key) ?>" <?= $statusFilter === $key ? 'selected' : '' ?>><?= htmlspecialchars($label) ?></option>
+                                                    <?php endforeach; ?>
+                                                </select>
+                                            </div>
+                                            <div class="col-12 col-md-4">
+                                                <label class="form-label text-muted text-uppercase small">Fiscal Year</label>
+                                                <select name="year" class="form-select">
+                                                    <?php for ($yr = $currentYear - 2; $yr <= $currentYear + 3; $yr++): ?>
+                                                        <option value="<?= $yr ?>" <?= $yearFilter === $yr ? 'selected' : '' ?>><?= $yr ?></option>
+                                                    <?php endfor; ?>
+                                                </select>
+                                            </div>
+                                            <div class="col-12 col-md-4">
+                                                <label class="form-label text-muted text-uppercase small">Keyword</label>
+                                                <div class="input-group">
+                                                    <span class="input-group-text"><i class="fas fa-search"></i></span>
+                                                    <input type="search" name="search" class="form-control" value="<?= htmlspecialchars($searchFilter) ?>" placeholder="Search name or notes">
+                                                </div>
+                                            </div>
                                         </div>
-                                        <div class="align-self-end mb-1">
-                                            <button class="btn btn-outline-secondary" type="submit"><i class="fas fa-search"></i></button>
+                                        <div class="mt-3 d-flex flex-column flex-sm-row align-items-stretch justify-content-between gap-2">
+                                            <button type="submit" class="btn btn-primary">
+                                                <i class="fas fa-filter me-1"></i>Apply Filters
+                                            </button>
+                                            <button type="button" class="btn btn-outline-secondary" id="budgetsClearBtn">
+                                                <i class="fas fa-undo me-1"></i>Clear Fields
+                                            </button>
                                         </div>
-                                        <input type="hidden" name="status" value="<?= htmlspecialchars($statusFilter) ?>">
-                                        <input type="hidden" name="year" value="<?= htmlspecialchars($yearFilter) ?>">
                                     </form>
-                                </div>
-                                <div class="col-lg-2 col-sm-12 text-lg-end">
-                                    <a href="index.php" class="btn btn-link text-decoration-none">Reset Filters</a>
                                 </div>
                             </div>
                         </div>
@@ -243,6 +265,53 @@ include __DIR__ . '/../../include/header.php';
     </div>
 
     <?php include __DIR__ . '/../../include/footer.php'; ?>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const filterForm = document.getElementById('budgetFilterForm');
+            if (!filterForm) {
+                return;
+            }
+            const statusSelect = filterForm.querySelector('select[name="status"]');
+            const yearSelect = filterForm.querySelector('select[name="year"]');
+            const searchInput = filterForm.querySelector('input[name="search"]');
+            const defaultYear = <?= (int)$currentYear ?>;
+
+            document.querySelectorAll('[data-budget-status]').forEach(function(button) {
+                button.addEventListener('click', function() {
+                    if (statusSelect) {
+                        statusSelect.value = this.dataset.budgetStatus || 'all';
+                        filterForm.submit();
+                    }
+                });
+            });
+
+            document.querySelectorAll('[data-budget-year]').forEach(function(button) {
+                button.addEventListener('click', function() {
+                    if (yearSelect) {
+                        yearSelect.value = this.dataset.budgetYear;
+                        filterForm.submit();
+                    }
+                });
+            });
+
+            const clearBtn = document.getElementById('budgetsClearBtn');
+            if (clearBtn) {
+                clearBtn.addEventListener('click', function() {
+                    if (statusSelect) {
+                        statusSelect.value = 'all';
+                    }
+                    if (yearSelect) {
+                        yearSelect.value = defaultYear;
+                    }
+                    if (searchInput) {
+                        searchInput.value = '';
+                    }
+                    filterForm.submit();
+                });
+            }
+        });
+    </script>
 </body>
 
 </html>

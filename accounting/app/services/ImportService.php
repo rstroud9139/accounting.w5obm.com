@@ -8,6 +8,7 @@ class ImportService
         if (in_array($ext, array('qif'))) return 'qif';
         if (in_array($ext, array('ofx', 'qbo', 'qfx'))) return 'ofx';
         if (in_array($ext, array('iif'))) return 'iif';
+        if (in_array($ext, array('gnucash', 'gcz'))) return 'gnucash';
         return 'csv';
     }
 
@@ -18,6 +19,7 @@ class ImportService
         if ($type === 'qif') return $this->parseQIF($tmpPath);
         if ($type === 'ofx') return $this->parseOFX($tmpPath);
         if ($type === 'iif') return $this->parseIIF($tmpPath);
+        if ($type === 'gnucash') return $this->parseGnuCash($tmpPath);
         return false;
     }
 
@@ -44,11 +46,13 @@ class ImportService
                 'description' => isset($rec['description']) ? $rec['description'] : (isset($rec['memo']) ? $rec['memo'] : ''),
                 'payee' => isset($rec['payee']) ? $rec['payee'] : '',
                 'memo' => isset($rec['memo']) ? $rec['memo'] : '',
-                'category' => isset($rec['category']) ? $rec['category'] : ''
+                'category' => isset($rec['category']) ? $rec['category'] : '',
+                'account' => isset($rec['account']) ? $rec['account'] : '',
+                'account_type' => isset($rec['account_type']) ? $rec['account_type'] : '',
             );
         }
         fclose($fh);
-        return $rows;
+        return $this->packageResult($rows);
     }
 
     private function parseQIF($tmpPath)
@@ -94,7 +98,7 @@ class ImportService
                     break;
             }
         }
-        return $rows;
+        return $this->packageResult($rows);
     }
 
     private function parseOFX($tmpPath)
@@ -124,7 +128,7 @@ class ImportService
                 'category' => ''
             );
         }
-        return $rows;
+        return $this->packageResult($rows);
     }
 
     private function parseIIF($tmpPath)
@@ -153,7 +157,108 @@ class ImportService
                 );
             }
         }
-        return $rows;
+        return $this->packageResult($rows);
+    }
+
+    private function parseGnuCash($tmpPath)
+    {
+        $xml = $this->readGnuCashXml($tmpPath);
+        if ($xml === false) return false;
+
+        $dom = new DOMDocument();
+        if (!$dom->loadXML($xml, LIBXML_NOERROR | LIBXML_NOWARNING | LIBXML_PARSEHUGE)) {
+            return false;
+        }
+
+        $xpath = new DOMXPath($dom);
+        $namespaces = array(
+            'gnc' => 'http://www.gnucash.org/XML/gnc',
+            'act' => 'http://www.gnucash.org/XML/act',
+            'trn' => 'http://www.gnucash.org/XML/trn',
+            'spl' => 'http://www.gnucash.org/XML/split',
+            'cmdty' => 'http://www.gnucash.org/XML/cmdty',
+            'ts' => 'http://www.gnucash.org/XML/ts',
+        );
+        foreach ($namespaces as $prefix => $uri) {
+            $xpath->registerNamespace($prefix, $uri);
+        }
+
+        $accounts = array();
+        $accountNodes = $xpath->query('//gnc:account');
+        foreach ($accountNodes ?: array() as $node) {
+            $guid = trim($xpath->evaluate('string(act:id)', $node));
+            if ($guid === '') continue;
+            $accounts[$guid] = array(
+                'guid' => $guid,
+                'name' => trim($xpath->evaluate('string(act:name)', $node)),
+                'code' => trim($xpath->evaluate('string(act:code)', $node)),
+                'type' => trim($xpath->evaluate('string(act:type)', $node)),
+            );
+        }
+
+        $rows = array();
+        $transactions = $xpath->query('//gnc:transaction');
+        foreach ($transactions ?: array() as $txnNode) {
+            $txnDescription = trim($xpath->evaluate('string(trn:description)', $txnNode));
+            $txnNumber = trim($xpath->evaluate('string(trn:number)', $txnNode));
+            $posted = trim($xpath->evaluate('string(trn:date-posted/ts:date)', $txnNode));
+
+            $splitNodes = $xpath->query('trn:splits/trn:split', $txnNode);
+            foreach ($splitNodes ?: array() as $splitNode) {
+                $accountGuid = trim($xpath->evaluate('string(spl:account)', $splitNode));
+                $memo = trim($xpath->evaluate('string(spl:memo)', $splitNode));
+                $valueRaw = trim($xpath->evaluate('string(spl:value)', $splitNode));
+                $amount = $this->gnucashFractionToFloat($valueRaw);
+
+                $rows[] = array(
+                    'date' => $this->normalizeDate($posted ?: date('Y-m-d')),
+                    'amount' => round($amount, 2),
+                    'type' => ($amount >= 0) ? 'Income' : 'Expense',
+                    'description' => $txnDescription ?: $memo,
+                    'payee' => $accounts[$accountGuid]['name'] ?? '',
+                    'memo' => $memo,
+                    'category' => $accounts[$accountGuid]['name'] ?? '',
+                    'account' => $accounts[$accountGuid]['name'] ?? '',
+                    'account_type' => $accounts[$accountGuid]['type'] ?? '',
+                    'account_guid' => $accountGuid,
+                    'reference' => $txnNumber,
+                );
+            }
+        }
+
+        return $this->packageResult($rows, array(
+            'accounts' => array_values($accounts),
+            'categories' => $this->inferCategorySeeds($rows, $accounts),
+            'meta' => array('source' => 'GnuCash XML')
+        ));
+    }
+
+    private function readGnuCashXml($path)
+    {
+        $contents = @file_get_contents($path);
+        if ($contents === false) {
+            return false;
+        }
+        if (strncmp($contents, "\x1F\x8B", 2) === 0) {
+            $decoded = @gzdecode($contents);
+            if ($decoded === false) {
+                return false;
+            }
+            return $decoded;
+        }
+        return $contents;
+    }
+
+    private function gnucashFractionToFloat($value)
+    {
+        $value = trim((string)$value);
+        if ($value === '') return 0.0;
+        if (strpos($value, '/') !== false) {
+            list($num, $den) = explode('/', $value, 2);
+            $den = (float)$den ?: 1.0;
+            return (float)$num / $den;
+        }
+        return (float)$value;
     }
 
     private function ofxTag($block, $tag)
@@ -202,5 +307,81 @@ class ImportService
         $v = trim((string)$v);
         $v = str_replace(array(',', '$'), '', $v);
         return (float)$v;
+    }
+
+    private function packageResult(array $transactions, array $extras = array()): array
+    {
+        $transactions = array_values($transactions);
+        $payload = array(
+            'transactions' => $transactions,
+            'categories' => $extras['categories'] ?? $this->inferCategorySeeds($transactions),
+            'accounts' => $extras['accounts'] ?? $this->inferAccountSeeds($transactions),
+            'meta' => $extras['meta'] ?? array(),
+        );
+        return $payload;
+    }
+
+    private function inferCategorySeeds(array $transactions, array $accountLookup = array()): array
+    {
+        $seeds = array();
+        foreach ($transactions as $row) {
+            $name = '';
+            if (!empty($row['category'])) {
+                $name = trim((string)$row['category']);
+            }
+            if ($name === '' && !empty($row['payee']) && !empty($row['type'])) {
+                $name = trim((string)$row['payee']);
+            }
+            if ($name === '') {
+                continue;
+            }
+            $type = isset($row['type']) ? $row['type'] : ((isset($row['amount']) && (float)$row['amount'] >= 0) ? 'Income' : 'Expense');
+            $key = strtolower($name . '|' . $type);
+            if (!isset($seeds[$key])) {
+                $seeds[$key] = array('name' => $name, 'type' => $type);
+            }
+        }
+
+        if (empty($seeds) && !empty($accountLookup)) {
+            foreach ($accountLookup as $acc) {
+                $accName = trim((string)($acc['name'] ?? ''));
+                if ($accName === '') {
+                    continue;
+                }
+                $accType = strtoupper((string)($acc['type'] ?? ''));
+                if (!in_array($accType, array('INCOME', 'EXPENSE'), true)) {
+                    continue;
+                }
+                $key = strtolower($accName . '|' . $accType);
+                if (!isset($seeds[$key])) {
+                    $seeds[$key] = array(
+                        'name' => $accName,
+                        'type' => $accType === 'INCOME' ? 'Income' : 'Expense',
+                    );
+                }
+            }
+        }
+
+        return array_values($seeds);
+    }
+
+    private function inferAccountSeeds(array $transactions): array
+    {
+        $seeds = array();
+        foreach ($transactions as $row) {
+            $name = trim((string)($row['account_name'] ?? $row['account'] ?? ''));
+            if ($name === '') {
+                continue;
+            }
+            $type = isset($row['account_type']) ? (string)$row['account_type'] : null;
+            $key = strtolower($name . '|' . $type);
+            if (!isset($seeds[$key])) {
+                $seeds[$key] = array(
+                    'name' => $name,
+                    'type' => $type,
+                );
+            }
+        }
+        return array_values($seeds);
     }
 }

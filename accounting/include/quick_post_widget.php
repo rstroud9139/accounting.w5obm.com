@@ -7,6 +7,14 @@
  * SECURITY: Requires authentication and accounting_add permission
  */
 
+if (!function_exists('route')) {
+    function route(string $name, array $params = []): string
+    {
+        $query = http_build_query(array_merge(['route' => $name], $params));
+        return '/accounting/app/index.php?' . $query;
+    }
+}
+
 if (!function_exists('render_quick_post_cash_donation_widget')) {
     /**
      * Render the quick-post cash donation widget
@@ -28,7 +36,7 @@ if (!function_exists('render_quick_post_cash_donation_widget')) {
         global $conn;
         $defaultAccount = null;
         $cashAccounts = [];
-        
+
         try {
             if ($conn) {
                 // Fetch cash/checking accounts for deposit target
@@ -50,7 +58,7 @@ if (!function_exists('render_quick_post_cash_donation_widget')) {
                     $cashAccounts[] = $row;
                 }
                 $stmt->close();
-                
+
                 if (!empty($cashAccounts)) {
                     $defaultAccount = $cashAccounts[0];
                 }
@@ -71,7 +79,7 @@ if (!function_exists('render_quick_post_cash_donation_widget')) {
         $widgetId = 'quickPostCashDonation';
         $defaultDate = date('Y-m-d');
         $defaultDescription = 'Cash donation - Event collection';
-        ?>
+?>
 
         <div class="card shadow-sm mb-4 quick-post-widget" id="<?= htmlspecialchars($widgetId) ?>">
             <div class="card-header bg-gradient-success text-white d-flex justify-content-between align-items-center">
@@ -101,13 +109,13 @@ if (!function_exists('render_quick_post_cash_donation_widget')) {
                                 </label>
                                 <div class="input-group">
                                     <span class="input-group-text">$</span>
-                                    <input 
-                                        type="number" 
-                                        step="0.01" 
-                                        min="0.01" 
-                                        class="form-control" 
-                                        id="qp_amount" 
-                                        name="amount" 
+                                    <input
+                                        type="number"
+                                        step="0.01"
+                                        min="0.01"
+                                        class="form-control"
+                                        id="qp_amount"
+                                        name="amount"
                                         placeholder="0.00"
                                         required
                                         autofocus>
@@ -118,11 +126,11 @@ if (!function_exists('render_quick_post_cash_donation_widget')) {
                                 <label for="qp_donation_date" class="form-label">
                                     Date <span class="text-danger">*</span>
                                 </label>
-                                <input 
-                                    type="date" 
-                                    class="form-control" 
-                                    id="qp_donation_date" 
-                                    name="donation_date" 
+                                <input
+                                    type="date"
+                                    class="form-control"
+                                    id="qp_donation_date"
+                                    name="donation_date"
                                     value="<?= htmlspecialchars($defaultDate) ?>"
                                     required>
                             </div>
@@ -149,22 +157,22 @@ if (!function_exists('render_quick_post_cash_donation_widget')) {
 
                             <div class="col-12">
                                 <label for="qp_description" class="form-label">Description (optional)</label>
-                                <input 
-                                    type="text" 
-                                    class="form-control" 
-                                    id="qp_description" 
-                                    name="description" 
+                                <input
+                                    type="text"
+                                    class="form-control"
+                                    id="qp_description"
+                                    name="description"
                                     placeholder="<?= htmlspecialchars($defaultDescription) ?>"
                                     value="<?= htmlspecialchars($defaultDescription) ?>">
                             </div>
 
                             <div class="col-12">
                                 <label for="qp_notes" class="form-label">Notes (optional)</label>
-                                <textarea 
-                                    class="form-control" 
-                                    id="qp_notes" 
-                                    name="notes" 
-                                    rows="2" 
+                                <textarea
+                                    class="form-control"
+                                    id="qp_notes"
+                                    name="notes"
+                                    rows="2"
                                     placeholder="Event name, location, or other context..."></textarea>
                             </div>
                         </div>
@@ -190,8 +198,8 @@ if (!function_exists('render_quick_post_cash_donation_widget')) {
                     <?php if (empty($cashAccounts)): ?>
                         <div class="alert alert-warning mt-3 mb-0">
                             <i class="fas fa-exclamation-triangle me-2"></i>
-                            <strong>Setup Required:</strong> No cash/checking accounts found. 
-                            <a href="/accounting/ledger/" class="alert-link">Configure accounts</a> to enable quick posting.
+                            <strong>Setup Required:</strong> No cash/checking accounts found.
+                            <a href="<?= route('accounts'); ?>" class="alert-link">Configure accounts</a> to enable quick posting.
                         </div>
                     <?php endif; ?>
                 </div>
@@ -199,25 +207,25 @@ if (!function_exists('render_quick_post_cash_donation_widget')) {
         </div>
 
         <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const form = document.getElementById('quickPostCashDonationForm');
-            if (form) {
-                form.addEventListener('submit', function(e) {
-                    const amount = parseFloat(document.getElementById('qp_amount').value);
-                    if (amount <= 0) {
-                        e.preventDefault();
-                        alert('Please enter a valid donation amount greater than $0.00');
-                        return false;
-                    }
-                });
+            document.addEventListener('DOMContentLoaded', function() {
+                const form = document.getElementById('quickPostCashDonationForm');
+                if (form) {
+                    form.addEventListener('submit', function(e) {
+                        const amount = parseFloat(document.getElementById('qp_amount').value);
+                        if (amount <= 0) {
+                            e.preventDefault();
+                            alert('Please enter a valid donation amount greater than $0.00');
+                            return false;
+                        }
+                    });
 
-                // Auto-clear form after successful submission (handled by redirect)
-                form.addEventListener('reset', function() {
-                    document.getElementById('qp_amount').focus();
-                });
-            }
-        });
+                    // Auto-clear form after successful submission (handled by redirect)
+                    form.addEventListener('reset', function() {
+                        document.getElementById('qp_amount').focus();
+                    });
+                }
+            });
         </script>
-        <?php
+<?php
     }
 }

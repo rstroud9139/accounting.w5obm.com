@@ -384,6 +384,46 @@ $activeTypeLabel = $filters['type'] === 'all'
     ? 'All report types'
     : ucwords(str_replace('_', ' ', $filters['type']));
 
+$reportFilterSummary = [
+    [
+        'label' => 'Date',
+        'value' => $currentRangeLabel,
+        'field' => 'range',
+        'default' => '90',
+        'active' => $filters['range'] !== '90',
+    ],
+    [
+        'label' => 'Type',
+        'value' => $activeTypeLabel,
+        'field' => 'type',
+        'default' => 'all',
+        'active' => $filters['type'] !== 'all',
+    ],
+    [
+        'label' => 'Group',
+        'value' => $groupLabels[$filters['group']] ?? 'Disabled',
+        'field' => 'group',
+        'default' => 'none',
+        'active' => $filters['group'] !== 'none',
+    ],
+];
+
+if (!empty($filters['search'])) {
+    $reportFilterSummary[] = [
+        'label' => 'Keyword',
+        'value' => $filters['search'],
+        'field' => 'search',
+        'default' => '',
+        'active' => true,
+    ];
+}
+
+$activeFilterCount = count(array_filter($reportFilterSummary, static function ($pill) {
+    return !empty($pill['active']);
+}));
+
+$reportFilterCollapseId = 'reportFilterDrawer';
+
 $reportHeroHighlights = [
     [
         'label' => 'Total Reports',
@@ -439,6 +479,155 @@ $reportHeroActions = [
         'variant' => 'outline'
     ],
 ];
+
+$catalogHref = static function (string $key, string $fallback = '#') use ($reportCatalog) {
+    return $reportCatalog[$key]['href'] ?? $fallback;
+};
+
+$monthlyReportButtons = [
+    [
+        'label' => 'Monthly Financial Snapshot',
+        'meta' => 'Modal + pop-out',
+        'accent' => 'sky',
+        'href' => $catalogHref('monthly_summary', 'reports/monthly_summary.php'),
+    ],
+    [
+        'label' => 'Actual vs Budget (Income)',
+        'meta' => 'Variance view',
+        'accent' => 'indigo',
+        'href' => $catalogHref('ytd_budget_comparison', 'reports/ytd_budget_comparison.php'),
+    ],
+    [
+        'label' => 'Member Dues Detail',
+        'meta' => 'Class + status',
+        'accent' => 'mint',
+        'href' => $catalogHref('monthly_income_report', 'reports/monthly_income_report.php'),
+    ],
+    [
+        'label' => 'Expense Watchlist',
+        'meta' => 'Variance >10%',
+        'accent' => 'sunset',
+        'href' => $catalogHref('expense_report', 'reports/expense_report.php'),
+    ],
+    [
+        'label' => 'Cash vs Forecast',
+        'meta' => 'Reconciliation aware',
+        'accent' => 'gold',
+        'href' => $catalogHref('cash_account_report', 'reports/cash_account_report.php'),
+    ],
+    [
+        'label' => 'Operations Checklist',
+        'meta' => 'Close tasks',
+        'accent' => 'slate',
+        'href' => $catalogHref('sources_uses', 'reports/sources_uses.php'),
+    ],
+];
+
+$ytdReportButtons = [
+    [
+        'label' => 'YTD Consolidated Statement',
+        'meta' => 'Interactive/PDF',
+        'accent' => 'sky',
+        'href' => $catalogHref('ytd_income_statement', 'reports/ytd_income_statement.php'),
+    ],
+    [
+        'label' => '13-Column Income Statement',
+        'meta' => 'Jan–Dec + total',
+        'accent' => 'indigo',
+        'href' => $catalogHref('ytd_income_statement_monthly', 'reports/ytd_income_statement_monthly.php'),
+    ],
+    [
+        'label' => 'Actual vs Budget (YTD)',
+        'meta' => 'Variance grid',
+        'accent' => 'mint',
+        'href' => $catalogHref('ytd_budget_comparison', 'reports/ytd_budget_comparison.php'),
+    ],
+    [
+        'label' => '13-Column Balance Sheet',
+        'meta' => 'Assets/Liabilities',
+        'accent' => 'sunset',
+        'href' => $catalogHref('balance_sheet', 'reports/balance_sheet.php'),
+    ],
+    [
+        'label' => 'YTD Expense Heatmap',
+        'meta' => 'Color-coded',
+        'accent' => 'gold',
+        'href' => $catalogHref('expense_report', 'reports/expense_report.php'),
+    ],
+    [
+        'label' => 'Rolling Cash Balance',
+        'meta' => 'Runway insight',
+        'accent' => 'slate',
+        'href' => $catalogHref('ytd_cash_flow_monthly', 'reports/ytd_cash_flow_monthly.php'),
+    ],
+];
+
+$reportQuickLinks = [
+    [
+        'label' => 'Compare Periods',
+        'url' => $catalogHref('ytd_budget_comparison', 'reports/ytd_budget_comparison.php'),
+    ],
+    [
+        'label' => 'Schedule Email',
+        'url' => 'reports/generate_report.php#schedule-email',
+    ],
+    [
+        'label' => 'Open KPI Builder',
+        'url' => 'reports/generate_report.php',
+    ],
+];
+
+$statementPeriodTimestamp = strtotime('first day of last month');
+if ($statementPeriodTimestamp === false) {
+    $statementPeriodTimestamp = time();
+}
+$statementPeriod = date('F Y', $statementPeriodTimestamp);
+$statementPreparedAt = date('M d, g:i A');
+$reportModalStatement = [
+    'title' => 'Monthly Income Statement · ' . $statementPeriod,
+    'context' => 'Filtered to Main Checking · Board-ready version',
+    'chips' => [
+        'Prepared ' . $statementPreparedAt,
+        'Source: Accounting Ledger',
+        'Review: Treasurer',
+    ],
+    'rows' => [
+        ['type' => 'section', 'label' => 'Income'],
+        ['type' => 'row', 'label' => 'Membership dues', 'current' => 4850],
+        ['type' => 'row', 'label' => 'Fundraising events', 'current' => 2800],
+        ['type' => 'row', 'label' => 'Grant revenue', 'current' => 1500],
+        ['type' => 'total', 'label' => 'Gross income', 'total' => 9150, 'line' => 'single'],
+        ['type' => 'section', 'label' => 'Operating expenses'],
+        ['type' => 'subsection', 'label' => 'Programs & outreach'],
+        ['type' => 'row', 'label' => 'Field day logistics', 'current' => -1250],
+        ['type' => 'row', 'label' => 'Repeater maintenance', 'current' => -640],
+        ['type' => 'row', 'label' => 'Instructor stipends', 'current' => -450],
+        ['type' => 'subsection', 'label' => 'Administration'],
+        ['type' => 'row', 'label' => 'Insurance', 'current' => -320],
+        ['type' => 'row', 'label' => 'Utilities', 'current' => -285],
+        ['type' => 'row', 'label' => 'Office supplies', 'current' => -90],
+        ['type' => 'total', 'label' => 'Total operating expenses', 'total' => -3035, 'line' => 'single'],
+        ['type' => 'total', 'label' => 'Operating income', 'total' => 6115, 'line' => 'double'],
+        ['type' => 'section', 'label' => 'Other income & expenses'],
+        ['type' => 'row', 'label' => 'Investment income', 'current' => 210],
+        ['type' => 'row', 'label' => 'Interest expense', 'current' => -95],
+        ['type' => 'total', 'label' => 'Net other income', 'total' => 115, 'line' => 'single'],
+        ['type' => 'total', 'label' => 'Net income', 'total' => 6230, 'line' => 'double', 'emphasis' => true],
+    ],
+    'notes' => [
+        'reminder' => 'Variance notes are required when +/- exceeds 8% or $1,000.',
+        'actions' => 'Attach maintenance invoices, schedule donor update call.',
+    ],
+];
+
+$formatStatementCurrency = static function ($value): string {
+    if ($value === null || $value === '') {
+        return '—';
+    }
+    $value = (float)$value;
+    $formatted = '$' . number_format(abs($value), 0);
+    return $value < 0 ? '(' . $formatted . ')' : $formatted;
+};
 
 $buildCollectionItems = static function (array $keys) use ($reportCatalog) {
     $items = [];
@@ -560,6 +749,424 @@ $page_title = "Reports Dashboard - W5OBM";
     <?php include __DIR__ . '/../include/header.php'; ?>
 
     <style>
+        .reports-dashboard-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .reports-card {
+            background-color: #fff;
+            border-radius: 1.25rem;
+            border: 1px solid #e4e9f2;
+            padding: 1.5rem;
+            box-shadow: 0 1.25rem 2.5rem -1.25rem rgba(15, 23, 42, 0.18);
+        }
+
+        .section-heading {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 1rem;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .section-heading h2 {
+            margin-bottom: 0;
+            font-size: 1.1rem;
+        }
+
+        .section-note {
+            color: #6c757d;
+            font-size: .9rem;
+            margin-bottom: 0;
+        }
+
+        .view-all-link {
+            font-weight: 600;
+            font-size: .9rem;
+            color: #0d6efd;
+            text-decoration: none;
+        }
+
+        .view-all-link:hover {
+            text-decoration: underline;
+        }
+
+        .quick-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: .75rem;
+        }
+
+        .quick-links a {
+            font-size: .85rem;
+            color: #0d6efd;
+            text-decoration: none;
+        }
+
+        .quick-links a:hover {
+            text-decoration: underline;
+        }
+
+        .filters-shell {
+            background: linear-gradient(135deg, rgba(13, 110, 253, 0.08), rgba(25, 135, 84, 0.08));
+            border: none;
+        }
+
+        .filters-summary {
+            display: flex;
+            flex-wrap: wrap;
+            gap: .75rem;
+            margin-top: 1rem;
+        }
+
+        .filter-count-badge {
+            font-size: .75rem;
+            letter-spacing: .08em;
+            text-transform: uppercase;
+        }
+
+        .filter-pill {
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid transparent;
+            border-radius: 999px;
+            padding: .35rem .95rem;
+            display: inline-flex;
+            align-items: center;
+            gap: .5rem;
+            font-size: .85rem;
+            color: #495057;
+        }
+
+        .filter-pill strong {
+            font-weight: 600;
+            font-size: .75rem;
+            text-transform: uppercase;
+            letter-spacing: .08em;
+            color: #6c757d;
+        }
+
+        .filter-pill.active {
+            border-color: rgba(13, 110, 253, 0.4);
+            background: rgba(13, 110, 253, 0.08);
+        }
+
+        .filter-pill-reset {
+            border: 0;
+            background: transparent;
+            color: #6c757d;
+            font-weight: bold;
+            font-size: 1rem;
+            line-height: 1;
+            padding: 0;
+        }
+
+        .filter-pill-reset:disabled {
+            opacity: .4;
+            cursor: not-allowed;
+        }
+
+        .filters-drawer {
+            margin-top: 1.25rem;
+        }
+
+        .filters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+            gap: 1rem;
+        }
+
+        .ghost-field {
+            background: rgba(255, 255, 255, 0.85);
+            border: 1px dashed #cfd6e3;
+            border-radius: .9rem;
+            padding: .85rem 1rem;
+        }
+
+        .ghost-field label {
+            display: block;
+            text-transform: uppercase;
+            letter-spacing: .08em;
+            font-size: .7rem;
+            color: #6c757d;
+            margin-bottom: .25rem;
+        }
+
+        .ghost-field span {
+            font-weight: 600;
+            color: #212529;
+        }
+
+        .filter-chip-tray {
+            margin: 1.25rem 0;
+        }
+
+        .filter-chip-collection {
+            display: flex;
+            flex-wrap: wrap;
+            gap: .85rem;
+        }
+
+        .filter-chip {
+            border: 1px solid rgba(13, 110, 253, 0.3);
+            border-radius: 1rem;
+            padding: .65rem 1rem;
+            background-color: #fff;
+            min-width: 180px;
+            text-align: left;
+            font-size: .85rem;
+            color: #0d6efd;
+            cursor: pointer;
+        }
+
+        .filter-chip span {
+            display: block;
+            font-weight: 600;
+        }
+
+        .filter-chip small {
+            display: block;
+            color: #6c757d;
+            font-size: .75rem;
+        }
+
+        .reports-kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1rem;
+        }
+
+        .kpi-card {
+            background: #f8f9fc;
+            border-radius: 1rem;
+            padding: 1rem;
+            border: 1px solid #e4e9f2;
+        }
+
+        .kpi-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .kpi-trend {
+            font-size: .85rem;
+            color: #6c757d;
+        }
+
+        .report-button-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1rem;
+        }
+
+        .report-button {
+            border-radius: 1rem;
+            padding: 1rem 1.25rem;
+            display: flex;
+            flex-direction: column;
+            gap: .4rem;
+            color: #fff;
+            text-decoration: none;
+            font-weight: 600;
+            min-height: 110px;
+            box-shadow: 0 1rem 2rem -1rem rgba(15, 23, 42, 0.35);
+            transition: transform .15s ease, box-shadow .15s ease;
+        }
+
+        .report-button span {
+            font-size: .9rem;
+            font-weight: 400;
+            opacity: .9;
+        }
+
+        .report-button:hover {
+            transform: translateY(-4px);
+            color: #fff;
+        }
+
+        .report-button.sky {
+            background: linear-gradient(135deg, #6fb1fc, #4364f7);
+        }
+
+        .report-button.indigo {
+            background: linear-gradient(135deg, #a18cd1, #5f72be);
+        }
+
+        .report-button.mint {
+            background: linear-gradient(135deg, #5efce8, #39b385);
+        }
+
+        .report-button.sunset {
+            background: linear-gradient(135deg, #ff9a9e, #f6416c);
+        }
+
+        .report-button.gold {
+            background: linear-gradient(135deg, #f6d365, #fda085);
+        }
+
+        .report-button.slate {
+            background: linear-gradient(135deg, #485563, #29323c);
+        }
+
+        .report-modal-shell {
+            display: flex;
+            justify-content: center;
+        }
+
+        .report-modal-frame {
+            width: min(100%, 960px);
+            background: #fff;
+            border-radius: 1.25rem;
+            border: 1px solid #e4e9f2;
+            padding: 1.5rem;
+            box-shadow: 0 2rem 3rem -1.5rem rgba(15, 23, 42, 0.3);
+        }
+
+        .statement-header {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 1rem;
+            align-items: center;
+            border-bottom: 1px solid #f1f3f5;
+            padding-bottom: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .statement-actions {
+            display: flex;
+            gap: .5rem;
+        }
+
+        .statement-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: .5rem;
+        }
+
+        .statement-chip {
+            background: #f1f3f5;
+            border-radius: 999px;
+            padding: .35rem .9rem;
+            font-size: .8rem;
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .statement-table-wrap {
+            margin-top: 1rem;
+            overflow-x: auto;
+        }
+
+        .statement-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: .9rem;
+        }
+
+        .statement-table.two-amount-columns th:nth-child(2),
+        .statement-table.two-amount-columns th:nth-child(3) {
+            width: 28%;
+        }
+
+        .statement-table thead th {
+            text-transform: uppercase;
+            font-size: .75rem;
+            letter-spacing: .08em;
+            color: #6c757d;
+            border-bottom: 2px solid #dee2e6;
+            padding-bottom: .5rem;
+        }
+
+        .statement-table td {
+            padding: .4rem 0;
+            border-bottom: 1px solid #f1f3f5;
+        }
+
+        .statement-section td {
+            padding-top: 1rem;
+            font-weight: 700;
+            font-size: .95rem;
+            border-bottom: 0;
+        }
+
+        .statement-subsection td {
+            padding-top: .6rem;
+            font-weight: 600;
+            color: #6c757d;
+            border-bottom: 0;
+        }
+
+        .statement-indent {
+            padding-left: 1.5rem;
+        }
+
+        .amount {
+            text-align: right;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .amount-income {
+            color: #198754;
+        }
+
+        .amount-expense {
+            color: #dc3545;
+        }
+
+        .statement-total td {
+            font-weight: 700;
+        }
+
+        .statement-line-single td {
+            border-top: 1px solid #212529;
+        }
+
+        .statement-line-double td {
+            border-top: 3px double #212529;
+        }
+
+        .statement-total-emphasis td {
+            font-size: 1rem;
+        }
+
+        .totals-cell {
+            text-align: right;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .statement-summary {
+            margin-top: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: .4rem;
+            background: #f8f9fa;
+            border-radius: .85rem;
+            padding: 1rem;
+        }
+
+        @media (max-width: 767.98px) {
+            .reports-card {
+                padding: 1.1rem;
+            }
+
+            .section-heading {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .filter-chip {
+                min-width: 140px;
+            }
+
+            .statement-actions {
+                width: 100%;
+                justify-content: flex-start;
+            }
+        }
+
         .report-collections-card .card-header {
             background: linear-gradient(92deg, rgba(13, 110, 253, 0.12), rgba(25, 135, 84, 0.12));
         }
@@ -825,47 +1432,272 @@ $page_title = "Reports Dashboard - W5OBM";
             </div>
         <?php endif; ?>
 
-        <div class="row mb-3 hero-summary-row">
-            <div class="col-md-3 col-sm-6 mb-3">
-                <div class="border rounded p-3 h-100 bg-light hero-summary-card">
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-                        <span class="text-muted small">Total Reports</span>
-                        <i class="fas fa-chart-line text-primary"></i>
+        <div class="reports-dashboard-grid mb-4">
+            <section class="reports-card filters-shell">
+                <div class="section-heading">
+                    <div>
+                        <h2 class="mb-1">Filters</h2>
+                        <p class="section-note mb-0">Summary pills stay visible; expand the drawer whenever you need precise controls.</p>
                     </div>
-                    <h4 class="mb-0"><?= number_format($total_reports_count) ?></h4>
-                    <small class="text-muted">All-time generated reports</small>
-                </div>
-            </div>
-            <div class="col-md-3 col-sm-6 mb-3">
-                <div class="border rounded p-3 h-100 bg-light hero-summary-card">
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-                        <span class="text-muted small">Last 30 Days</span>
-                        <i class="fas fa-clock text-success"></i>
+                    <div class="filters-toggle d-flex align-items-center gap-2">
+                        <span class="badge bg-light text-dark filter-count-badge"><?= $activeFilterCount ?> active</span>
+                        <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="collapse"
+                            data-bs-target="#<?= htmlspecialchars($reportFilterCollapseId) ?>"
+                            aria-expanded="<?= $activeFilterCount > 0 ? 'true' : 'false' ?>"
+                            aria-controls="<?= htmlspecialchars($reportFilterCollapseId) ?>">
+                            Adjust Filters
+                        </button>
                     </div>
-                    <h4 class="mb-0"><?= number_format($recent_reports_count) ?></h4>
-                    <small class="text-muted">Recent report activity</small>
                 </div>
-            </div>
-            <div class="col-md-3 col-sm-6 mb-3">
-                <div class="border rounded p-3 h-100 bg-light hero-summary-card">
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-                        <span class="text-muted small">Avg / Month</span>
-                        <i class="fas fa-chart-area text-info"></i>
+                <div class="filters-summary">
+                    <?php foreach ($reportFilterSummary as $pill): ?>
+                        <div class="filter-pill<?= !empty($pill['active']) ? ' active' : '' ?>">
+                            <strong><?= htmlspecialchars($pill['label']) ?></strong>
+                            <span><?= htmlspecialchars($pill['value'] ?: '—') ?></span>
+                            <?php if (!empty($pill['field'])): ?>
+                                <button type="button" class="filter-pill-reset" data-filter-field="<?= htmlspecialchars($pill['field']) ?>"
+                                    data-filter-default="<?= htmlspecialchars($pill['default']) ?>"
+                                    <?= !empty($pill['active']) ? '' : 'disabled' ?> aria-label="Reset <?= htmlspecialchars($pill['label']) ?> filter">
+                                    &times;
+                                </button>
+                            <?php endif; ?>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+                <div class="collapse filters-drawer<?= $activeFilterCount > 0 ? ' show' : '' ?>" id="<?= htmlspecialchars($reportFilterCollapseId) ?>">
+                    <div class="filters-grid mb-3">
+                        <div class="ghost-field">
+                            <label>Date Range</label>
+                            <span><?= htmlspecialchars($currentRangeLabel) ?></span>
+                        </div>
+                        <div class="ghost-field">
+                            <label>Report Type</label>
+                            <span><?= htmlspecialchars($activeTypeLabel) ?></span>
+                        </div>
+                        <div class="ghost-field">
+                            <label>Grouping</label>
+                            <span><?= htmlspecialchars($groupLabels[$filters['group']] ?? 'Disabled') ?></span>
+                        </div>
+                        <div class="ghost-field">
+                            <label>Keyword</label>
+                            <span><?= !empty($filters['search']) ? htmlspecialchars($filters['search']) : 'Not applied' ?></span>
+                        </div>
                     </div>
-                    <h4 class="mb-0"><?= number_format(round($avg_reports_per_month)) ?></h4>
-                    <small class="text-muted">Rolling 12-month average</small>
-                </div>
-            </div>
-            <div class="col-md-3 col-sm-6 mb-3">
-                <div class="border rounded p-3 h-100 bg-light hero-summary-card">
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-                        <span class="text-muted small">Filtered Results</span>
-                        <i class="fas fa-filter text-warning"></i>
+                    <div class="filter-chip-tray">
+                        <div class="filter-chip-collection">
+                            <button type="button" class="filter-chip report-chip" data-range="30">
+                                <span>Last 30 Days</span>
+                                <small>Recent activity</small>
+                            </button>
+                            <button type="button" class="filter-chip report-chip" data-range="90">
+                                <span>Quarter to Date</span>
+                                <small>Past 90 days</small>
+                            </button>
+                            <button type="button" class="filter-chip report-chip" data-range="ytd">
+                                <span>Year to Date</span>
+                                <small>Reset to Jan 1</small>
+                            </button>
+                            <?php foreach ($presetTypes as $type): ?>
+                                <button type="button" class="filter-chip report-chip" data-type="<?= htmlspecialchars($type) ?>">
+                                    <span><?= htmlspecialchars(ucwords(str_replace('_', ' ', $type))) ?></span>
+                                    <small>Type preset</small>
+                                </button>
+                            <?php endforeach; ?>
+                            <button type="button" class="filter-chip report-chip" data-clear="true">
+                                <span>Clear Presets</span>
+                                <small>Reset everything</small>
+                            </button>
+                        </div>
                     </div>
-                    <h4 class="mb-0"><?= number_format($filteredReportCount) ?></h4>
-                    <small class="text-muted">Matches current filters</small>
+                    <form method="GET" id="reportFilterForm" class="filters-form">
+                        <div class="row g-3">
+                            <div class="col-md-6 col-xl-3">
+                                <label for="type" class="form-label text-muted text-uppercase small mb-1">Report Type</label>
+                                <select id="type" name="type" class="form-select form-select-sm">
+                                    <option value="all" <?= $filters['type'] === 'all' ? 'selected' : '' ?>>All Types</option>
+                                    <?php foreach ($availableTypes as $type): ?>
+                                        <option value="<?= htmlspecialchars($type) ?>" <?= $filters['type'] === $type ? 'selected' : '' ?>>
+                                            <?= htmlspecialchars(ucwords(str_replace('_', ' ', $type))) ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+                            <div class="col-md-6 col-xl-3">
+                                <label for="range" class="form-label text-muted text-uppercase small mb-1">Date Range</label>
+                                <select id="range" name="range" class="form-select form-select-sm">
+                                    <option value="30" <?= $filters['range'] === '30' ? 'selected' : '' ?>>Last 30 Days</option>
+                                    <option value="90" <?= $filters['range'] === '90' ? 'selected' : '' ?>>Last 90 Days</option>
+                                    <option value="365" <?= $filters['range'] === '365' ? 'selected' : '' ?>>Last 12 Months</option>
+                                    <option value="ytd" <?= $filters['range'] === 'ytd' ? 'selected' : '' ?>>Year to Date</option>
+                                    <option value="all" <?= $filters['range'] === 'all' ? 'selected' : '' ?>>All Time</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 col-xl-3">
+                                <label for="sort" class="form-label text-muted text-uppercase small mb-1">Sort By</label>
+                                <select id="sort" name="sort" class="form-select form-select-sm">
+                                    <option value="generated_desc" <?= $filters['sort'] === 'generated_desc' ? 'selected' : '' ?>>Newest First</option>
+                                    <option value="generated_asc" <?= $filters['sort'] === 'generated_asc' ? 'selected' : '' ?>>Oldest First</option>
+                                    <option value="type_asc" <?= $filters['sort'] === 'type_asc' ? 'selected' : '' ?>>Type (A-Z)</option>
+                                    <option value="type_desc" <?= $filters['sort'] === 'type_desc' ? 'selected' : '' ?>>Type (Z-A)</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 col-xl-3">
+                                <label for="group" class="form-label text-muted text-uppercase small mb-1">Group By</label>
+                                <select id="group" name="group" class="form-select form-select-sm">
+                                    <option value="none" <?= $filters['group'] === 'none' ? 'selected' : '' ?>>Disabled</option>
+                                    <option value="type" <?= $filters['group'] === 'type' ? 'selected' : '' ?>>Report Type</option>
+                                    <option value="month" <?= $filters['group'] === 'month' ? 'selected' : '' ?>>Month Generated</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row g-3 mt-1">
+                            <div class="col-lg-8">
+                                <label for="search" class="form-label text-muted text-uppercase small mb-1">Keyword</label>
+                                <div class="input-group input-group-sm">
+                                    <span class="input-group-text"><i class="fas fa-search"></i></span>
+                                    <input type="text" id="search" name="search" class="form-control"
+                                        placeholder="Type, parameter, generated by" value="<?= htmlspecialchars($filters['search']) ?>">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-3 d-flex flex-column flex-sm-row align-items-stretch justify-content-between gap-2">
+                            <button type="button" class="btn btn-outline-secondary btn-sm" id="reportExportBtn">
+                                <i class="fas fa-file-export me-1"></i>Export
+                            </button>
+                            <div class="d-flex gap-2">
+                                <a href="reports_dashboard.php" class="btn btn-outline-secondary btn-sm"><i class="fas fa-times me-1"></i>Reset</a>
+                                <button type="submit" class="btn btn-primary btn-sm">
+                                    <i class="fas fa-search me-1"></i>Apply
+                                </button>
+                            </div>
+                        </div>
+                    </form>
                 </div>
-            </div>
+            </section>
+
+            <section class="reports-card">
+                <div class="section-heading">
+                    <h2 class="mb-1">Key Metrics</h2>
+                    <div class="quick-links">
+                        <?php foreach ($reportQuickLinks as $link): ?>
+                            <a href="<?= htmlspecialchars($link['url']) ?>" target="_blank" rel="noopener" data-report-launch="true">
+                                <?= htmlspecialchars($link['label']) ?>
+                            </a>
+                        <?php endforeach; ?>
+                    </div>
+                </div>
+                <div class="reports-kpi-grid">
+                    <?php foreach ($reportHeroHighlights as $highlight): ?>
+                        <div class="kpi-card">
+                            <h4><?= htmlspecialchars($highlight['label']) ?></h4>
+                            <div class="kpi-value"><?= htmlspecialchars($highlight['value']) ?></div>
+                            <div class="kpi-trend"><?= htmlspecialchars($highlight['meta']) ?></div>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            </section>
+
+            <section class="reports-card">
+                <div class="section-heading">
+                    <h2 class="mb-1">Monthly Reports</h2>
+                    <a class="view-all-link" href="reports/generate_report.php" target="_blank" rel="noopener" data-report-launch="true">View full list</a>
+                </div>
+                <p class="section-note">Core statements for each period; launch in a modal by default with options to pop out.</p>
+                <div class="report-button-grid">
+                    <?php foreach ($monthlyReportButtons as $button): ?>
+                        <a class="report-button <?= htmlspecialchars($button['accent']) ?>" href="<?= htmlspecialchars($button['href']) ?>" target="_blank" rel="noopener" data-report-launch="true">
+                            <?= htmlspecialchars($button['label']) ?>
+                            <span><?= htmlspecialchars($button['meta']) ?></span>
+                        </a>
+                    <?php endforeach; ?>
+                </div>
+            </section>
+
+            <section class="reports-card">
+                <div class="section-heading">
+                    <h2 class="mb-1">Monthly Income Statement · Modal Preview</h2>
+                    <span class="section-note">Selecting "Monthly Financial Snapshot" streams the PDF into this centered preview so underscores and totals remain faithful.</span>
+                </div>
+                <div class="report-modal-shell">
+                    <div class="report-modal-frame">
+                        <div class="statement-header">
+                            <div>
+                                <h3 class="mb-1"><?= htmlspecialchars($reportModalStatement['title']) ?></h3>
+                                <p class="annotation mb-0"><?= htmlspecialchars($reportModalStatement['context']) ?></p>
+                            </div>
+                            <div class="statement-actions">
+                                <button class="btn btn-outline-secondary btn-sm" type="button">Export CSV</button>
+                                <button class="btn btn-primary btn-sm" type="button">Share Link</button>
+                            </div>
+                        </div>
+                        <div class="statement-meta">
+                            <?php foreach ($reportModalStatement['chips'] as $chip): ?>
+                                <span class="statement-chip"><?= htmlspecialchars($chip) ?></span>
+                            <?php endforeach; ?>
+                        </div>
+                        <div class="statement-table-wrap">
+                            <table class="statement-table two-amount-columns">
+                                <thead>
+                                    <tr>
+                                        <th>Account</th>
+                                        <th>Current Month Activity</th>
+                                        <th>Totals &amp; Subtotals</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php foreach ($reportModalStatement['rows'] as $row): ?>
+                                        <?php if ($row['type'] === 'section'): ?>
+                                            <tr class="statement-section">
+                                                <td colspan="3"><?= htmlspecialchars($row['label']) ?></td>
+                                            </tr>
+                                        <?php elseif ($row['type'] === 'subsection'): ?>
+                                            <tr class="statement-subsection">
+                                                <td colspan="3"><?= htmlspecialchars($row['label']) ?></td>
+                                            </tr>
+                                        <?php elseif ($row['type'] === 'row'): ?>
+                                            <?php $currentValue = (float)($row['current'] ?? 0); ?>
+                                            <tr>
+                                                <td class="statement-indent"><?= htmlspecialchars($row['label']) ?></td>
+                                                <td class="amount <?= $currentValue < 0 ? 'amount-expense' : 'amount-income' ?>">
+                                                    <?= $formatStatementCurrency($currentValue) ?>
+                                                </td>
+                                                <td></td>
+                                            </tr>
+                                        <?php else: ?>
+                                            <?php $totalValue = (float)($row['total'] ?? 0); ?>
+                                            <tr class="statement-total statement-line-<?= htmlspecialchars($row['line'] ?? 'single') ?><?= !empty($row['emphasis']) ? ' statement-total-emphasis' : '' ?>">
+                                                <td><?= htmlspecialchars($row['label']) ?></td>
+                                                <td></td>
+                                                <td class="totals-cell"><?= $formatStatementCurrency($totalValue) ?></td>
+                                            </tr>
+                                        <?php endif; ?>
+                                    <?php endforeach; ?>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="statement-summary">
+                            <div><strong>Reminder:</strong> <?= htmlspecialchars($reportModalStatement['notes']['reminder']) ?></div>
+                            <div><strong>Next Actions:</strong> <?= htmlspecialchars($reportModalStatement['notes']['actions']) ?></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="reports-card">
+                <div class="section-heading">
+                    <h2 class="mb-1">YTD Reports</h2>
+                    <a class="view-all-link" href="reports/generate_report.php?preset=ytd" target="_blank" rel="noopener" data-report-launch="true">View full list</a>
+                </div>
+                <p class="section-note">Rolling fiscal views including 13-column variants and deeper variance analysis.</p>
+                <div class="report-button-grid">
+                    <?php foreach ($ytdReportButtons as $button): ?>
+                        <a class="report-button <?= htmlspecialchars($button['accent']) ?>" href="<?= htmlspecialchars($button['href']) ?>" target="_blank" rel="noopener" data-report-launch="true">
+                            <?= htmlspecialchars($button['label']) ?>
+                            <span><?= htmlspecialchars($button['meta']) ?></span>
+                        </a>
+                    <?php endforeach; ?>
+                </div>
+            </section>
         </div>
 
         <div class="card shadow-sm border-0 mb-4">
@@ -882,112 +1714,6 @@ $page_title = "Reports Dashboard - W5OBM";
                     data-bs-target="#reportInventoryCollapse" aria-expanded="false" aria-controls="reportInventoryCollapse">
                     <i class="fas fa-table me-1"></i>Browse Available Reports
                 </button>
-            </div>
-        </div>
-
-        <div class="card shadow mb-4 border-0">
-            <div class="card-header bg-primary text-white border-0">
-                <div class="row align-items-center">
-                    <div class="col">
-                        <h5 class="mb-0"><i class="fas fa-filter me-2"></i>Filter Reports</h5>
-                    </div>
-                    <div class="col-auto">
-                        <a href="reports_dashboard.php" class="btn btn-outline-light btn-sm"><i class="fas fa-times me-1"></i>Reset</a>
-                    </div>
-                </div>
-            </div>
-            <div class="card-body p-0">
-                <div class="row g-0 flex-column flex-lg-row">
-                    <div class="col-12 col-lg-3 border-bottom border-lg-bottom-0 border-lg-end bg-light-subtle p-3">
-                        <h6 class="text-uppercase small text-muted fw-bold mb-2">Preset Filters</h6>
-                        <p class="text-muted small mb-3">Jump to common time spans or popular report mixes.</p>
-                        <div class="d-grid gap-2">
-                            <button type="button" class="btn btn-outline-secondary btn-sm report-chip text-start" data-range="30">
-                                <span class="fw-semibold">Last 30 Days</span>
-                                <small class="d-block text-muted">Recent activity</small>
-                            </button>
-                            <button type="button" class="btn btn-outline-secondary btn-sm report-chip text-start" data-range="90">
-                                <span class="fw-semibold">Quarter to Date</span>
-                                <small class="d-block text-muted">Past 90 days</small>
-                            </button>
-                            <button type="button" class="btn btn-outline-secondary btn-sm report-chip text-start" data-range="ytd">
-                                <span class="fw-semibold">Year to Date</span>
-                                <small class="d-block text-muted">Reset to January 1</small>
-                            </button>
-                            <?php foreach ($presetTypes as $type): ?>
-                                <button type="button" class="btn btn-outline-secondary btn-sm report-chip text-start" data-type="<?= htmlspecialchars($type) ?>">
-                                    <span class="fw-semibold"><?= htmlspecialchars(ucwords(str_replace('_', ' ', $type))) ?></span>
-                                    <small class="d-block text-muted">Focus on type</small>
-                                </button>
-                            <?php endforeach; ?>
-                            <button type="button" class="btn btn-outline-secondary btn-sm report-chip text-start" data-clear="true">
-                                <span class="fw-semibold">Clear Presets</span>
-                                <small class="d-block text-muted">Reset filters & keyword</small>
-                            </button>
-                        </div>
-                    </div>
-                    <div class="col-12 col-lg-9 p-3 p-lg-4">
-                        <form method="GET" id="reportFilterForm">
-                            <div class="row row-cols-1 row-cols-md-2 g-3">
-                                <div class="col">
-                                    <label for="type" class="form-label text-muted text-uppercase small mb-1">Report Type</label>
-                                    <select id="type" name="type" class="form-select form-select-sm">
-                                        <option value="all" <?= $filters['type'] === 'all' ? 'selected' : '' ?>>All Types</option>
-                                        <?php foreach ($availableTypes as $type): ?>
-                                            <option value="<?= htmlspecialchars($type) ?>" <?= $filters['type'] === $type ? 'selected' : '' ?>>
-                                                <?= htmlspecialchars(ucwords(str_replace('_', ' ', $type))) ?>
-                                            </option>
-                                        <?php endforeach; ?>
-                                    </select>
-                                </div>
-                                <div class="col">
-                                    <label for="range" class="form-label text-muted text-uppercase small mb-1">Date Range</label>
-                                    <select id="range" name="range" class="form-select form-select-sm">
-                                        <option value="30" <?= $filters['range'] === '30' ? 'selected' : '' ?>>Last 30 Days</option>
-                                        <option value="90" <?= $filters['range'] === '90' ? 'selected' : '' ?>>Last 90 Days</option>
-                                        <option value="365" <?= $filters['range'] === '365' ? 'selected' : '' ?>>Last 12 Months</option>
-                                        <option value="ytd" <?= $filters['range'] === 'ytd' ? 'selected' : '' ?>>Year to Date</option>
-                                        <option value="all" <?= $filters['range'] === 'all' ? 'selected' : '' ?>>All Time</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="row row-cols-1 row-cols-md-2 g-3 mt-1">
-                                <div class="col">
-                                    <label for="sort" class="form-label text-muted text-uppercase small mb-1">Sort By</label>
-                                    <select id="sort" name="sort" class="form-select form-select-sm">
-                                        <option value="generated_desc" <?= $filters['sort'] === 'generated_desc' ? 'selected' : '' ?>>Newest First</option>
-                                        <option value="generated_asc" <?= $filters['sort'] === 'generated_asc' ? 'selected' : '' ?>>Oldest First</option>
-                                        <option value="type_asc" <?= $filters['sort'] === 'type_asc' ? 'selected' : '' ?>>Type (A-Z)</option>
-                                        <option value="type_desc" <?= $filters['sort'] === 'type_desc' ? 'selected' : '' ?>>Type (Z-A)</option>
-                                    </select>
-                                </div>
-                                <div class="col">
-                                    <label for="group" class="form-label text-muted text-uppercase small mb-1">Group By</label>
-                                    <select id="group" name="group" class="form-select form-select-sm">
-                                        <option value="none" <?= $filters['group'] === 'none' ? 'selected' : '' ?>>Disabled</option>
-                                        <option value="type" <?= $filters['group'] === 'type' ? 'selected' : '' ?>>Report Type</option>
-                                        <option value="month" <?= $filters['group'] === 'month' ? 'selected' : '' ?>>Month Generated</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="row mt-3">
-                                <div class="col-12 col-lg-8">
-                                    <label for="search" class="form-label text-muted text-uppercase small mb-1">Keyword</label>
-                                    <input type="text" id="search" name="search" class="form-control form-control-sm"
-                                        placeholder="Type, parameter, generated by" value="<?= htmlspecialchars($filters['search']) ?>">
-                                </div>
-                            </div>
-                            <div class="mt-3 d-flex flex-column flex-sm-row align-items-stretch justify-content-between gap-2">
-                                <button type="button" class="btn btn-outline-secondary btn-sm" id="reportExportBtn">
-                                    <i class="fas fa-file-export me-1"></i>Export
-                                </button>
-                                <button type="submit" class="btn btn-primary btn-sm">
-                                    <i class="fas fa-search me-1"></i>Apply
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
             </div>
         </div>
         <div class="collapse mb-4" id="reportGroupBuilderCollapse">
@@ -1538,6 +2264,7 @@ $page_title = "Reports Dashboard - W5OBM";
             const searchInput = document.getElementById('search');
             const exportBtn = document.getElementById('reportExportBtn');
             const presetButtons = document.querySelectorAll('.report-chip');
+            const filterResetButtons = document.querySelectorAll('.filter-pill-reset');
 
             presetButtons.forEach(function(btn) {
                 btn.addEventListener('click', function() {
@@ -1569,6 +2296,24 @@ $page_title = "Reports Dashboard - W5OBM";
                         rangeSelect.value = btn.dataset.range;
                     }
 
+                    submitFilterForm(form);
+                });
+            });
+
+            filterResetButtons.forEach(function(button) {
+                button.addEventListener('click', function() {
+                    if (!form || button.disabled) {
+                        return;
+                    }
+                    const fieldName = button.dataset.filterField;
+                    if (!fieldName) {
+                        return;
+                    }
+                    const defaultValue = button.dataset.filterDefault ?? '';
+                    const targetField = document.getElementById(fieldName);
+                    if (targetField) {
+                        targetField.value = defaultValue;
+                    }
                     submitFilterForm(form);
                 });
             });

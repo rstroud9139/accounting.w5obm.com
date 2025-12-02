@@ -29,6 +29,11 @@ if (!function_exists('loadEnvFile')) {
 // we rely solely on loadEnvFile here.
 loadEnvFile(__DIR__ . '/../config/.env');
 
+$allowDbFailure = false;
+if (PHP_SAPI === 'cli') {
+    $allowDbFailure = filter_var(getenv('ACCOUNTING_ALLOW_DB_FAILURE') ?: '0', FILTER_VALIDATE_BOOLEAN);
+}
+
 // Simple environment detection
 $is_local = (strpos($_SERVER['HTTP_HOST'] ?? '', 'localhost') !== false ||
     ($_SERVER['SERVER_ADDR'] ?? '') === '127.0.0.1');
@@ -48,14 +53,21 @@ if ($is_local) {
     $authDb     = $_ENV['AUTH_DB_NAME'] ?? 'w5obm';
 }
 
-if (!isset($conn) || $conn === null) {
-    $conn = new mysqli($authServer, $authUser, $authPass, $authDb);
+if (!isset($conn) || !$conn instanceof mysqli) {
+    $conn = @new mysqli($authServer, $authUser, $authPass, $authDb);
 
-    if ($conn->connect_error) {
-        die("Auth DB connection failed: " . $conn->connect_error);
+    if ($conn instanceof mysqli && $conn->connect_error) {
+        if ($allowDbFailure) {
+            error_log('[accounting] Auth DB connection failed but continuing: ' . $conn->connect_error);
+            $conn = null;
+        } else {
+            die("Auth DB connection failed: " . $conn->connect_error);
+        }
     }
 
-    $conn->set_charset("utf8");
+    if ($conn instanceof mysqli && !$conn->connect_error) {
+        $conn->set_charset("utf8");
+    }
 }
 
 // =====================================================================================
@@ -75,14 +87,19 @@ if ($is_local) {
 }
 
 try {
-    $accConn = new mysqli($accServer, $accUser, $accPass, $accDb);
-    if ($accConn->connect_error) {
-        // Do not hard-fail the app if accounting DB is unreachable; auth still works
+    $accConn = @new mysqli($accServer, $accUser, $accPass, $accDb);
+    if ($accConn instanceof mysqli && $accConn->connect_error) {
+        if ($allowDbFailure) {
+            error_log('[accounting] Accounting DB connection failed but continuing: ' . $accConn->connect_error);
+        }
         $accConn = null;
-    } else {
+    } elseif ($accConn instanceof mysqli) {
         $accConn->set_charset("utf8");
     }
 } catch (Exception $e) {
+    if ($allowDbFailure) {
+        error_log('[accounting] Accounting DB connection threw but continuing: ' . $e->getMessage());
+    }
     $accConn = null;
 }
 

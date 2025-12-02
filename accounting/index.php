@@ -191,7 +191,7 @@ accounting_head_assets();
                 'actions' => [
                     [
                         'label' => 'Enter Transactions',
-                        'url' => '/accounting/transactions/',
+                        'url' => route('transactions'),
                         'icon' => 'fa-table'
                     ],
                     [
@@ -223,10 +223,10 @@ accounting_head_assets();
                             <p class="text-white-50 mb-0 small"><?= htmlspecialchars($APP_DESCRIPTION); ?></p>
                         </div>
                         <div class="d-flex gap-2">
-                            <a href="/accounting/transactions/add.php" class="btn btn-success btn-sm">
+                            <a href="<?= route('transaction_new'); ?>" class="btn btn-success btn-sm">
                                 <i class="fas fa-plus-circle me-1"></i>New Transaction
                             </a>
-                            <a href="/accounting/reports/" class="btn btn-outline-light btn-sm">
+                            <a href="/accounting/reports_dashboard.php" class="btn btn-outline-light btn-sm">
                                 <i class="fas fa-chart-line me-1"></i>Quick Reports
                             </a>
                         </div>
@@ -244,7 +244,7 @@ accounting_head_assets();
                             <span class="text-muted text-uppercase small">Workspace</span>
                         </div>
                         <div class="list-group list-group-flush">
-                            <a href="/accounting/transactions/" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                            <a href="<?= route('transactions'); ?>" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
                                 <span><i class="fas fa-exchange-alt me-2 text-primary"></i>Transactions</span>
                                 <i class="fas fa-chevron-right small text-muted"></i>
                             </a>
@@ -270,7 +270,7 @@ accounting_head_assets();
                             <a href="/accounting/categories/" class="list-group-item list-group-item-action">
                                 <i class="fas fa-tags me-2"></i>Categories
                             </a>
-                            <a href="/accounting/ledger/" class="list-group-item list-group-item-action">
+                            <a href="<?= route('accounts'); ?>" class="list-group-item list-group-item-action">
                                 <i class="fas fa-book me-2"></i>Chart of Accounts
                             </a>
                             <a href="/accounting/admin/utilities.php" class="list-group-item list-group-item-action">

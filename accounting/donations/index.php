@@ -9,6 +9,7 @@ require_once __DIR__ . '/../lib/helpers.php';
 require_once __DIR__ . '/../controllers/donation_controller.php';
 require_once __DIR__ . '/../views/donationWorkspace.php';
 require_once __DIR__ . '/../../include/premium_hero.php';
+require_once __DIR__ . '/../include/accounting_nav_helpers.php';
 
 if (!isAuthenticated()) {
   header('Location: /authentication/login.php');
@@ -22,7 +23,7 @@ $canManage = hasPermission($userId, 'accounting_manage');
 
 if (!$canView) {
   setToastMessage('danger', 'Access Denied', 'You do not have permission to view donations.', 'club-logo');
-  header('Location: /accounting/dashboard.php');
+  header('Location: ' . route('dashboard'));
   exit();
 }
 
@@ -201,7 +202,7 @@ $donationHeroActions = array_values(array_filter([
   ],
   [
     'label' => 'Back to Dashboard',
-    'url' => '/accounting/dashboard.php',
+    'url' => route('dashboard'),
     'variant' => 'outline',
     'icon' => 'fa-arrow-left'
   ],
@@ -295,11 +296,11 @@ $donationHeroActions = array_values(array_filter([
               <span class="text-muted text-uppercase small">Workspace</span>
             </div>
             <div class="list-group list-group-flush">
-              <a href="/accounting/dashboard.php" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+              <a href="<?= route('dashboard'); ?>" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
                 <span><i class="fas fa-chart-pie me-2 text-primary"></i>Dashboard</span>
                 <i class="fas fa-chevron-right small text-muted"></i>
               </a>
-              <a href="/accounting/transactions/transactions.php" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+              <a href="<?= route('transactions'); ?>" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
                 <span><i class="fas fa-exchange-alt me-2 text-success"></i>Transactions</span>
                 <i class="fas fa-chevron-right small text-muted"></i>
               </a>
@@ -307,7 +308,7 @@ $donationHeroActions = array_values(array_filter([
                 <span><i class="fas fa-chart-bar me-2 text-info"></i>Reports</span>
                 <i class="fas fa-chevron-right small text-muted"></i>
               </a>
-              <a href="/accounting/ledger/" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+              <a href="<?= route('accounts'); ?>" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
                 <span><i class="fas fa-book me-2 text-warning"></i>Chart of Accounts</span>
                 <i class="fas fa-chevron-right small text-muted"></i>
               </a>

@@ -15,13 +15,15 @@ class AccountRepository
 
     private function tableExists($table)
     {
-        $stmt = $this->conn->prepare("SHOW TABLES LIKE ?");
-        $stmt->bind_param('s', $table);
-        if ($stmt->execute()) {
-            $res = $stmt->get_result();
-            return $res && $res->num_rows > 0;
+        $table = trim((string)$table);
+        if ($table === '') {
+            return false;
         }
-        return false;
+
+        $pattern = $this->conn->real_escape_string($table);
+        $sql = "SHOW TABLES LIKE '{$pattern}'";
+        $result = $this->conn->query($sql);
+        return $result && $result->num_rows > 0;
     }
 
     public function getAll()

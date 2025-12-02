@@ -6,6 +6,14 @@ require_once __DIR__ . '/../../include/dbconn.php';
 require_once __DIR__ . '/../lib/helpers.php';
 require_once __DIR__ . '/../../include/premium_hero.php';
 
+if (!function_exists('route')) {
+    function route(string $name, array $params = []): string
+    {
+        $query = http_build_query(array_merge(['route' => $name], $params));
+        return '/accounting/app/index.php?' . $query;
+    }
+}
+
 if (!isAuthenticated()) {
     setToastMessage('info', 'Login Required', 'Please login to access the accounting admin utilities.', 'fas fa-lock');
     header('Location: /authentication/login.php');
@@ -15,7 +23,7 @@ if (!isAuthenticated()) {
 $user_id = getCurrentUserId();
 if (!hasPermission($user_id, 'accounting_manage')) {
     setToastMessage('danger', 'Access Denied', 'Only accounting managers can run admin utilities.', 'fas fa-shield-alt');
-    header('Location: /accounting/dashboard.php');
+    header('Location: ' . route('dashboard'));
     exit();
 }
 
@@ -32,7 +40,7 @@ $utilityLinks = [
     [
         'title' => 'Data Imports',
         'description' => 'Stage QuickBooks/gnuCash files, map accounts, and post staged batches.',
-        'url' => '../imports.php',
+        'url' => route('import'),
         'icon' => 'fa-file-import',
         'impact' => 'Workflow'
     ],
@@ -78,13 +86,13 @@ $heroHighlights = [
 $heroActions = [
     [
         'label' => 'Back to Dashboard',
-        'url' => '/accounting/dashboard.php',
+        'url' => route('dashboard'),
         'variant' => 'outline',
         'icon' => 'fa-arrow-left'
     ],
     [
         'label' => 'View Ledger',
-        'url' => '/accounting/ledger/',
+        'url' => route('accounts'),
         'variant' => 'outline',
         'icon' => 'fa-book'
     ],

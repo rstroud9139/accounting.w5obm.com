@@ -3,7 +3,7 @@ require_once __DIR__ . '/../utils/session_manager.php';
 require_once __DIR__ . '/../../include/dbconn.php';
 require_once __DIR__ . '/../lib/helpers.php';
 require_once __DIR__ . '/../controllers/budgetController.php';
-require_once __DIR__ . '/../controllers/ledgerController.php';
+require_once __DIR__ . '/../app/repositories/AccountRepository.php';
 require_once __DIR__ . '/../../include/premium_hero.php';
 
 validate_session();
@@ -100,10 +100,41 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-$allAccounts = getAllLedgerAccounts([], ['order_by' => 'a.account_type ASC, a.account_number ASC']);
+$dbConn = accounting_db_connection();
+$accountRepository = new AccountRepository($dbConn);
+$rawAccounts = $accountRepository->getAll();
+$namesById = [];
+foreach ($rawAccounts as $row) {
+    $namesById[(int)($row['id'] ?? 0)] = $row['name'] ?? '';
+}
+
+$allAccounts = [];
+foreach ($rawAccounts as $row) {
+    $isActive = (int)($row['is_active'] ?? 1) === 1;
+    if (!$isActive) {
+        continue;
+    }
+    $parentId = isset($row['parent_id']) && (int)$row['parent_id'] > 0 ? (int)$row['parent_id'] : null;
+    $allAccounts[] = [
+        'id' => (int)($row['id'] ?? 0),
+        'account_number' => $row['code'] ?? '',
+        'account_type' => $row['type'] ?? 'Other',
+        'name' => $row['name'] ?? '',
+        'parent_account_id' => $parentId,
+        'parent_account_name' => $parentId && isset($namesById[$parentId]) ? $namesById[$parentId] : null,
+    ];
+}
+
+usort($allAccounts, static function ($a, $b) {
+    $keyA = ($a['account_type'] ?? '') . '|' . ($a['account_number'] ?? '') . '|' . ($a['name'] ?? '');
+    $keyB = ($b['account_type'] ?? '') . '|' . ($b['account_number'] ?? '') . '|' . ($b['name'] ?? '');
+    return $keyA <=> $keyB;
+});
+
 $groupedAccounts = [];
 foreach ($allAccounts as $account) {
-    $groupedAccounts[$account['account_type']][] = $account;
+    $groupKey = $account['account_type'] ?? 'Other';
+    $groupedAccounts[$groupKey][] = $account;
 }
 
 $lineMap = $budget['lines'] ?? [];
@@ -148,7 +179,7 @@ include __DIR__ . '/../../include/header.php';
             'title' => $budgetId ? 'Update Budget Plan' : 'Create Budget Plan',
             'subtitle' => 'Align allocations to every ledger line for full accountability.',
             'description' => 'Track annual targets by account and keep leadership synced with your fiscal roadmap.',
-            'theme' => 'emerald',
+            'theme' => 'midnight',
             'size' => 'compact',
             'highlights' => [
                 ['label' => 'Fiscal Year', 'value' => $budget['fiscal_year'] ?? $currentYear, 'meta' => 'Active plan'],

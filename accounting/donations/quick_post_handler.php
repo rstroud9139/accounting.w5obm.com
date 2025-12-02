@@ -14,7 +14,7 @@ if (session_status() === PHP_SESSION_NONE) {
 require_once __DIR__ . '/../../include/dbconn.php';
 require_once __DIR__ . '/../lib/helpers.php';
 require_once __DIR__ . '/../controllers/donation_controller.php';
-require_once __DIR__ . '/../controllers/transactionController.php';
+require_once __DIR__ . '/../app/repositories/TransactionRepository.php';
 require_once __DIR__ . '/../utils/csrf.php';
 $db = accounting_db_connection();
 
@@ -155,15 +155,19 @@ try {
 
     // Post the transaction
     $transaction_description = $description . ($notes ? ' - ' . substr($notes, 0, 50) : '');
-    $transactionOk = add_transaction(
-        $category_id,
-        $amount,
-        $donation_date,
-        $transaction_description,
-        'Income',
-        $deposit_account_id,
-        null // no vendor for cash donations
-    );
+    $transactionRepo = new TransactionRepository($db);
+    $transactionPayload = [
+        'transaction_date' => $donation_date,
+        'type' => 'Income',
+        'category_id' => $category_id,
+        'amount' => $amount,
+        'description' => $transaction_description,
+        'notes' => $notes,
+        'reference_number' => 'QPOST-' . date('Ymd') . '-' . $donation_id,
+        'cash_account_id' => $deposit_account_id,
+        'offset_account_id' => null,
+    ];
+    $transactionOk = $transactionRepo->createWithPosting($transactionPayload, []);
 
     if (!$transactionOk) {
         // Log warning but don't fail the donation

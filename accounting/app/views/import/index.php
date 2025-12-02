@@ -6,7 +6,7 @@
 ?>
 <div class="card">
     <div class="card-header d-flex align-items-center justify-content-between">
-        <span><i class="fas fa-file-import me-2"></i>Import Transactions</span>
+        <span><i class="fas fa-seedling me-2"></i>Ledger Data Builder</span>
         <div class="no-print">
             <a href="<?= route('dashboard') ?>" class="btn btn-sm btn-outline-secondary"><i class="fas fa-home me-1"></i>Dashboard</a>
         </div>
@@ -19,12 +19,15 @@
             <div class="alert alert-success"><i class="fas fa-check-circle me-2"></i><?= htmlspecialchars($success) ?></div>
         <?php endif; ?>
 
+        <p class="text-muted mb-3">Normalize external exports (bank CSVs, QuickBooks IIF, GnuCash books, and more) into transactions plus suggested chart-of-accounts and category entries. The preview step lets you verify every row before anything posts to the ledger.</p>
+        <div class="alert alert-secondary"><i class="fas fa-layer-group me-2"></i>The importer will stage transactions, infer new accounts/categories, detect duplicates, and only commit once you approve the preview. If you are redirected to login during preview, your session likely expired—sign in again and re-upload.</div>
+
         <form action="<?= route('import_upload') ?>" method="post" enctype="multipart/form-data" class="row g-3">
             <?= csrf_input() ?>
             <div class="col-12">
                 <label for="import_file" class="form-label">File</label>
                 <input type="file" class="form-control" id="import_file" name="import_file" required>
-                <div class="form-text">Supported: CSV, QIF, OFX/QBO/QFX, IIF. Type can be auto-detected.</div>
+                <div class="form-text">Supported: CSV, QIF, OFX/QBO/QFX, QuickBooks IIF, and GnuCash saved books (.gnucash). Type can be auto-detected.</div>
             </div>
             <div class="col-md-4">
                 <label for="import_type" class="form-label">Type</label>
@@ -34,6 +37,7 @@
                     <option value="qif">QIF</option>
                     <option value="ofx">OFX/QBO/QFX</option>
                     <option value="iif">QuickBooks IIF</option>
+                    <option value="gnucash">GnuCash Saved Book</option>
                 </select>
             </div>
             <div class="col-md-4">
@@ -69,11 +73,11 @@
                 </select>
             </div>
             <div class="col-12">
-                <button type="submit" class="btn btn-primary"><i class="fas fa-search me-2"></i>Preview</button>
+                <button type="submit" class="btn btn-primary"><i class="fas fa-search me-2"></i>Stage &amp; Preview</button>
             </div>
         </form>
 
         <hr>
-        <p class="text-muted small mb-0">Tip: You can assign defaults for Income vs Expense. You’ll have a chance to review before importing.</p>
+        <p class="text-muted small mb-0">Tip: Defaults here are only used when the source data leaves a category blank—the preview still lets you refine every record.</p>
     </div>
 </div>

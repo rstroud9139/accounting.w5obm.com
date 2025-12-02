@@ -10,7 +10,7 @@ require_once __DIR__ . '/../../include/helper_functions.php';
 require_once __DIR__ . '/../utils/csrf.php';
 require_once __DIR__ . '/../utils/quick_post.php';
 require_once __DIR__ . '/../controllers/donation_controller.php';
-require_once __DIR__ . '/../controllers/transactionController.php';
+require_once __DIR__ . '/../app/repositories/TransactionRepository.php';
 
 function accounting_quick_cash_response(int $status, array $payload): void
 {
@@ -110,7 +110,19 @@ try {
         throw new RuntimeException('Failed to save donation record.');
     }
 
-    $transactionId = add_transaction($categoryId, $amount, $donationDate, $description, 'Income', $accountId);
+    $transactionRepo = new TransactionRepository($conn instanceof mysqli ? $conn : null);
+    $transactionPayload = [
+        'transaction_date' => $donationDate,
+        'type' => 'Income',
+        'category_id' => $categoryId,
+        'amount' => $amount,
+        'description' => $description,
+        'notes' => $notes,
+        'reference_number' => 'QCASH-' . date('Ymd') . '-' . strtoupper(bin2hex(random_bytes(2))),
+        'cash_account_id' => $accountId,
+        'offset_account_id' => null,
+    ];
+    $transactionId = $transactionRepo->createWithPosting($transactionPayload, []);
     if (!$transactionId) {
         throw new RuntimeException('Failed to post ledger entry.');
     }

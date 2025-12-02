@@ -18,65 +18,8 @@ if (!function_exists('recon_format_short_date')) {
         }
         $ts = strtotime($date);
         if (!$ts) {
-            return (string)$date;
-        }
-        return date('M d', $ts);
-    }
-}
-$unclearedDisplay = $workspace['uncleared']['display'] ?? [];
-$clearedDisplay = $workspace['cleared']['display'] ?? [];
-$statusMessage = $workspace['status'] ?? null;
-?>
-
-<div class="recon-workspace">
-    <?php if (!empty($_GET['success'])): ?>
-        <div class="alert alert-success"><i class="fas fa-check me-2"></i><?= htmlspecialchars($_GET['success']) ?></div>
-    <?php endif; ?>
-    <?php if (!empty($error)): ?>
-        <div class="alert alert-danger"><i class="fas fa-exclamation-triangle me-2"></i><?= htmlspecialchars($error) ?></div>
-    <?php endif; ?>
-    <?php if (!$has_double): ?>
-        <div class="alert alert-warning"><i class="fas fa-info-circle me-2"></i>Reconciliation requires the double-entry journal tables. Please run migrations.</div>
-    <?php endif; ?>
-
-    <section class="recon-hero">
-        <div class="recon-hero-header">
-            <div>
-                <h1>Reconciliation Workspace</h1>
-                <p class="annotation">Guided three-step flow to lock statements, clear transactions, and document adjustments.</p>
-            </div>
-            <div class="status-pill <?= htmlspecialchars($active['status_class'] ?? 'neutral') ?>">
-                <?= htmlspecialchars($active['status_label'] ?? 'Setup Required') ?>
-                <?php if (!empty($active['progress_label'])): ?>
-                    <span> · <?= htmlspecialchars($active['progress_label']) ?></span>
-                <?php endif; ?>
-            </div>
-        </div>
-        <div class="recon-hero-body">
-            <div>
-                <h2><?= htmlspecialchars($hasActive ? $active['statement_title'] : 'Select a statement to begin') ?></h2>
-                <p class="annotation" style="color:rgba(255,255,255,0.75);">Statement ending balance is locked once reconciliation begins. Any delta must be resolved with adjustments plus audit trail.</p>
-            </div>
-            <div>
-                <span class="hero-meta-label">Open Since</span>
-                <div class="hero-meta-value"><?= htmlspecialchars($hasActive ? $active['open_since'] : '—') ?></div>
-            </div>
-        </div>
-        <div class="progress-ribbon" aria-label="<?= htmlspecialchars($active['progress_label'] ?? '0% cleared') ?>">
-            <div class="progress-ribbon-fill" style="width:<?= $progressPercent ?>%;"></div>
-        </div>
-        <div class="hero-meta">
-            <div class="hero-meta-block">
-                <div class="hero-meta-label">Statement Ending Balance</div>
-                <div class="hero-meta-value"><?= $fmtMoney($active['statement_balance'] ?? 0) ?></div>
-            </div>
-            <div class="hero-meta-block">
-                <div class="hero-meta-label">Ledger Balance</div>
-                <div class="hero-meta-value"><?= $fmtMoney($active['ledger_balance'] ?? 0) ?></div>
-            </div>
-            <div class="hero-meta-block">
-                <div class="hero-meta-label">Difference</div>
-                <div class="hero-meta-value"><?= $fmtMoney($active['difference'] ?? 0) ?></div>
+                    </div>
+                </div>
             </div>
             <div class="hero-meta-block">
                 <div class="hero-meta-label">Last Cleared</div>

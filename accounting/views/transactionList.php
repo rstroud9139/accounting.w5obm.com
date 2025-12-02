@@ -161,23 +161,23 @@ if (!function_exists('renderTransactionList')) {
         $today = date('Y-m-d');
         $addFields = renderTransactionModalFields($categories, $accounts, $vendors, 'add_', ['transaction_date' => $today]);
         $editFields = renderTransactionModalFields($categories, $accounts, $vendors, 'edit_');
+        $filterCollapseId = 'transactionsFilterCollapse';
     ?>
 
         <!-- Filters Card -->
         <div class="card shadow mb-4 border-0">
-            <div class="card-header bg-primary text-white border-0">
-                <div class="row align-items-center">
-                    <div class="col">
-                        <h5 class="mb-0"><i class="fas fa-filter me-2"></i>Filter Transactions</h5>
-                    </div>
-                    <div class="col-auto">
-                        <button type="button" class="btn btn-outline-light btn-sm" id="clearFilters">
-                            <i class="fas fa-times me-1"></i>Clear All
-                        </button>
-                    </div>
+            <div class="card-header bg-primary text-white border-0 d-flex flex-wrap justify-content-between align-items-center gap-2">
+                <h5 class="mb-0"><i class="fas fa-filter me-2"></i>Filter Transactions</h5>
+                <div class="d-flex flex-wrap gap-2">
+                    <button type="button" class="btn btn-outline-light btn-sm" id="clearFilters">
+                        <i class="fas fa-times me-1"></i>Clear All
+                    </button>
+                    <button type="button" class="btn btn-light btn-sm text-primary" data-bs-toggle="collapse" data-bs-target="#<?= $filterCollapseId ?>" aria-expanded="true" aria-controls="<?= $filterCollapseId ?>">
+                        <i class="fas fa-chevron-down me-1"></i>Toggle Filters
+                    </button>
                 </div>
             </div>
-            <div class="card-body p-0">
+            <div class="card-body p-0 collapse show" id="<?= $filterCollapseId ?>">
                 <div class="row g-0 flex-column flex-lg-row">
                     <div class="col-12 col-lg-3 border-bottom border-lg-bottom-0 border-lg-end bg-light-subtle p-3">
                         <h6 class="text-uppercase small text-muted fw-bold mb-2">Preset Filters</h6>

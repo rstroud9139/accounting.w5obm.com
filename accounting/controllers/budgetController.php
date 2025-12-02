@@ -109,10 +109,10 @@ if (!function_exists('fetchBudgets')) {
         $whereSql = empty($where) ? '' : 'WHERE ' . implode(' AND ', $where);
 
         $queryParts = [
-            'SELECT b.*',
-            '       COALESCE(SUM(l.annual_amount), 0) AS allocated_amount',
-            '       COUNT(l.id) AS line_count',
-            '       u.username AS created_by_name',
+            'SELECT b.*,',
+            '       COALESCE(SUM(l.annual_amount), 0) AS allocated_amount,',
+            '       COUNT(l.id) AS line_count,',
+            '       u.username AS created_by_name,',
             '       uu.username AS updated_by_name',
             'FROM acc_budget_plans b',
             'LEFT JOIN acc_budget_plan_lines l ON b.id = l.budget_id',
